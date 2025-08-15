@@ -1,0 +1,48 @@
+name: UX Specification Audit
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'uxspec.json'
+      - 'app/**'
+      - 'apps/**'
+
+jobs:
+  audit:
+    name: Run FlowLock Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run FlowLock audit
+        uses: ./action/uxcg-action
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const results = fs.readFileSync('artifacts/results.junit.xml', 'utf8');
+            
+            // Parse results and create comment
+            const comment = `## 🔍 FlowLock Audit Results
+            
+            Artifacts have been generated and uploaded.
+            
+            - [Download ER Diagram](../actions/runs/${{ github.run_id }})
+            - [Download Flow Diagram](../actions/runs/${{ github.run_id }})
+            - [Download Screen Inventory](../actions/runs/${{ github.run_id }})
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

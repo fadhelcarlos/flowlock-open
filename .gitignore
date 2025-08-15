@@ -1,0 +1,21 @@
+# deps
+node_modules/
+**/node_modules/
+.pnpm-store/
+.pnp.*
+# build output
+dist/
+**/dist/
+artifacts/
+.next/
+out/
+coverage/
+# env & misc
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+# editor
+.vscode/
+.idea/

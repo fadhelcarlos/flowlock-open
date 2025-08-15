@@ -1,0 +1,155 @@
+export const starterSpec = {
+  version: '1.0.0',
+  name: 'My UX Specification',
+  roles: [
+    {
+      id: 'admin',
+      name: 'Administrator',
+      permissions: ['create', 'read', 'update', 'delete'],
+    },
+    {
+      id: 'user',
+      name: 'User',
+      permissions: ['read', 'update'],
+    },
+  ],
+  entities: [
+    {
+      id: 'user',
+      name: 'User',
+      fields: [
+        { id: 'id', name: 'ID', type: 'string', required: true },
+        { id: 'email', name: 'Email', type: 'email', required: true },
+        { id: 'name', name: 'Name', type: 'string', required: true },
+        { id: 'role', name: 'Role', type: 'string' },
+        { id: 'createdAt', name: 'Created At', type: 'date', derived: true, provenance: 'system.timestamp' },
+      ],
+    },
+    {
+      id: 'product',
+      name: 'Product',
+      fields: [
+        { id: 'id', name: 'ID', type: 'string', required: true },
+        { id: 'name', name: 'Name', type: 'string', required: true },
+        { id: 'description', name: 'Description', type: 'text' },
+        { id: 'price', name: 'Price', type: 'number', required: true },
+        { id: 'stock', name: 'Stock', type: 'number', external: true, source: 'inventory.api' },
+      ],
+    },
+  ],
+  screens: [
+    {
+      id: 'user_list',
+      name: 'User List',
+      type: 'list',
+      entityId: 'user',
+      reads: ['user.id', 'user.name', 'user.email', 'user.role'],
+    },
+    {
+      id: 'user_detail',
+      name: 'User Detail',
+      type: 'detail',
+      entityId: 'user',
+      reads: ['user.id', 'user.name', 'user.email', 'user.role', 'user.createdAt'],
+    },
+    {
+      id: 'user_create',
+      name: 'Create User',
+      type: 'form',
+      entityId: 'user',
+      forms: [
+        {
+          id: 'create_user_form',
+          entityId: 'user',
+          type: 'create',
+          fields: [
+            { fieldId: 'email', label: 'Email Address' },
+            { fieldId: 'name', label: 'Full Name' },
+            { fieldId: 'role', label: 'User Role' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'user_success',
+      name: 'User Created',
+      type: 'success',
+    },
+    {
+      id: 'product_list',
+      name: 'Product Catalog',
+      type: 'list',
+      entityId: 'product',
+      reads: ['product.id', 'product.name', 'product.price', 'product.stock'],
+    },
+    {
+      id: 'product_detail',
+      name: 'Product Detail',
+      type: 'detail',
+      entityId: 'product',
+      reads: ['product.id', 'product.name', 'product.description', 'product.price', 'product.stock'],
+    },
+  ],
+  flows: [
+    {
+      id: 'create_user_flow',
+      name: 'Create User Flow',
+      entryStepId: 'step_1',
+      roles: ['admin'],
+      steps: [
+        {
+          id: 'step_1',
+          screenId: 'user_list',
+          next: [{ targetStepId: 'step_2' }],
+        },
+        {
+          id: 'step_2',
+          screenId: 'user_create',
+          next: [{ targetStepId: 'step_3' }],
+        },
+        {
+          id: 'step_3',
+          screenId: 'user_success',
+          next: [{ targetStepId: 'step_4' }],
+        },
+        {
+          id: 'step_4',
+          screenId: 'user_detail',
+        },
+      ],
+    },
+    {
+      id: 'browse_products_flow',
+      name: 'Browse Products',
+      entryStepId: 'browse_1',
+      roles: ['user', 'admin'],
+      steps: [
+        {
+          id: 'browse_1',
+          screenId: 'product_list',
+          next: [{ targetStepId: 'browse_2' }],
+        },
+        {
+          id: 'browse_2',
+          screenId: 'product_detail',
+        },
+      ],
+    },
+  ],
+  policies: [
+    {
+      id: 'auth_required',
+      name: 'Authentication Required',
+      type: 'security',
+      rule: 'All screens except login require authentication',
+      severity: 'error',
+    },
+    {
+      id: 'email_unique',
+      name: 'Email Uniqueness',
+      type: 'validation',
+      rule: 'User email must be unique across the system',
+      severity: 'error',
+    },
+  ],
+};

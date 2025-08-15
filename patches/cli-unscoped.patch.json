@@ -1,0 +1,6 @@
+{
+  "name": "flowlock-uxcg",
+  "bin": { "uxcg": "dist/index.js" },
+  "publishConfig": { "access": "public" },
+  "private": false
+}

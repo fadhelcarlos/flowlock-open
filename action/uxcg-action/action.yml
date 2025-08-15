@@ -1,0 +1,52 @@
+name: 'FlowLock UX Audit'
+description: 'Run FlowLock UX specification checks and upload artifacts'
+author: 'FlowLock Team'
+
+inputs:
+  working-directory:
+    description: 'Working directory for the audit'
+    required: false
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: pnpm install --frozen-lockfile
+
+    - name: Run FlowLock audit
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: pnpm -w uxcg audit
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: flowlock-artifacts
+        path: |
+          ${{ inputs.working-directory }}/artifacts/er.svg
+          ${{ inputs.working-directory }}/artifacts/flow.svg
+          ${{ inputs.working-directory }}/artifacts/screens.csv
+          ${{ inputs.working-directory }}/artifacts/results.junit.xml
+        retention-days: 30
+
+    - name: Report test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: FlowLock Check Results
+        path: ${{ inputs.working-directory }}/artifacts/results.junit.xml
+        reporter: java-junit

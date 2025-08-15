@@ -1,0 +1,11 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+      "jsx": "react-jsx",
+      "baseUrl": ".",
+      "skipLibCheck": true
+    },
+    "include": ["app/**/*.tsx", "app/**/*.ts"],
+    "exclude": ["node_modules"]
+  }
+  

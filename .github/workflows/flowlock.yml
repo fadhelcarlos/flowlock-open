@@ -1,0 +1,29 @@
+name: FlowLock UX Audit
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      - run: pnpm install
+      - name: Run FlowLock audit
+        run: pnpm -w uxcg audit
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: flowlock-artifacts
+          path: |
+            artifacts/er.svg
+            artifacts/flow.svg
+            artifacts/screens.csv
+            artifacts/results.junit.xml
