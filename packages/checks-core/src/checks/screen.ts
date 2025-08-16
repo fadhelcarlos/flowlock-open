@@ -1,4 +1,4 @@
-export function checkRoleBoundaries(spec: any) {
+export function checkScreen(spec: any) {
   const results: any[] = [];
   const screens = spec?.screens || [];
 

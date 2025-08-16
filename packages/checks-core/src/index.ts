@@ -9,7 +9,7 @@ import { reachabilityCheck } from "./reachability";
 // Subfolder checks (FUNCTION exports => wrap+normalize)
 import { checkUIStates } from "./checks/uiStates";
 import { checkStateMachines } from "./checks/stateMachine";
-import { checkRoleBoundaries } from "./checks/roleBoundaries";
+import { checkScreen } from "./checks/screen";
 import { checkSpecCoverage } from "./checks/coverage";
 
 /** Normalize unknown results to CheckResult[] with narrow level/status. Drops extra props. */
@@ -48,11 +48,11 @@ const stateMachine: FlowlockCheck = {
   run: (spec: UXSpec) => normalizeResults(checkStateMachines(spec)),
 };
 
-const roleBoundaries: FlowlockCheck = {
-  id: "role_boundaries",
-  name: "Role Boundaries",
-  description: "Ensures actions/visibility align with declared role permissions.",
-  run: (spec: UXSpec) => normalizeResults(checkRoleBoundaries(spec)),
+const screen: FlowlockCheck = {
+  id: "screen",
+  name: "SCREEN",
+  description: "Ensures all screens declare allowed roles.",
+  run: (spec: UXSpec) => normalizeResults(checkScreen(spec)),
 };
 
 const coverage: FlowlockCheck = {
@@ -66,7 +66,8 @@ const coverage: FlowlockCheck = {
 export const honestReads = honestReadsCheck;
 export const creatableNeedsDetail = creatableNeedsDetailCheck;
 export const reachability = reachabilityCheck;
-export { uiStates, stateMachine, roleBoundaries, coverage };
+export { uiStates, stateMachine, screen, coverage };
+export const roleBoundaries = screen; // Backward compatibility alias
 
 // Bundle consumed by the runner/CLI
 export const coreChecks: FlowlockCheck[] = [
@@ -75,6 +76,6 @@ export const coreChecks: FlowlockCheck[] = [
   reachabilityCheck,
   uiStates,
   stateMachine,
-  roleBoundaries,
+  screen,
   coverage,
 ];
