@@ -46,11 +46,33 @@ export class Runner {
     specPath: string,
     config?: Omit<RunnerConfig, "spec" | "specPath">
   ): Promise<Runner> {
+    // Load both raw JSON (with all user fields) and the parsed spec (normalized/core)
     const content = await fs.readFile(specPath, "utf-8");
-    const json = JSON.parse(content);
-    const spec = parseSpec(json);
-    return new Runner({ ...config, spec });
+    const raw = JSON.parse(content);
+    const base = parseSpec(raw);
+  
+    // Merge screen-level extras (roles, uiStates) from the raw spec back onto parsed screens
+    const mergedScreens = (base as any).screens.map((s: any, idx: number) => {
+      const rawScreen = Array.isArray(raw.screens) ? raw.screens[idx] : undefined;
+      const roles = Array.isArray(rawScreen?.roles) ? rawScreen.roles : s.roles;
+      const uiStates = Array.isArray(rawScreen?.uiStates) ? rawScreen.uiStates : s.uiStates;
+      return { ...s, roles, uiStates };
+    });
+  
+    // Merge top-level extras (roles, jtbd) as well
+    const specWithExtras = {
+      ...(base as any),
+      roles: Array.isArray(raw.roles) ? raw.roles : (base as any).roles,
+      jtbd: raw.jtbd && typeof raw.jtbd === "object" ? raw.jtbd : (base as any).jtbd,
+      screens: mergedScreens,
+    } as UXSpec; // cast is fine – we’re enriching with optional fields
+  
+    return new Runner({
+      ...config,
+      spec: specWithExtras as any,
+    });
   }
+  
 
   async run(): Promise<RunnerResult> {
     const checkResults: CheckResult[] = [];

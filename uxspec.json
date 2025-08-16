@@ -325,5 +325,16 @@
       "rule": "User email must be unique across the system",
       "severity": "error"
     }
-  ]
+  ],
+  "jtbd": {
+    "admin": [
+      "Create user",
+      "Review users",
+      "Review products"
+    ],
+    "viewer": [
+      "Browse products",
+      "See product detail"
+    ]
+  }
 }
