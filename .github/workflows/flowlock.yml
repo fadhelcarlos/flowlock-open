@@ -21,7 +21,7 @@ jobs:
 
       - run: pnpm install
 
-      #  Build the workspace packages so ./packages/cli/dist/index.js exists
+      # Build all workspace packages so ./packages/cli/dist/index.js exists
       - name: Build packages
         run: pnpm -r --filter "./packages/*" build
 
@@ -39,6 +39,8 @@ jobs:
             artifacts/results.junit.xml
             artifacts/gap_report.md
             artifacts/acceptance_criteria.feature
+            artifacts/er.mmd
+            artifacts/flow.mmd
 
       - name: Post audit summary to FlowLock Cloud
         if: always()
@@ -52,30 +54,38 @@ jobs:
           const path = require('path');
 
           const outDir = 'artifacts';
+          const junit = path.join(outDir, 'results.junit.xml');
+
+          // default stats
+          let stats = { tests: 0, failures: 0, errors: 0, skipped: 0 };
+
+          try {
+            const xml = fs.readFileSync(junit, 'utf8');
+            const m = xml.match(/tests="(\d+)"[^>]*failures="(\d+)"[^>]*errors="(\d+)"[^>]*skipped="(\d+)"/);
+            if (m) stats = { tests: +m[1], failures: +m[2], errors: +m[3], skipped: +m[4] };
+          } catch {}
+
+          const artifacts = [
+            'er.svg',
+            'flow.svg',
+            'screens.csv',
+            'results.junit.xml',
+            'gap_report.md',
+            'acceptance_criteria.feature',
+            'er.mmd',
+            'flow.mmd',
+          ].filter(f => fs.existsSync(path.join(outDir, f)));
+
           const payload = {
             project: process.env.PROJECT_ID || 'demo',
-            kind: 'audit',
-            payload: {
-              checks: [], // optionally parse JUnit here
-              artifacts: [
-                'er.svg',
-                'flow.svg',
-                'screens.csv',
-                'results.junit.xml',
-                'gap_report.md',
-                'acceptance_criteria.feature'
-              ].filter(f => fs.existsSync(path.join(outDir, f))),
-              startedAt: new Date().toISOString(),
-              finishedAt: new Date().toISOString()
-            }
+            kind: 'junit',
+            payload: { stats, artifacts }
           };
 
-          const url = (process.env.CLOUD_URL || '').replace(/\/$/, '') + '/ingest';
-          const headers = { 'content-type': 'application/json' };
-          if (process.env.TOKEN) headers['authorization'] = `Bearer ${process.env.TOKEN}`;
-
-          fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) })
-            .then(r => r.text())
-            .then(t => console.log('Cloud response:', t))
-            .catch(e => { console.error('Cloud post failed:', e.message); process.exit(0); });
+          fs.writeFileSync('cloud-payload.json', JSON.stringify(payload));
           NODE
+
+          curl -fsS -X POST "$CLOUD_URL/ingest" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $TOKEN" \
+            --data-binary @cloud-payload.json || true
