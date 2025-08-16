@@ -1012,8 +1012,12 @@ function LiveSyncSection({ onWatch, onOpenCloud }: { onWatch?: () => void; onOpe
   const [activeTab, setActiveTab] = useState<'commands' | 'payload'>('commands')
   const [streamState, setStreamState] = useState<'ready' | 'checking' | 'success' | 'failed'>('ready')
   const [testResults, setTestResults] = useState({ passed: 0, failed: 0 })
+  const [timestamp, setTimestamp] = useState('2024-01-15T10:30:00.000Z')
   
   useEffect(() => {
+    // Set timestamp only on client side to avoid hydration mismatch
+    setTimestamp(new Date().toISOString())
+    
     const interval = setInterval(() => {
       setStreamState(prev => {
         // Create a realistic cycle: ready → checking → success/failed → ready
@@ -1203,7 +1207,7 @@ function LiveSyncSection({ onWatch, onOpenCloud }: { onWatch?: () => void; onOpe
   "run": {
     "origin": "local",
     "specDigest": "sha256:7f3b9c2a...",
-    "timestamp": "${new Date().toISOString()}",
+    "timestamp": "${timestamp}",
     "status": "${streamState === 'failed' ? 'failed' : streamState === 'success' ? 'passed' : 'running'}",
     "checks": [
       {

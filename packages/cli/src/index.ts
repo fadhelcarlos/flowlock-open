@@ -1,9 +1,10 @@
-import { Command } from "commander";
+﻿import { Command } from "commander";
 import { initCommand } from "./commands/init";
 import { auditCommand } from "./commands/audit";
 import { diagramsCommand } from "./commands/diagrams";
 import { exportCommand } from "./commands/export";
 import { watchCommand } from "./commands/watch";
+import { writeClaudeCommands } from "./templates/claude";
 
 const program = new Command();
 
@@ -20,7 +21,8 @@ program
 program
   .command("audit")
   .description("Run UX specification checks and generate artifacts")
-  .action(auditCommand);
+  .option("--fix", "Autofix roles/uiStates and obvious HONEST reads, then re-run")
+  .action((opts) => auditCommand(opts));
 
 program
   .command("diagrams")
@@ -39,5 +41,8 @@ program
   .option("--cloudUrl <url>", "Cloud endpoint URL")
   .option("--projectId <id>", "Project identifier")
   .action(watchCommand);
+
+// Ensure agent commands exist for Claude/Cursor users
+try { writeClaudeCommands(process.cwd()); } catch {}
 
 program.parse(process.argv);

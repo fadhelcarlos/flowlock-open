@@ -1,26 +1,6 @@
 {
   "version": "1.0.0",
-  "name": "My UX Specification",
-  "roles": [
-    {
-      "id": "admin",
-      "name": "Administrator",
-      "permissions": [
-        "create",
-        "read",
-        "update",
-        "delete"
-      ]
-    },
-    {
-      "id": "user",
-      "name": "User",
-      "permissions": [
-        "read",
-        "update"
-      ]
-    }
-  ],
+  "name": "Demo spec with gaps (triggers heal + agent fix)",
   "entities": [
     {
       "id": "user",
@@ -68,39 +48,29 @@
           "id": "id",
           "name": "ID",
           "type": "string",
-          "required": true,
-          "external": true,
-          "source": "catalog_api"
+          "required": true
         },
         {
           "id": "name",
           "name": "Name",
           "type": "string",
-          "required": true,
-          "external": true,
-          "source": "catalog_api"
+          "required": true
         },
         {
           "id": "description",
           "name": "Description",
-          "type": "text",
-          "external": true,
-          "source": "catalog_api"
+          "type": "text"
         },
         {
           "id": "price",
           "name": "Price",
           "type": "number",
-          "required": true,
-          "external": true,
-          "source": "catalog_api"
+          "required": true
         },
         {
           "id": "stock",
           "name": "Stock",
-          "type": "number",
-          "external": true,
-          "source": "inventory.api"
+          "type": "number"
         }
       ]
     }
@@ -130,7 +100,6 @@
     {
       "id": "user_detail",
       "name": "User Detail",
-      "type": "detail",
       "entityId": "user",
       "reads": [
         "user.id",
@@ -139,6 +108,7 @@
         "user.role",
         "user.createdAt"
       ],
+      "type": "detail",
       "roles": [
         "admin",
         "viewer"
@@ -186,7 +156,7 @@
       ]
     },
     {
-      "id": "user_success",
+      "id": "user_created",
       "name": "User Created",
       "type": "success",
       "roles": [
@@ -223,7 +193,6 @@
     {
       "id": "product_detail",
       "name": "Product Detail",
-      "type": "detail",
       "entityId": "product",
       "reads": [
         "product.id",
@@ -232,6 +201,7 @@
         "product.price",
         "product.stock"
       ],
+      "type": "detail",
       "roles": [
         "admin",
         "viewer"
@@ -247,40 +217,37 @@
     {
       "id": "create_user_flow",
       "name": "Create User Flow",
-      "entryStepId": "step_1",
-      "roles": [
-        "admin"
-      ],
+      "entryStepId": "cu_1",
       "steps": [
         {
-          "id": "step_1",
+          "id": "cu_1",
           "screenId": "user_list",
           "next": [
             {
-              "targetStepId": "step_2"
+              "targetStepId": "cu_2"
             }
           ]
         },
         {
-          "id": "step_2",
+          "id": "cu_2",
           "screenId": "user_create",
           "next": [
             {
-              "targetStepId": "step_3"
+              "targetStepId": "cu_3"
             }
           ]
         },
         {
-          "id": "step_3",
-          "screenId": "user_success",
+          "id": "cu_3",
+          "screenId": "user_created",
           "next": [
             {
-              "targetStepId": "step_4"
+              "targetStepId": "cu_4"
             }
           ]
         },
         {
-          "id": "step_4",
+          "id": "cu_4",
           "screenId": "user_detail"
         }
       ]
@@ -288,42 +255,22 @@
     {
       "id": "browse_products_flow",
       "name": "Browse Products",
-      "entryStepId": "browse_1",
-      "roles": [
-        "user",
-        "admin"
-      ],
+      "entryStepId": "bp_1",
       "steps": [
         {
-          "id": "browse_1",
+          "id": "bp_1",
           "screenId": "product_list",
           "next": [
             {
-              "targetStepId": "browse_2"
+              "targetStepId": "bp_2"
             }
           ]
         },
         {
-          "id": "browse_2",
+          "id": "bp_2",
           "screenId": "product_detail"
         }
       ]
-    }
-  ],
-  "policies": [
-    {
-      "id": "auth_required",
-      "name": "Authentication Required",
-      "type": "security",
-      "rule": "All screens except login require authentication",
-      "severity": "error"
-    },
-    {
-      "id": "email_unique",
-      "name": "Email Uniqueness",
-      "type": "validation",
-      "rule": "User email must be unique across the system",
-      "severity": "error"
     }
   ],
   "jtbd": {
@@ -336,5 +283,15 @@
       "Browse products",
       "See product detail"
     ]
-  }
+  },
+  "roles": [
+    {
+      "id": "admin",
+      "name": "Admin"
+    },
+    {
+      "id": "viewer",
+      "name": "Viewer"
+    }
+  ]
 }
