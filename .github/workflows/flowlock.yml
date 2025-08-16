@@ -1,4 +1,5 @@
 name: FlowLock UX Audit
+
 on:
   pull_request:
   push:
@@ -85,7 +86,22 @@ jobs:
           fs.writeFileSync('cloud-payload.json', JSON.stringify(payload));
           NODE
 
-          curl -fsS -X POST "$CLOUD_URL/ingest" \
+          curl -fsS -X POST "${CLOUD_URL%/}/ingest" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $TOKEN" \
+            -H "Authorization: Bearer ${TOKEN}" \
             --data-binary @cloud-payload.json || true
+
+      - uses: actions/github-script@v7
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        env:
+          CLOUD_URL: ${{ secrets.FLOWLOCK_CLOUD_URL }}
+          PROJECT_ID: ${{ secrets.FLOWLOCK_PROJECT_ID }}
+        with:
+          script: |
+            const url = `${process.env.CLOUD_URL.replace(/\/$/,'')}/dashboard?project=${process.env.PROJECT_ID}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `FlowLock: **audit complete** → ${url}`
+            });
