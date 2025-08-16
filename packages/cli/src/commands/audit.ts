@@ -3,6 +3,7 @@ import * as path from 'path';
 import chalk from 'chalk';
 import { Runner } from 'flowlock-runner';
 import type { CheckResult } from 'flowlock-plugin-sdk';
+import { printArtifacts } from "../lib/printArtifacts";
 
 export async function auditCommand() {
   const specPath = path.join(process.cwd(), 'uxspec.json');
@@ -12,14 +13,10 @@ export async function auditCommand() {
     
     const runner = await Runner.fromFile(specPath);
     const result = await runner.runAndSave('artifacts');
+  printArtifacts("artifacts");
     
     printResults(result.checkResults);
     
-    console.log(chalk.cyan('\\n📁 Artifacts generated:'));
-    console.log('  • artifacts/er.svg');
-    console.log('  • artifacts/flow.svg');
-    console.log('  • artifacts/screens.csv');
-    console.log('  • artifacts/results.junit.xml');
     
     const hasErrors = result.checkResults.some(r => r.level === 'error' && r.status === 'fail');
     

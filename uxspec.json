@@ -30,7 +30,9 @@
           "id": "id",
           "name": "ID",
           "type": "string",
-          "required": true
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
         },
         {
           "id": "email",
@@ -66,24 +68,32 @@
           "id": "id",
           "name": "ID",
           "type": "string",
-          "required": true
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
         },
         {
           "id": "name",
           "name": "Name",
           "type": "string",
-          "required": true
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
         },
         {
           "id": "description",
           "name": "Description",
-          "type": "text"
+          "type": "text",
+          "external": true,
+          "source": "catalog_api"
         },
         {
           "id": "price",
           "name": "Price",
           "type": "number",
-          "required": true
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
         },
         {
           "id": "stock",
@@ -106,6 +116,15 @@
         "user.name",
         "user.email",
         "user.role"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
       ]
     },
     {
@@ -119,6 +138,15 @@
         "user.email",
         "user.role",
         "user.createdAt"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
       ]
     },
     {
@@ -146,12 +174,30 @@
             }
           ]
         }
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
       ]
     },
     {
       "id": "user_success",
       "name": "User Created",
-      "type": "success"
+      "type": "success",
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ]
     },
     {
       "id": "product_list",
@@ -163,6 +209,15 @@
         "product.name",
         "product.price",
         "product.stock"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
       ]
     },
     {
@@ -176,6 +231,15 @@
         "product.description",
         "product.price",
         "product.stock"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
       ]
     }
   ],
