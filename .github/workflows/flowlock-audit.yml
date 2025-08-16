@@ -1,0 +1,131 @@
+name: FlowLock UX Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build packages
+        run: pnpm -r --filter "./packages/*" build
+      
+      - name: Run FlowLock audit
+        run: pnpm -w uxcg audit
+      
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flowlock-artifacts
+          path: |
+            artifacts/er.mmd
+            artifacts/er.svg
+            artifacts/flow.mmd
+            artifacts/flow.svg
+            artifacts/screens.csv
+            artifacts/results.junit.xml
+            artifacts/gap_report.md
+            artifacts/acceptance_criteria.feature
+      
+      - name: Prepare audit summary
+        if: always()
+        id: prepare_summary
+        run: |
+          # Extract stats from JUnit XML
+          if [ -f artifacts/results.junit.xml ]; then
+            tests=$(grep -o 'tests="[^"]*"' artifacts/results.junit.xml | cut -d'"' -f2 || echo "0")
+            failures=$(grep -o 'failures="[^"]*"' artifacts/results.junit.xml | cut -d'"' -f2 || echo "0")
+            errors=$(grep -o 'errors="[^"]*"' artifacts/results.junit.xml | cut -d'"' -f2 || echo "0")
+            skipped=$(grep -o 'skipped="[^"]*"' artifacts/results.junit.xml | cut -d'"' -f2 || echo "0")
+          else
+            tests=0
+            failures=0
+            errors=0
+            skipped=0
+          fi
+          
+          # List artifacts
+          artifacts='["er.mmd","er.svg","flow.mmd","flow.svg","screens.csv","results.junit.xml","gap_report.md","acceptance_criteria.feature"]'
+          
+          # Create JSON payload
+          cat > audit_summary.json <<EOF
+          {
+            "project": "${{ env.FLOWLOCK_PROJECT_ID }}",
+            "kind": "junit",
+            "payload": {
+              "stats": {
+                "tests": $tests,
+                "failures": $failures,
+                "errors": $errors,
+                "skipped": $skipped
+              },
+              "artifacts": $artifacts,
+              "startedAt": "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)",
+              "finishedAt": "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            }
+          }
+          EOF
+          
+          echo "Summary prepared"
+      
+      - name: Post to FlowLock Cloud
+        if: always() && env.FLOWLOCK_CLOUD_URL != ''
+        env:
+          FLOWLOCK_CLOUD_URL: ${{ secrets.FLOWLOCK_CLOUD_URL }}
+          FLOWLOCK_PROJECT_ID: ${{ secrets.FLOWLOCK_PROJECT_ID }}
+          FLOWLOCK_TOKEN: ${{ secrets.FLOWLOCK_TOKEN }}
+        run: |
+          if [ -n "$FLOWLOCK_CLOUD_URL" ] && [ -n "$FLOWLOCK_PROJECT_ID" ]; then
+            if [ -n "$FLOWLOCK_TOKEN" ]; then
+              AUTH_HEADER="Authorization: Bearer $FLOWLOCK_TOKEN"
+            else
+              AUTH_HEADER=""
+            fi
+            
+            curl -X POST "$FLOWLOCK_CLOUD_URL/ingest" \
+              -H "Content-Type: application/json" \
+              ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+              -d @audit_summary.json \
+              --fail-with-body || echo "Failed to post to FlowLock Cloud"
+          fi
+      
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && env.FLOWLOCK_CLOUD_URL != ''
+        env:
+          FLOWLOCK_CLOUD_URL: ${{ secrets.FLOWLOCK_CLOUD_URL }}
+          FLOWLOCK_PROJECT_ID: ${{ secrets.FLOWLOCK_PROJECT_ID }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const cloudUrl = process.env.FLOWLOCK_CLOUD_URL;
+            const projectId = process.env.FLOWLOCK_PROJECT_ID;
+            if (cloudUrl && projectId) {
+              const dashboardUrl = `${cloudUrl}/dashboard?project=${projectId}`;
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `FlowLock: audit complete → [View Dashboard](${dashboardUrl})`
+              });
+            }
