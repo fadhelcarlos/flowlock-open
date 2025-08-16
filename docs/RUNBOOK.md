@@ -79,6 +79,10 @@ In GitHub repository settings:
 - `FLOWLOCK_PROJECT_ID`: Unique project identifier
 - `FLOWLOCK_TOKEN`: Bearer token (if auth enabled)
 
+**Note on Permissions**: For PR comments to work, ensure either:
+- Repository Settings → Actions → General → Workflow permissions → "Read and write permissions"
+- OR add a Personal Access Token (PAT) with `pull-requests: write` permission
+
 ### 3. Deploy FlowLock Cloud
 
 #### Option A: Self-Host on Render

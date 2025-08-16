@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+# Note: For PR comments to work, you may need to configure these permissions
+# in your repository settings or add a PAT (Personal Access Token)
+permissions:
+  contents: read
+  pull-requests: write  # Required for PR comments
+
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -112,6 +118,7 @@ jobs:
       
       - name: Comment on PR
         if: github.event_name == 'pull_request' && env.FLOWLOCK_CLOUD_URL != ''
+        continue-on-error: true
         env:
           FLOWLOCK_CLOUD_URL: ${{ secrets.FLOWLOCK_CLOUD_URL }}
           FLOWLOCK_PROJECT_ID: ${{ secrets.FLOWLOCK_PROJECT_ID }}
@@ -122,10 +129,17 @@ jobs:
             const projectId = process.env.FLOWLOCK_PROJECT_ID;
             if (cloudUrl && projectId) {
               const dashboardUrl = `${cloudUrl}/dashboard?project=${projectId}`;
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `FlowLock: audit complete → [View Dashboard](${dashboardUrl})`
-              });
+              try {
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: `FlowLock: audit complete → [View Dashboard](${dashboardUrl})`
+                });
+                console.log('PR comment posted successfully');
+              } catch (error) {
+                console.log('Note: Could not post PR comment. This may be due to GitHub token permissions.');
+                console.log('Dashboard URL would be:', dashboardUrl);
+                console.log('To enable PR comments, ensure the workflow has write permissions for pull-requests.');
+              }
             }
