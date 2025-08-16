@@ -48,29 +48,39 @@
           "id": "id",
           "name": "ID",
           "type": "string",
-          "required": true
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
         },
         {
           "id": "name",
           "name": "Name",
           "type": "string",
-          "required": true
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
         },
         {
           "id": "description",
           "name": "Description",
-          "type": "text"
+          "type": "text",
+          "external": true,
+          "source": "catalog_api"
         },
         {
           "id": "price",
           "name": "Price",
           "type": "number",
-          "required": true
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
         },
         {
           "id": "stock",
           "name": "Stock",
-          "type": "number"
+          "type": "number",
+          "external": true,
+          "source": "catalog_api"
         }
       ]
     }
