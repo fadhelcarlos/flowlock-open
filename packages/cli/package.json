@@ -1,6 +1,6 @@
 {
   "name": "flowlock-uxcg",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "FlowLock CLI for UX consistency checks",
   "publishConfig": {
     "access": "public"
