@@ -59,7 +59,7 @@ Should show all checks green:
 
 ### 1. Add GitHub Action
 
-Create `.github/workflows/flowlock-audit.yml`:
+Create `.github/workflows/flowlock.yml`:
 
 ```yaml
 name: FlowLock UX Audit

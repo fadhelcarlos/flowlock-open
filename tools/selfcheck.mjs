@@ -154,7 +154,7 @@ if (missingCommands.length > 0) {
 
 // Step 7: Verify CI workflow
 console.log('Step 7: Checking CI workflow...');
-const workflowPath = '.github/workflows/flowlock-audit.yml';
+const workflowPath = '.github/workflows/flowlock.yml';
 if (!fs.existsSync(workflowPath)) {
   console.error('❌ GitHub Action workflow not found');
   errors.push('GitHub Action workflow not found');
