@@ -195,4 +195,4 @@ export default function QuickstartPage() {
       </div>
     </div>
   );
-}
+}{/* FlowLock v0.1.2 note: audit now also generates gap_report.md and acceptance_criteria.feature in /artifacts */}
