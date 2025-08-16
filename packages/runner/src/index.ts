@@ -6,6 +6,7 @@ import { generateScreensCSV } from "./generators/csv";
 import { generateJUnitXML } from "./generators/junit";
 import { writeGapReport } from "./generators/gapReport";
 import { writeAcceptance } from "./generators/acceptance";
+import { renderMermaidCLI } from "./utils/render";
 import * as fs from "fs/promises";
 import * as path from "path";
 
@@ -46,33 +47,25 @@ export class Runner {
     specPath: string,
     config?: Omit<RunnerConfig, "spec" | "specPath">
   ): Promise<Runner> {
-    // Load both raw JSON (with all user fields) and the parsed spec (normalized/core)
     const content = await fs.readFile(specPath, "utf-8");
-    const raw = JSON.parse(content);
-    const base = parseSpec(raw);
-  
-    // Merge screen-level extras (roles, uiStates) from the raw spec back onto parsed screens
-    const mergedScreens = (base as any).screens.map((s: any, idx: number) => {
-      const rawScreen = Array.isArray(raw.screens) ? raw.screens[idx] : undefined;
-      const roles = Array.isArray(rawScreen?.roles) ? rawScreen.roles : s.roles;
-      const uiStates = Array.isArray(rawScreen?.uiStates) ? rawScreen.uiStates : s.uiStates;
-      return { ...s, roles, uiStates };
-    });
-  
-    // Merge top-level extras (roles, jtbd) as well
-    const specWithExtras = {
-      ...(base as any),
-      roles: Array.isArray(raw.roles) ? raw.roles : (base as any).roles,
-      jtbd: raw.jtbd && typeof raw.jtbd === "object" ? raw.jtbd : (base as any).jtbd,
-      screens: mergedScreens,
-    } as UXSpec; // cast is fine – we’re enriching with optional fields
-  
-    return new Runner({
-      ...config,
-      spec: specWithExtras as any,
-    });
+    const json = JSON.parse(content);
+    const spec = parseSpec(json);
+// Passthrough: keep non-canonical fields so checks can see them
+try {
+  if (Array.isArray(json?.roles)) (spec as any).roles = json.roles;
+  if (json?.jtbd) (spec as any).jtbd = json.jtbd;
+
+  const rawScreens = Array.isArray(json?.screens) ? json.screens : [];
+  if (Array.isArray((spec as any).screens)) {
+    for (const s of (spec as any).screens as any[]) {
+      const raw = rawScreens.find((r:any) => r && r.id === s.id) || {};
+      if (Array.isArray(raw.roles) && !s.roles) (s as any).roles = raw.roles;
+      if (Array.isArray(raw.uiStates) && !s.uiStates) (s as any).uiStates = raw.uiStates;
+    }
   }
-  
+} catch { /* no-op */ }
+    return new Runner({ ...config, spec });
+  }
 
   async run(): Promise<RunnerResult> {
     const checkResults: CheckResult[] = [];
@@ -105,26 +98,41 @@ export class Runner {
     const result = await this.run();
     await fs.mkdir(outputDir, { recursive: true });
 
-    await fs.writeFile(
-      path.join(outputDir, "er.svg"),
-      `<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">Mermaid diagram: ${result.artifacts.erDiagram.substring(0, 100)}...</text></svg>`
-    );
-    await fs.writeFile(
-      path.join(outputDir, "flow.svg"),
-      `<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">Mermaid diagram: ${result.artifacts.flowDiagram.substring(0, 100)}...</text></svg>`
-    );
-    await fs.writeFile(
-      path.join(outputDir, "screens.csv"),
-      result.artifacts.screensCSV
-    );
-    await fs.writeFile(
-      path.join(outputDir, "results.junit.xml"),
-      result.artifacts.junitXML
-    );
+    // Save Mermaid sources (always)
+    const erMmd = path.join(outputDir, "er.mmd");
+    const flowMmd = path.join(outputDir, "flow.mmd");
+    await fs.writeFile(erMmd, result.artifacts.erDiagram, "utf8");
+    await fs.writeFile(flowMmd, result.artifacts.flowDiagram, "utf8");
 
-    // Write extra documents (do not log; just write)
-    void writeGapReport(outputDir, result.checkResults as any);
-    void writeAcceptance(outputDir, this.spec as UXSpec);
+    // Try rendering SVGs; fallback writes a small notice SVG
+    const erSvg = path.join(outputDir, "er.svg");
+    const flowSvg = path.join(outputDir, "flow.svg");
+
+    const erOk = await renderMermaidCLI(erMmd, erSvg);
+    if (!erOk) {
+      await fs.writeFile(
+        erSvg,
+        `<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">Mermaid source saved to er.mmd (renderer unavailable)</text></svg>`
+      );
+    }
+
+    const flowOk = await renderMermaidCLI(flowMmd, flowSvg);
+    if (!flowOk) {
+      await fs.writeFile(
+        flowSvg,
+        `<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">Mermaid source saved to flow.mmd (renderer unavailable)</text></svg>`
+      );
+    }
+
+    // Other artifacts
+    await fs.writeFile(path.join(outputDir, "screens.csv"), result.artifacts.screensCSV);
+    await fs.writeFile(path.join(outputDir, "results.junit.xml"), result.artifacts.junitXML);
+
+    // Extra docs (both return file paths; we dont rely on them)
+    const gap = writeGapReport(outputDir, result.checkResults as any);
+    const acc = writeAcceptance(outputDir, (this as any).spec as UXSpec);
+    if ((gap as any)?.artifactsFile) console.log("  " + path.normalize((gap as any).artifactsFile));
+    if ((acc as any)?.artifactsFile) console.log("  " + path.normalize((acc as any).artifactsFile));
 
     return result;
   }
