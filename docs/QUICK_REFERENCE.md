@@ -1,16 +1,22 @@
-# FlowLock Quick Reference
+# FlowLock v3 Quick Reference
 
 ## Installation
 ```bash
-# CLI (global)
-npm install -g flowlock-uxcg
+# CLI (global) - v0.5.0
+npm install -g flowlock-uxcg@latest
 
-# All packages (in project)
-npm install flowlock-uxspec flowlock-runner flowlock-checks-core
+# All packages (in project) - v0.4.1
+npm install flowlock-uxspec@latest flowlock-runner@latest flowlock-checks-core@latest
 
-# MCP Server (for Claude)
-npm install flowlock-mcp
+# MCP Server (for Claude) - v0.3.0
+npm install flowlock-mcp@latest
 ```
+
+## What's New in v3
+- **11 validation checks** (up from 7): Added JTBD, RELATIONS, ROUTES, CTAS
+- **Enhanced schema**: JTBD, entity relations, routes, CTAs, state machines
+- **5 Claude commands** (up from 4): New `/ux-enhance-spec`
+- **Backward compatible**: All v2 specs work without changes
 
 ## CLI Commands
 ```bash
@@ -23,13 +29,18 @@ uxcg watch --cloud          # Dev mode with sync
 uxcg agent --cloud <url>    # Connect to cloud
 ```
 
-## uxspec.json Structure
+## uxspec.json Structure (v3 Enhanced)
 ```json
 {
   "version": "1.0.0",
+  "project": "my-app",
   "name": "App Name",
+  "description": "App description",
   "roles": [
-    { "id": "admin", "name": "Admin" }
+    { "id": "admin", "name": "Admin", "permissions": ["create", "read", "update", "delete"] }
+  ],
+  "jtbd": [
+    { "role": "admin", "tasks": ["Manage users"], "description": "Admin tasks" }
   ],
   "entities": [{
     "id": "user",
@@ -40,37 +51,75 @@ uxcg agent --cloud <url>    # Connect to cloud
         "derived": true, "provenance": "System timestamp" },
       { "id": "avatar", "name": "Avatar", "type": "url",
         "external": true, "source": "Gravatar" }
+    ],
+    "relations": [
+      { "id": "orders", "to": "order", "kind": "1:many" }
     ]
   }],
   "screens": [{
     "id": "user-list",
     "name": "User List",
     "type": "list",
-    "reads": ["user.id", "user.name"],
+    "routes": ["/users"],
     "roles": ["admin"],
-    "uiStates": ["empty", "loading", "error"]
+    "uiStates": ["empty", "loading", "error"],
+    "lists": [{
+      "id": "users",
+      "reads": ["user.id", "user.name"],
+      "sortable": true
+    }],
+    "ctas": [{
+      "label": "Add User",
+      "to": "user-create",
+      "type": "primary"
+    }]
   }],
   "flows": [{
     "id": "main-flow",
     "name": "Main Flow",
+    "jtbd": "admin",
+    "role": "admin",
     "entryStepId": "step1",
     "steps": [{
       "id": "step1",
-      "screenId": "user-list",
-      "next": [{ "targetStepId": "step2" }]
-    }]
+      "screen": "user-list",
+      "writes": ["user.email"],
+      "transition": {
+        "entity": "user",
+        "from": "pending",
+        "to": "active"
+      }
+    }],
+    "success": {
+      "screen": "user-detail",
+      "message": "User created"
+    }
+  }],
+  "states": [{
+    "entity": "user",
+    "allowed": ["pending", "active"],
+    "initial": "pending",
+    "transitions": [
+      { "from": "pending", "to": "active", "trigger": "verify" }
+    ]
+  }],
+  "glossary": [{
+    "term": "system.timestamp",
+    "definition": "Server timestamp",
+    "formula": "new Date().toISOString()"
   }]
 }
 ```
 
 ## Field Types
 - `string` - Text
-- `number` - Numeric
+- `number` - Numeric (supports min/max)
 - `boolean` - True/false
 - `date` - Date/time
 - `email` - Email address
 - `url` - Web URL
 - `text` - Long text
+- `enum` - Enumeration (v3 - with enum array)
 
 ## Field Modifiers
 - `required: true` - Must be provided
@@ -90,8 +139,9 @@ uxcg agent --cloud <url>    # Connect to cloud
 - `loading` - Fetching
 - `error` - Failed
 
-## 7 Core Checks
+## 11 Validation Checks (v3)
 
+### Core Checks (7)
 | Check | ID | Purpose |
 |-------|-----|---------|
 | HONEST | `honest_reads` | Screens only read captured/derived/external fields |
@@ -102,15 +152,28 @@ uxcg agent --cloud <url>    # Connect to cloud
 | SCREEN | `screen` | All screens declare roles |
 | SPEC | `spec_coverage` | Coverage percentages |
 
-## Generated Artifacts
+### New v3 Checks (4)
+| Check | ID | Purpose |
+|-------|-----|---------|
+| JTBD | `jtbd` | Jobs To Be Done mapped to flows |
+| RELATIONS | `relations` | Entity relations are valid |
+| ROUTES | `routes` | Screen routes are unique |
+| CTAS | `ctas` | Navigation targets exist |
+
+## Generated Artifacts (Enhanced in v3)
 ```
 artifacts/
-├── er.svg                       # Entity diagram
-├── flow.svg                     # Flow diagram
-├── screens.csv                  # Screen list
-├── results.junit.xml           # Test results
+├── er.svg                       # Entity diagram (with relations)
+├── flow.svg                     # Flow diagram (with JTBD & CTAs)
+├── screens.csv                  # Screen list (with routes & components)
+├── entities.csv                 # Entity details (v3 - NEW)
+├── flows.csv                    # Flow summary (v3 - NEW)
+├── jtbd.csv                     # JTBD mapping (v3 - NEW)
+├── results.junit.xml           # Test results (11 checks)
 ├── gap_report.md               # Issues found
-└── acceptance_criteria.feature # Gherkin tests
+├── acceptance_criteria.feature # Gherkin tests
+├── er.mmd                      # Mermaid source
+└── flow.mmd                    # Mermaid source
 ```
 
 ## Auto-Fix Capabilities

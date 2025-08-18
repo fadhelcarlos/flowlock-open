@@ -1,5 +1,17 @@
 # flowlock-uxspec
 
+## 0.4.1
+
+### Patch Changes
+
+- 2b30559: Fix: Add backward compatibility for JTBD field
+
+  The JTBD field now supports both formats:
+  - **Old format**: Object with role keys mapping to task arrays (e.g., `{ "admin": ["task1"], "user": ["task2"] }`)
+  - **New format**: Array of JTBD objects with role, tasks, and description
+
+  This ensures existing specs continue to work while allowing new specs to use the enhanced format.
+
 ## 0.4.0
 
 ### Minor Changes

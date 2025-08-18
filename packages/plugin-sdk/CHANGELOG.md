@@ -1,5 +1,12 @@
 # flowlock-plugin-sdk
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [2b30559]
+  - flowlock-uxspec@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes

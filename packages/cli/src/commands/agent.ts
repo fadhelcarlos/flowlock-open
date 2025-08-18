@@ -118,17 +118,39 @@ export const agentCommand = new Command("agent")
   .option("--token <token>", "Bearer token (optional)")
   .action(async (opts: AgentOpts) => {
     const base = (opts.cloud || "").replace(/\/$/, "");
-    const project = opts.project || "demo";
+    let project = opts.project || "demo";
     const token = opts.token;
 
     if (!base) {
       console.error("Missing --cloud <url>");
       process.exit(1);
     }
-    console.log(`FlowLock agent connected → ${base}/dashboard?project=${project}`);
+
+    // For authenticated connections, get the proper connection details
+    const headers = token ? { authorization: `Bearer ${token}` } : undefined;
+    
+    if (token) {
+      try {
+        // Use the /agent/connect endpoint to get proper URLs
+        const connectInfo = await fetchJson(base + "/agent/connect", { headers });
+        if (connectInfo.ok) {
+          project = connectInfo.project; // Use authenticated project
+          console.log(`FlowLock agent authenticated as ${connectInfo.user}`);
+          console.log(`Connected to project: ${connectInfo.projectName} (${project})`);
+          console.log(`Dashboard: ${connectInfo.endpoints.dashboard}`);
+        } else {
+          console.error("Authentication failed:", connectInfo.error || "Invalid token");
+          process.exit(1);
+        }
+      } catch (e) {
+        console.error("Failed to connect:", e);
+        process.exit(1);
+      }
+    } else {
+      console.log(`FlowLock agent connected (unauthenticated) → ${base}/dashboard?project=${project}`);
+    }
 
     // 1) Poll for backlog (if any)
-    const headers = token ? { authorization: `Bearer ${token}` } : undefined;
     try {
       const backlog = await fetchJson(base + `/commands?project=${encodeURIComponent(project)}`, { headers });
       if (Array.isArray(backlog)) {

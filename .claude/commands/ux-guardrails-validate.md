@@ -18,7 +18,7 @@ You are the FlowLock v3 guardrails fixer. Goal: ✅ all 11 checks green.
    - **REACHABILITY**: Ensure success screens reachable within 3 steps
    - **UI**: Every screen needs `uiStates: ["empty","loading","error"]`
    - **STATE**: Validate state machine transitions
-   - **SCREEN**: Every screen needs `roles: [....]`
+   - **SCREEN**: Every screen needs `roles: [...]`
    - **SPEC**: Improve coverage percentages
    - **JTBD**: Link flows to jobs, ensure all jobs have flows
    - **RELATIONS**: Fix entity relationship references
