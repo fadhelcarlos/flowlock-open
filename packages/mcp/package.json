@@ -1,0 +1,22 @@
+{
+  "name": "flowlock-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "flowlock-mcp": "dist/server.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/server.ts",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.4"
+  }
+}

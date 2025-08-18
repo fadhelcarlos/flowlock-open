@@ -1,0 +1,373 @@
+diff --git a/packages/cli/package.json b/packages/cli/package.json
+index 9b0b7aa..c3b2a31 100644
+--- a/packages/cli/package.json
++++ b/packages/cli/package.json
+@@ -8,6 +8,7 @@
+   "dependencies": {
+     "commander": "^11.1.0",
++    "prompts": "^2.4.2"
+   },
+   "devDependencies": {
+     "tsup": "^8.5.0",
+diff --git a/packages/cli/src/utils/exec.ts b/packages/cli/src/utils/exec.ts
+new file mode 100644
+index 0000000..c8a9d3c
+--- /dev/null
++++ b/packages/cli/src/utils/exec.ts
+@@ -0,0 +1,62 @@
++import { spawn } from "child_process";
++
++export async function run(cmd: string, args: string[], opts: { cwd?: string; env?: NodeJS.ProcessEnv } = {}) {
++  return new Promise<void>((resolve, reject) => {
++    const child = spawn(cmd, args, {
++      cwd: opts.cwd || process.cwd(),
++      env: { ...process.env, ...(opts.env || {}) },
++      stdio: "inherit",
++      shell: process.platform === "win32",
++    });
++    child.on("error", reject);
++    child.on("exit", (code) => {
++      if (code === 0) resolve();
++      else reject(new Error(`${cmd} ${args.join(" ")} exited with code ${code}`));
++    });
++  });
++}
++
++export async function which(cmd: string): Promise<string | null> {
++  const isWin = process.platform === "win32";
++  const probe = isWin ? ["where", cmd] : ["which", cmd];
++  try {
++    await run(probe[0], [probe[1]]);
++    return cmd;
++  } catch {
++    return null;
++  }
++}
+diff --git a/packages/cli/src/templates/projects/index.ts b/packages/cli/src/templates/projects/index.ts
+new file mode 100644
+index 0000000..8a6a34a
+--- /dev/null
++++ b/packages/cli/src/templates/projects/index.ts
+@@ -0,0 +1,220 @@
++import * as fs from "fs";
++import * as path from "path";
++import { run, which } from "../../utils/exec";
++import { writeClaudeCommands } from "../claude";
++
++export type InitChoices = {
++  mode: "current" | "scaffold";
++  template?: "blank" | "next-tailwind";
++  appName?: string;
++  addWorkflow: boolean;
++  addScript: boolean;
++  addClaudeCmds: boolean;
++};
++
++export async function scaffoldProject(cwd: string, c: InitChoices) {
++  if (c.mode === "current") {
++    await applyFlowLockBasics(cwd, c);
++    return;
++  }
++  if (c.template === "blank") {
++    const target = path.join(cwd, c.appName || "flowlock-app");
++    fs.mkdirSync(target, { recursive: true });
++    await writeBlankTemplate(target);
++    await applyFlowLockBasics(target, c);
++    return;
++  }
++  if (c.template === "next-tailwind") {
++    const target = path.join(cwd, c.appName || "flowlock-next");
++    fs.mkdirSync(target, { recursive: true });
++    await createNextApp(target, c.appName || "flowlock-next");
++    await addTailwind(target);
++    await applyFlowLockBasics(target, c);
++    return;
++  }
++  throw new Error("Unknown scaffold choice");
++}
++
++async function applyFlowLockBasics(target: string, c: InitChoices) {
++  seedUxspec(target);
++  if (c.addClaudeCmds) {
++    writeClaudeCommands(target);
++  }
++  if (c.addScript) {
++    ensureNpmScript(target, "flowlock:audit", "uxcg audit");
++  }
++  if (c.addWorkflow) {
++    maybeWriteWorkflow(target);
++  }
++  console.log(`\n✅ FlowLock ready in: ${path.relative(process.cwd(), target) || "."}`);
++  console.log(`   - uxspec.json`);
++  if (c.addClaudeCmds) console.log(`   - .claude/commands/*`);
++  if (c.addWorkflow) console.log(`   - .github/workflows/flowlock.yml`);
++  if (c.addScript) console.log(`   - package.json scripts.flowlock:audit`);
++}
++
++function seedUxspec(target: string) {
++  const p = path.join(target, "uxspec.json");
++  if (fs.existsSync(p)) return;
++  const spec = {
++    version: "1.0.0",
++    name: "FlowLock Project",
++    roles: ["admin", "viewer"],
++    entities: [
++      {
++        id: "user",
++        name: "User",
++        fields: [
++          { id: "id", name: "ID", type: "string", required: true, derived: true, provenance: "system.uuid" },
++          { id: "email", name: "Email", type: "email", required: true },
++          { id: "name", name: "Name", type: "string", required: true },
++          { id: "role", name: "Role", type: "string" },
++          { id: "createdAt", name: "Created At", type: "date", derived: true, provenance: "system.timestamp" },
++        ],
++      },
++    ],
++    screens: [
++      {
++        id: "user_list",
++        name: "User List",
++        type: "list",
++        entityId: "user",
++        reads: ["user.id", "user.name", "user.email", "user.role"],
++        roles: ["admin", "viewer"],
++        uiStates: ["empty", "loading", "error"],
++      },
++      {
++        id: "user_detail",
++        name: "User Detail",
++        type: "detail",
++        entityId: "user",
++        reads: ["user.id", "user.name", "user.email", "user.role", "user.createdAt"],
++        roles: ["admin", "viewer"],
++        uiStates: ["empty", "loading", "error"],
++      },
++    ],
++    flows: [
++      {
++        id: "user_browse",
++        name: "Browse Users",
++        entryStepId: "s1",
++        roles: ["admin", "viewer"],
++        steps: [
++          { id: "s1", screenId: "user_list", next: [{ targetStepId: "s2" }] },
++          { id: "s2", screenId: "user_detail" },
++        ],
++      },
++    ],
++    jtbd: { admin: ["Manage users"], viewer: ["See users"] },
++  };
++  fs.writeFileSync(p, JSON.stringify(spec, null, 2));
++}
++
++function ensureNpmScript(target: string, name: string, cmd: string) {
++  const pkgPath = path.join(target, "package.json");
++  if (!fs.existsSync(pkgPath)) return;
++  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
++  pkg.scripts = pkg.scripts || {};
++  if (!pkg.scripts[name]) {
++    pkg.scripts[name] = cmd;
++    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
++  }
++}
++
++function maybeWriteWorkflow(target: string) {
++  const wfDir = path.join(target, ".github", "workflows");
++  const wfPath = path.join(wfDir, "flowlock.yml");
++  if (fs.existsSync(wfPath)) return;
++  fs.mkdirSync(wfDir, { recursive: true });
++  const yml = `name: FlowLock UX Audit
++on:
++  pull_request:
++  push:
++    branches: [ main ]
++
++jobs:
++  audit:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '20'
++      - run: npm i -g pnpm
++      - name: Run FlowLock audit
++        run: npx -y flowlock-uxcg audit
++      - name: Upload artifacts
++        uses: actions/upload-artifact@v4
++        with:
++          name: flowlock-artifacts
++          path: |
++            artifacts/er.svg
++            artifacts/flow.svg
++            artifacts/screens.csv
++            artifacts/results.junit.xml
++            artifacts/gap_report.md
++            artifacts/acceptance_criteria.feature
++            artifacts/er.mmd
++            artifacts/flow.mmd
++`;
++  fs.writeFileSync(wfPath, yml);
++}
++
++async function createNextApp(target: string, appName: string) {
++  const npx = (await which("npx")) || "npx";
++  console.log("• Scaffolding Next.js app via create-next-app …");
++  await run(npx, ["-y", "create-next-app@latest", appName, "--ts"], { cwd: path.dirname(target) });
++}
++
++async function addTailwind(target: string) {
++  const npx = (await which("npx")) || "npx";
++  console.log("• Adding Tailwind CSS …");
++  await run(npx, ["-y", "tailwindcss@latest", "init", "-p"], { cwd: target });
++  // Minimal config touch-ups
++  const cfg = path.join(target, "tailwind.config.js");
++  if (fs.existsSync(cfg)) {
++    let s = fs.readFileSync(cfg, "utf8");
++    if (!/content:\s*\[/.test(s)) {
++      s = s.replace(
++        /module\.exports\s*=\s*\{/,
++        `module.exports = {
++  content: ["./app/**/*.{ts,tsx}", "./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],`
++      );
++    }
++    fs.writeFileSync(cfg, s);
++  }
++  const globals = path.join(target, "app", "globals.css");
++  if (fs.existsSync(globals)) {
++    const pre = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n`;
++    const s = fs.readFileSync(globals, "utf8");
++    if (!s.includes("@tailwind base")) {
++      fs.writeFileSync(globals, pre + s);
++    }
++  }
++}
++
++async function writeBlankTemplate(target: string) {
++  const pkgPath = path.join(target, "package.json");
++  if (!fs.existsSync(pkgPath)) {
++    const pkg = {
++      name: path.basename(target),
++      private: true,
++      version: "0.0.0",
++      scripts: {
++        dev: "node index.js",
++        "flowlock:audit": "uxcg audit"
++      }
++    };
++    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
++  }
++  const indexJs = path.join(target, "index.js");
++  if (!fs.existsSync(indexJs)) {
++    fs.writeFileSync(
++      indexJs,
++      `console.log("Hello from ${path.basename(target)}");\n`
++    );
++  }
++}
+diff --git a/packages/cli/src/commands/init.ts b/packages/cli/src/commands/init.ts
+index 8c8e9a1..c4f7a7c 100644
+--- a/packages/cli/src/commands/init.ts
++++ b/packages/cli/src/commands/init.ts
+@@ -1,20 +1,167 @@
+-import { Command } from "commander";
+-export const initCommand = async () => {
+-  console.log("Initialize a new FlowLock project");
+-  // previous minimal init…
+-};
++import { Command } from "commander";
++import prompts from "prompts";
++import * as path from "path";
++import * as fs from "fs";
++import { scaffoldProject, type InitChoices } from "../templates/projects";
++import { writeClaudeCommands } from "../templates/claude";
++
++function repoIsProbablyEmpty(cwd: string) {
++  const children = fs.readdirSync(cwd).filter((x) => !x.startsWith(".git"));
++  return children.length === 0;
++}
++
++export const initCommand = async () => {
++  console.log("🚀 FlowLock Init");
++
++  // Offer mode based on folder emptiness
++  const defaultMode: "current" | "scaffold" = repoIsProbablyEmpty(process.cwd()) ? "scaffold" : "current";
++
++  const answers = await prompts(
++    [
++      {
++        type: "select",
++        name: "mode",
++        message: "Where do you want to initialize FlowLock?",
++        choices: [
++          { title: "Use current folder", value: "current" },
++          { title: "Scaffold a new project", value: "scaffold" },
++        ],
++        initial: defaultMode === "scaffold" ? 1 : 0,
++      },
++      {
++        type: (prev) => (prev === "scaffold" ? "select" : null),
++        name: "template",
++        message: "Choose a project template",
++        choices: [
++          { title: "Blank (FlowLock-only starter)", value: "blank" },
++          { title: "Next.js + Tailwind (via create-next-app)", value: "next-tailwind" },
++        ],
++        initial: 0,
++      },
++      {
++        type: (prev, values) => (values.mode === "scaffold" ? "text" : null),
++        name: "appName",
++        message: "Project directory name",
++        initial: (prev, values) => (values.template === "next-tailwind" ? "flowlock-next" : "flowlock-app"),
++        validate: (v) => (!!v && /^[a-z0-9-_]+$/i.test(v)) || "Use letters, numbers, - or _",
++      },
++      {
++        type: "toggle",
++        name: "addClaudeCmds",
++        message: "Write .claude/commands helper files?",
++        initial: true,
++        active: "yes",
++        inactive: "no",
++      },
++      {
++        type: "toggle",
++        name: "addWorkflow",
++        message: "Add GitHub Actions workflow for FlowLock audit?",
++        initial: true,
++        active: "yes",
++        inactive: "no",
++      },
++      {
++        type: "toggle",
++        name: "addScript",
++        message: "Add npm script `flowlock:audit`?",
++        initial: true,
++        active: "yes",
++        inactive: "no",
++      },
++    ],
++    {
++      onCancel: () => {
++        process.stdout.write("\nCancelled.\n");
++        process.exit(1);
++      },
++    }
++  );
++
++  const choices = answers as InitChoices;
++  await scaffoldProject(process.cwd(), choices);
++
++  // Always ensure commands exist in *this* repo too (idempotent)
++  try {
++    writeClaudeCommands(process.cwd());
++  } catch {}
++
++  console.log("\nNext steps:");
++  if (choices.mode === "scaffold") {
++    const dir = path.join(process.cwd(), choices.appName || (choices.template === "next-tailwind" ? "flowlock-next" : "flowlock-app"));
++    console.log(`  cd ${path.relative(process.cwd(), dir)}`);
++  }
++  console.log("  npx -y flowlock-uxcg audit");
++};

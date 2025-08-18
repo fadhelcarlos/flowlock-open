@@ -1,0 +1,369 @@
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index 1c1c1c1..9d9d9d9 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -1,5 +1,6 @@
+ packages:
+   - "packages/*"
++  - "packages/mcp"
+   - "apps/*"
+ 
+diff --git a/packages/cli/package.json b/packages/cli/package.json
+index 9b0b7aa..0bca3b3 100644
+--- a/packages/cli/package.json
++++ b/packages/cli/package.json
+@@ -8,10 +8,12 @@
+   "dependencies": {
+     "commander": "^11.1.0",
+     "prompts": "^2.4.2"
+   },
+   "devDependencies": {
+     "tsup": "^8.5.0",
+     "typescript": "^5.5.4"
+   },
++  "optionalDependencies": {
++    "eventsource": "^2.0.2"
++  },
+   "bin": {
+     "uxcg": "dist/index.js"
+   }
+diff --git a/packages/cli/src/commands/agent.ts b/packages/cli/src/commands/agent.ts
+new file mode 100644
+index 0000000..7e6a0ab
+--- /dev/null
++++ b/packages/cli/src/commands/agent.ts
+@@ -0,0 +1,197 @@
++import { Command } from "commander";
++import * as http from "http";
++import * as https from "https";
++import * as url from "url";
++import { spawn } from "child_process";
++
++type AgentOpts = {
++  cloud?: string;
++  project?: string;
++  token?: string;
++};
++
++function fetchJson(u: string, opts: { method?: string; headers?: Record<string, string>; body?: any } = {}): Promise<any> {
++  return new Promise((resolve, reject) => {
++    const parsed = url.parse(u);
++    const mod = parsed.protocol === "https:" ? https : http;
++    const req = mod.request(
++      {
++        method: opts.method || "GET",
++        hostname: parsed.hostname,
++        port: parsed.port,
++        path: parsed.path,
++        headers: { "content-type": "application/json", ...(opts.headers || {}) },
++      },
++      (res) => {
++        let data = "";
++        res.on("data", (c) => (data += c));
++        res.on("end", () => {
++          try {
++            resolve(data ? JSON.parse(data) : {});
++          } catch (e) {
++            resolve({ ok: false, error: "invalid_json", raw: data });
++          }
++        });
++      }
++    );
++    req.on("error", reject);
++    if (opts.body) req.write(typeof opts.body === "string" ? opts.body : JSON.stringify(opts.body));
++    req.end();
++  });
++}
++
++function runCli(cmd: string, args: string[] = []): Promise<{ code: number; out: string }> {
++  return new Promise((resolve) => {
++    const child = spawn(process.execPath, [require.resolve("../../dist/index.js"), cmd, ...args], {
++      stdio: ["ignore", "pipe", "pipe"],
++      shell: process.platform === "win32",
++      cwd: process.cwd(),
++    });
++    let out = "";
++    child.stdout.on("data", (c) => (out += c.toString()));
++    child.stderr.on("data", (c) => (out += c.toString()));
++    child.on("exit", (code) => resolve({ code: code ?? 1, out }));
++  });
++}
++
++async function handleCommand(base: string, token: string | undefined, cmdRow: any) {
++  const { id, command, args } = cmdRow;
++  let result = { ok: false, code: 1, out: "" };
++
++  if (command === "audit") result = await runCli("audit");
++  else if (command === "audit_fix") result = await runCli("audit", ["--fix"]);
++  else if (command === "diagrams") result = await runCli("diagrams");
++  else {
++    result = { ok: false, code: 1, out: `Unknown command: ${command}` };
++  }
++
++  await fetchJson(base + `/command/${encodeURIComponent(id)}/done`, {
++    method: "POST",
++    headers: token ? { authorization: `Bearer ${token}` } : undefined,
++    body: { ok: result.code === 0, output: result.out.slice(0, 20000) },
++  }).catch(() => {});
++}
++
++function connectSSE(base: string, project: string, token: string | undefined, onLine: (type: string, data: any) => void) {
++  const sseUrl = `${base.replace(/\/$/, "")}/events?project=${encodeURIComponent(project)}`;
++  const parsed = url.parse(sseUrl);
++  const mod = parsed.protocol === "https:" ? https : http;
++  const req = mod.request(
++    {
++      method: "GET",
++      hostname: parsed.hostname,
++      port: parsed.port,
++      path: parsed.path,
++      headers: { Accept: "text/event-stream", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
++    },
++    (res) => {
++      res.setEncoding("utf8");
++      let buf = "";
++      res.on("data", (chunk) => {
++        buf += chunk;
++        let idx;
++        while ((idx = buf.indexOf("\n\n")) >= 0) {
++          const raw = buf.slice(0, idx);
++          buf = buf.slice(idx + 2);
++          const lines = raw.split(/\r?\n/);
++          let ev = "message";
++          let data = "";
++          for (const ln of lines) {
++            if (ln.startsWith("event:")) ev = ln.slice(6).trim();
++            else if (ln.startsWith("data:")) data += ln.slice(5).trim();
++          }
++          try {
++            onLine(ev, data ? JSON.parse(data) : null);
++          } catch {}
++        }
++      });
++    }
++  );
++  req.on("error", () => {});
++  req.end();
++}
++
++export const agentCommand = new Command("agent")
++  .description("Connect to FlowLock Cloud and execute remote commands")
++  .option("--cloud <url>", "Cloud base URL (e.g. https://flowlock-cloud.onrender.com)")
++  .option("--project <id>", "Project id (e.g. demo)")
++  .option("--token <token>", "Bearer token (optional)")
++  .action(async (opts: AgentOpts) => {
++    const base = (opts.cloud || "").replace(/\/$/, "");
++    const project = opts.project || "demo";
++    const token = opts.token;
++
++    if (!base) {
++      console.error("Missing --cloud <url>");
++      process.exit(1);
++    }
++    console.log(`FlowLock agent connected → ${base}/dashboard?project=${project}`);
++
++    // 1) Poll for backlog (if any)
++    const headers = token ? { authorization: `Bearer ${token}` } : undefined;
++    try {
++      const backlog = await fetchJson(base + `/commands?project=${encodeURIComponent(project)}`, { headers });
++      if (Array.isArray(backlog)) {
++        for (const row of backlog) await handleCommand(base, token, row);
++      }
++    } catch {}
++
++    // 2) Live commands via SSE
++    connectSSE(base, project, token, async (type, data) => {
++      if (type === "command" && data && data.project === project) {
++        await handleCommand(base, token, data.row || data);
++      }
++    });
++
++    // keep process alive
++    setInterval(() => {}, 1 << 30);
++  });
+diff --git a/packages/cli/src/index.ts b/packages/cli/src/index.ts
+index a1a1a1a..b2b2b2b 100644
+--- a/packages/cli/src/index.ts
++++ b/packages/cli/src/index.ts
+@@ -6,6 +6,7 @@ import { initCommand } from './commands/init';
+ import { auditCommand } from './commands/audit';
+ import { diagramsCommand } from './commands/diagrams';
+ import { exportCommand } from './commands/export';
+ import { watchCommand } from './commands/watch';
++import { agentCommand } from './commands/agent';
+ 
+ const program = new Command();
+ 
+@@ -32,6 +33,9 @@ program
+   .action(watchCommand);
+ 
++program
++  .addCommand(agentCommand);
++
+ try { writeClaudeCommands(process.cwd()); } catch {}
+ program.parse(process.argv);
+ 
+diff --git a/packages/mcp/package.json b/packages/mcp/package.json
+new file mode 100644
+index 0000000..f0a0a0a
+--- /dev/null
++++ b/packages/mcp/package.json
+@@ -0,0 +1,34 @@
++{
++  "name": "flowlock-mcp",
++  "version": "0.1.0",
++  "private": true,
++  "type": "module",
++  "bin": {
++    "flowlock-mcp": "dist/server.js"
++  },
++  "scripts": {
++    "build": "tsup",
++    "dev": "tsx src/server.ts",
++    "start": "node dist/server.js"
++  },
++  "dependencies": {
++    "@modelcontextprotocol/sdk": "^0.4.0"
++  },
++  "devDependencies": {
++    "tsup": "^8.5.0",
++    "tsx": "^4.15.7",
++    "typescript": "^5.5.4"
++  }
++}
+diff --git a/packages/mcp/tsconfig.json b/packages/mcp/tsconfig.json
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/packages/mcp/tsconfig.json
+@@ -0,0 +1,13 @@
++{
++  "compilerOptions": {
++    "target": "ES2022",
++    "module": "ESNext",
++    "moduleResolution": "Bundler",
++    "strict": true,
++    "esModuleInterop": true,
++    "skipLibCheck": true,
++    "outDir": "dist"
++  },
++  "include": ["src"]
++}
+diff --git a/packages/mcp/tsup.config.ts b/packages/mcp/tsup.config.ts
+new file mode 100644
+index 0000000..2222222
+--- /dev/null
++++ b/packages/mcp/tsup.config.ts
+@@ -0,0 +1,10 @@
++import { defineConfig } from "tsup";
++export default defineConfig({
++  entry: ["src/server.ts"],
++  format: ["cjs"],
++  target: "es2022",
++  sourcemap: true,
++  clean: true,
++  banner: { js: "#!/usr/bin/env node" }
++});
+diff --git a/packages/mcp/src/server.ts b/packages/mcp/src/server.ts
+new file mode 100644
+index 0000000..e3e3e3e
+--- /dev/null
++++ b/packages/mcp/src/server.ts
+@@ -0,0 +1,167 @@
++import { Server } from "@modelcontextprotocol/sdk/server/index.js";
++import { StdioServerTransport } from "@modelcontextprotocol/sdk/transports/stdio.js";
++import { spawnSync } from "child_process";
++import * as fs from "fs";
++import * as path from "path";
++
++function runUx(cmd: string, args: string[], cwd?: string) {
++  const node = process.execPath;
++  // Call the local CLI build; fallback to npx if not present
++  const cliDist = path.resolve(process.cwd(), "packages/cli/dist/index.js");
++  const isLocal = fs.existsSync(cliDist);
++  const proc = isLocal
++    ? spawnSync(node, [cliDist, cmd, ...args], { cwd: cwd || process.cwd(), encoding: "utf8", shell: process.platform === "win32" })
++    : spawnSync("npx", ["-y", "flowlock-uxcg", cmd, ...args], { cwd: cwd || process.cwd(), encoding: "utf8", shell: process.platform === "win32" });
++  return { code: proc.status ?? 1, out: (proc.stdout || "") + (proc.stderr || "") };
++}
++
++const server = new Server(
++  { name: "flowlock-mcp", version: "0.1.0" },
++  { capabilities: { tools: {} } }
++);
++
++server.tool(
++  "ping",
++  {
++    description: "Health check",
++    inputSchema: { type: "object", properties: { message: { type: "string" } } }
++  },
++  async (args) => ({ ok: true, echo: args?.message || "pong" })
++);
++
++server.tool(
++  "audit",
++  {
++    description: "Run FlowLock audit (optionally with --fix)",
++    inputSchema: {
++      type: "object",
++      properties: {
++        cwd: { type: "string" },
++        fix: { type: "boolean" }
++      }
++    }
++  },
++  async (args) => {
++    const cwd = (args?.cwd as string) || process.cwd();
++    const res = runUx("audit", args?.fix ? ["--fix"] : [], cwd);
++    const artifacts = ["er.svg","flow.svg","screens.csv","results.junit.xml","gap_report.md","acceptance_criteria.feature","er.mmd","flow.mmd"]
++      .map((f) => path.join("artifacts", f))
++      .filter((p) => fs.existsSync(path.join(cwd, p)));
++    return { ok: res.code === 0, code: res.code, output: res.out, artifacts };
++  }
++);
++
++server.tool(
++  "diagrams",
++  {
++    description: "Generate only diagram artifacts",
++    inputSchema: { type: "object", properties: { cwd: { type: "string" } } }
++  },
++  async (args) => {
++    const cwd = (args?.cwd as string) || process.cwd();
++    const res = runUx("diagrams", [], cwd);
++    const artifacts = ["er.svg","flow.svg","er.mmd","flow.mmd"].map((f)=>path.join("artifacts", f)).filter((p)=>fs.existsSync(path.join(cwd,p)));
++    return { ok: res.code === 0, code: res.code, output: res.out, artifacts };
++  }
++);
++
++server.tool(
++  "init",
++  {
++    description: "Initialize FlowLock in current project (interactive in client side recommended)",
++    inputSchema: { type: "object", properties: { cwd: { type: "string" } } }
++  },
++  async (args) => {
++    const cwd = (args?.cwd as string) || process.cwd();
++    const res = runUx("init", [], cwd);
++    return { ok: res.code === 0, code: res.code, output: res.out };
++  }
++);
++
++server.tool(
++  "write_claude_commands",
++  {
++    description: "Ensure .claude/commands exist for FlowLock agent workflows",
++    inputSchema: { type: "object", properties: { cwd: { type: "string" } } }
++  },
++  async (args) => {
++    const cwd = (args?.cwd as string) || process.cwd();
++    // Reuse CLI entrypoint side-effect that writes commands on start
++    const res = runUx("--help", [], cwd);
++    const exists = fs.existsSync(path.join(cwd, ".claude", "commands"));
++    return { ok: exists, code: res.code, output: res.out, wrote: exists };
++  }
++);
++
++await server.connect(new StdioServerTransport());
++console.error("[flowlock-mcp] ready (stdio)");

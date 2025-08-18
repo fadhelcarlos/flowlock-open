@@ -4,6 +4,7 @@ import { auditCommand } from "./commands/audit";
 import { diagramsCommand } from "./commands/diagrams";
 import { exportCommand } from "./commands/export";
 import { watchCommand } from "./commands/watch";
+import { agentCommand } from "./commands/agent";
 import { writeClaudeCommands } from "./templates/claude";
 
 const program = new Command();
@@ -41,6 +42,9 @@ program
   .option("--cloudUrl <url>", "Cloud endpoint URL")
   .option("--projectId <id>", "Project identifier")
   .action(watchCommand);
+
+program
+  .addCommand(agentCommand);
 
 // Ensure agent commands exist for Claude/Cursor users
 try { writeClaudeCommands(process.cwd()); } catch {}

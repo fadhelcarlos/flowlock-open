@@ -1,56 +1,103 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { starterSpec } from '../templates/starter-spec';
-import { packageScripts, huskyPreCommit } from '../templates/package-scripts';
+import prompts from "prompts";
+import * as path from "path";
+import * as fs from "fs";
+import { scaffoldProject, type InitChoices } from "../templates/projects";
+import { writeClaudeCommands } from "../templates/claude";
 
-export async function initCommand() {
-  console.log('🚀 Initializing FlowLock UX specification...');
-  
-  const specPath = path.join(process.cwd(), 'uxspec.json');
-  const packagePath = path.join(process.cwd(), 'package.json');
-  
-  try {
-    await fs.access(specPath);
-    console.log('⚠️  uxspec.json already exists. Skipping...');
-  } catch {
-    await fs.writeFile(specPath, JSON.stringify(starterSpec, null, 2));
-    console.log('✅ Created uxspec.json');
-  }
-  
-  try {
-    const packageContent = await fs.readFile(packagePath, 'utf-8');
-    const packageJson = JSON.parse(packageContent);
-    
-    packageJson.scripts = {
-      ...packageJson.scripts,
-      ...packageScripts,
-    };
-    
-    await fs.writeFile(packagePath, JSON.stringify(packageJson, null, 2));
-    console.log('✅ Added scripts to package.json');
-  } catch {
-    console.log('⚠️  No package.json found. Creating one...');
-    const newPackage = {
-      name: 'my-ux-project',
-      version: '1.0.0',
-      scripts: packageScripts,
-    };
-    await fs.writeFile(packagePath, JSON.stringify(newPackage, null, 2));
-    console.log('✅ Created package.json with scripts');
-  }
-  
-  try {
-    await fs.mkdir('.husky', { recursive: true });
-    await fs.writeFile('.husky/pre-commit', huskyPreCommit);
-    await fs.chmod('.husky/pre-commit', 0o755);
-    console.log('✅ Set up Husky pre-commit hook');
-  } catch (error) {
-    console.log('⚠️  Could not set up Husky:', error);
-  }
-  
-  console.log('\\n🎉 FlowLock initialization complete!');
-  console.log('\\nNext steps:');
-  console.log('  1. Edit uxspec.json to define your UX specification');
-  console.log('  2. Run "npm run uxcg:audit" to validate your spec');
-  console.log('  3. Run "npm run uxcg:watch" to enable live validation');
+type PromptAnswers = {
+  mode?: "current" | "scaffold";
+  template?: "blank" | "next-tailwind";
+  appName?: string;
+  addClaudeCmds?: boolean;
+  addWorkflow?: boolean;
+  addScript?: boolean;
+};
+
+function repoIsProbablyEmpty(cwd: string) {
+  const children = fs.readdirSync(cwd).filter((x) => !x.startsWith(".git"));
+  return children.length === 0;
 }
+
+export const initCommand = async () => {
+  console.log("🚀 FlowLock Init");
+
+  // Offer mode based on folder emptiness
+  const defaultMode: "current" | "scaffold" = repoIsProbablyEmpty(process.cwd()) ? "scaffold" : "current";
+
+  const answers = await prompts(
+    [
+      {
+        type: "select",
+        name: "mode",
+        message: "Where do you want to initialize FlowLock?",
+        choices: [
+          { title: "Use current folder", value: "current" },
+          { title: "Scaffold a new project", value: "scaffold" },
+        ],
+        initial: defaultMode === "scaffold" ? 1 : 0,
+      },
+      {
+        type: (prev: any) => (prev === "scaffold" ? "select" : null),
+        name: "template",
+        message: "Choose a project template",
+        choices: [
+          { title: "Blank (FlowLock-only starter)", value: "blank" },
+          { title: "Next.js + Tailwind (via create-next-app)", value: "next-tailwind" },
+        ],
+        initial: 0,
+      },
+      {
+        type: (_prev: any, values: PromptAnswers) => (values.mode === "scaffold" ? "text" : null),
+        name: "appName",
+        message: "Project directory name",
+        initial: (_prev: any, values: PromptAnswers) => (values.template === "next-tailwind" ? "flowlock-next" : "flowlock-app"),
+        validate: (v: string) => (!!v && /^[a-z0-9-_]+$/i.test(v)) || "Use letters, numbers, - or _",
+      },
+      {
+        type: "toggle",
+        name: "addClaudeCmds",
+        message: "Write .claude/commands helper files?",
+        initial: true,
+        active: "yes",
+        inactive: "no",
+      },
+      {
+        type: "toggle",
+        name: "addWorkflow",
+        message: "Add GitHub Actions workflow for FlowLock audit?",
+        initial: true,
+        active: "yes",
+        inactive: "no",
+      },
+      {
+        type: "toggle",
+        name: "addScript",
+        message: "Add npm script `flowlock:audit`?",
+        initial: true,
+        active: "yes",
+        inactive: "no",
+      },
+    ],
+    {
+      onCancel: () => {
+        process.stdout.write("\nCancelled.\n");
+        process.exit(1);
+      },
+    }
+  );
+
+  const choices = answers as InitChoices;
+  await scaffoldProject(process.cwd(), choices);
+
+  // Always ensure commands exist in *this* repo too (idempotent)
+  try {
+    writeClaudeCommands(process.cwd());
+  } catch {}
+
+  console.log("\nNext steps:");
+  if (choices.mode === "scaffold") {
+    const dir = path.join(process.cwd(), choices.appName || (choices.template === "next-tailwind" ? "flowlock-next" : "flowlock-app"));
+    console.log(`  cd ${path.relative(process.cwd(), dir)}`);
+  }
+  console.log("  npx -y flowlock-uxcg audit");
+};
