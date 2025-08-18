@@ -213,7 +213,21 @@ export function generateJTBDCSV(spec: UXSpec): string {
   const headers = ['Role', 'Tasks', 'Description', 'Related Flows'];
   const rows: string[][] = [headers];
   
-  const jtbdList = (spec as any).jtbd || [];
+  // Handle both old (object) and new (array) formats
+  let jtbdList: any[] = [];
+  const jtbdField = (spec as any).jtbd;
+  
+  if (Array.isArray(jtbdField)) {
+    // New format: array of JTBD objects
+    jtbdList = jtbdField;
+  } else if (jtbdField && typeof jtbdField === 'object') {
+    // Old format: convert object to array format
+    jtbdList = Object.entries(jtbdField).map(([role, tasks]) => ({
+      role,
+      tasks: Array.isArray(tasks) ? tasks : [tasks],
+      description: ''
+    }));
+  }
   
   for (const jtbd of jtbdList) {
     // Find flows related to this JTBD

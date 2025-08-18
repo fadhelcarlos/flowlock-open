@@ -5,8 +5,22 @@ import type { UXSpec } from 'flowlock-uxspec';
  */
 export function checkJTBD(spec: UXSpec): any[] {
   const results: any[] = [];
-  const jtbdList = (spec as any).jtbd || [];
   const flows = spec.flows || [];
+  
+  // Handle both old (object) and new (array) formats
+  let jtbdList: any[] = [];
+  const jtbdField = (spec as any).jtbd;
+  
+  if (Array.isArray(jtbdField)) {
+    // New format: array of JTBD objects
+    jtbdList = jtbdField;
+  } else if (jtbdField && typeof jtbdField === 'object') {
+    // Old format: convert object to array format
+    jtbdList = Object.entries(jtbdField).map(([role, tasks]) => ({
+      role,
+      tasks: Array.isArray(tasks) ? tasks : [tasks],
+    }));
+  }
   
   // Check that each JTBD has at least one flow
   for (const jtbd of jtbdList) {

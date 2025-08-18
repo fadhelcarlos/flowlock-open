@@ -187,7 +187,10 @@ export const UXSpecSchema = z.object({
   name: z.string(),
   description: z.string().optional(), // NEW
   roles: z.array(RoleSchema).optional(),
-  jtbd: z.array(JTBDSchema).optional(), // NEW
+  jtbd: z.union([
+    z.array(JTBDSchema),  // New format: array of JTBD objects
+    z.record(z.array(z.string()))  // Old format: object with role keys
+  ]).optional(), // NEW - supports both formats
   entities: z.array(EntitySchema),
   screens: z.array(ScreenSchema),
   flows: z.array(FlowSchema),
