@@ -1,8 +1,6 @@
 {
   "name": "flowlock-mcp",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
+  "version": "0.2.0",
   "bin": {
     "flowlock-mcp": "dist/server.js"
   },

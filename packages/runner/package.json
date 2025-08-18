@@ -1,6 +1,6 @@
 {
   "name": "flowlock-runner",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Test runner for FlowLock checks",
   "publishConfig": {
     "access": "public"

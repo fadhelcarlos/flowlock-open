@@ -11,6 +11,10 @@ import { checkUIStates } from "./checks/uiStates";
 import { checkStateMachines } from "./checks/stateMachine";
 import { checkScreen } from "./checks/screen";
 import { checkSpecCoverage } from "./checks/coverage";
+import { checkJTBD } from "./checks/jtbd";
+import { checkRelations } from "./checks/relations";
+import { checkRoutes } from "./checks/routes";
+import { checkCTAs } from "./checks/ctas";
 
 /** Normalize unknown results to CheckResult[] with narrow level/status. Drops extra props. */
 function normalizeResults(raw: any): CheckResult[] {
@@ -62,11 +66,39 @@ const coverage: FlowlockCheck = {
   run: (spec: UXSpec) => normalizeResults(checkSpecCoverage(spec)),
 };
 
+const jtbd: FlowlockCheck = {
+  id: "jtbd",
+  name: "Jobs To Be Done",
+  description: "Validates that all JTBD are addressed by flows.",
+  run: (spec: UXSpec) => normalizeResults(checkJTBD(spec)),
+};
+
+const relations: FlowlockCheck = {
+  id: "relations",
+  name: "Entity Relations",
+  description: "Validates entity relations are properly defined.",
+  run: (spec: UXSpec) => normalizeResults(checkRelations(spec)),
+};
+
+const routes: FlowlockCheck = {
+  id: "routes",
+  name: "Screen Routes",
+  description: "Validates screen routes are unique and properly formatted.",
+  run: (spec: UXSpec) => normalizeResults(checkRoutes(spec)),
+};
+
+const ctas: FlowlockCheck = {
+  id: "ctas",
+  name: "Call to Actions",
+  description: "Validates CTAs point to valid screens.",
+  run: (spec: UXSpec) => normalizeResults(checkCTAs(spec)),
+};
+
 // Optional short aliases (kept for convenience)
 export const honestReads = honestReadsCheck;
 export const creatableNeedsDetail = creatableNeedsDetailCheck;
 export const reachability = reachabilityCheck;
-export { uiStates, stateMachine, screen, coverage };
+export { uiStates, stateMachine, screen, coverage, jtbd, relations, routes, ctas };
 export const roleBoundaries = screen; // Backward compatibility alias
 
 // Bundle consumed by the runner/CLI
@@ -78,4 +110,8 @@ export const coreChecks: FlowlockCheck[] = [
   stateMachine,
   screen,
   coverage,
+  jtbd,
+  relations,
+  routes,
+  ctas,
 ];

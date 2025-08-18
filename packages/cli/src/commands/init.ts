@@ -11,6 +11,8 @@ type PromptAnswers = {
   addClaudeCmds?: boolean;
   addWorkflow?: boolean;
   addScript?: boolean;
+  addHusky?: boolean;
+  addGlossary?: boolean;
 };
 
 function repoIsProbablyEmpty(cwd: string) {
@@ -73,6 +75,22 @@ export const initCommand = async () => {
         type: "toggle",
         name: "addScript",
         message: "Add npm script `flowlock:audit`?",
+        initial: true,
+        active: "yes",
+        inactive: "no",
+      },
+      {
+        type: "toggle",
+        name: "addHusky",
+        message: "Add Husky git hooks for pre-commit validation?",
+        initial: false,
+        active: "yes",
+        inactive: "no",
+      },
+      {
+        type: "toggle",
+        name: "addGlossary",
+        message: "Create glossary.yml for derived fields?",
         initial: true,
         active: "yes",
         inactive: "no",

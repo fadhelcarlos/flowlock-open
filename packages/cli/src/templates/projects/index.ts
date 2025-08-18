@@ -2,6 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { run, which } from "../../utils/exec";
 import { writeClaudeCommands } from "../claude";
+import { setupHusky } from "../husky";
+import { createGlossaryFiles } from "../glossary";
+import { starterSpec } from "../starter-spec";
 
 export type InitChoices = {
   mode: "current" | "scaffold";
@@ -10,6 +13,8 @@ export type InitChoices = {
   addWorkflow: boolean;
   addScript: boolean;
   addClaudeCmds: boolean;
+  addHusky?: boolean;
+  addGlossary?: boolean;
 };
 
 export async function scaffoldProject(cwd: string, c: InitChoices) {
@@ -37,77 +42,51 @@ export async function scaffoldProject(cwd: string, c: InitChoices) {
 
 async function applyFlowLockBasics(target: string, c: InitChoices) {
   seedUxspec(target);
+  
+  if (c.addGlossary) {
+    const glossaryFiles = createGlossaryFiles();
+    for (const [file, content] of Object.entries(glossaryFiles)) {
+      const filePath = path.join(target, file);
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, content, "utf8");
+      }
+    }
+  }
+  
   if (c.addClaudeCmds) {
     writeClaudeCommands(target);
   }
+  
   if (c.addScript) {
     ensureNpmScript(target, "flowlock:audit", "uxcg audit");
+    ensureNpmScript(target, "flowlock:fix", "uxcg audit --fix");
+    ensureNpmScript(target, "flowlock:watch", "uxcg watch");
   }
+  
   if (c.addWorkflow) {
     maybeWriteWorkflow(target);
   }
+  
+  if (c.addHusky) {
+    await setupHusky(target);
+  }
+  
   console.log(`\n✅ FlowLock ready in: ${path.relative(process.cwd(), target) || "."}`);
   console.log(`   - uxspec.json`);
+  if (c.addGlossary) console.log(`   - uxspec/glossary.yml & glossary.md`);
   if (c.addClaudeCmds) console.log(`   - .claude/commands/*`);
   if (c.addWorkflow) console.log(`   - .github/workflows/flowlock.yml`);
-  if (c.addScript) console.log(`   - package.json scripts.flowlock:audit`);
+  if (c.addScript) console.log(`   - package.json scripts (flowlock:audit, flowlock:fix, flowlock:watch)`);
+  if (c.addHusky) console.log(`   - .husky/* (git hooks)`);
 }
 
 function seedUxspec(target: string) {
   const p = path.join(target, "uxspec.json");
   if (fs.existsSync(p)) return;
-  const spec = {
-    version: "1.0.0",
-    name: "FlowLock Project",
-    roles: ["admin", "viewer"],
-    entities: [
-      {
-        id: "user",
-        name: "User",
-        fields: [
-          { id: "id", name: "ID", type: "string", required: true, derived: true, provenance: "system.uuid" },
-          { id: "email", name: "Email", type: "email", required: true },
-          { id: "name", name: "Name", type: "string", required: true },
-          { id: "role", name: "Role", type: "string" },
-          { id: "createdAt", name: "Created At", type: "date", derived: true, provenance: "system.timestamp" },
-        ],
-      },
-    ],
-    screens: [
-      {
-        id: "user_list",
-        name: "User List",
-        type: "list",
-        entityId: "user",
-        reads: ["user.id", "user.name", "user.email", "user.role"],
-        roles: ["admin", "viewer"],
-        uiStates: ["empty", "loading", "error"],
-      },
-      {
-        id: "user_detail",
-        name: "User Detail",
-        type: "detail",
-        entityId: "user",
-        reads: ["user.id", "user.name", "user.email", "user.role", "user.createdAt"],
-        roles: ["admin", "viewer"],
-        uiStates: ["empty", "loading", "error"],
-      },
-    ],
-    flows: [
-      {
-        id: "user_browse",
-        name: "Browse Users",
-        entryStepId: "s1",
-        roles: ["admin", "viewer"],
-        steps: [
-          { id: "s1", screenId: "user_list", next: [{ targetStepId: "s2" }] },
-          { id: "s2", screenId: "user_detail" },
-        ],
-      },
-    ],
-    jtbd: { admin: ["Manage users"], viewer: ["See users"] },
-  };
-  fs.writeFileSync(p, JSON.stringify(spec, null, 2));
+  
+  // Use the enhanced starter spec
+  fs.writeFileSync(p, JSON.stringify(starterSpec, null, 2));
 }
 
 function ensureNpmScript(target: string, name: string, cmd: string) {
