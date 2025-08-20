@@ -4,7 +4,6 @@ import * as path from "path";
 import chalk from "chalk";
 import chokidar from "chokidar";
 import { Runner } from "flowlock-runner";
-import WebSocket from "ws"; // (unused for now, kept for future realtime enhancements)
 
 interface WatchOptions {
   cloud?: boolean;

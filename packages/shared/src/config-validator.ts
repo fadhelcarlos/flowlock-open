@@ -79,7 +79,6 @@ export function validateFlowlockConfig(config: any): FlowlockConfig {
 
 export function loadFlowlockConfig(configPath: string): FlowlockConfig {
   const fs = require('fs');
-  const path = require('path');
   const YAML = require('yaml');
 
   if (!fs.existsSync(configPath)) {

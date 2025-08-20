@@ -48,7 +48,7 @@ program
   .option("--skip <checks>", "Skip specific checks (comma-separated)")
   .option("--json", "Output results as JSON")
   .option("--quiet", "Suppress non-error output")
-  .action((opts) => auditCommand(opts));
+  .action((opts: any) => auditCommand(opts));
 
 program
   .command("diagrams")
@@ -72,7 +72,7 @@ program
   .option("--db-only", "Extract only database entities")
   .option("--api-only", "Extract only API endpoints")
   .option("--ui-only", "Extract only UI reads/writes")
-  .action((opts) => inventoryCommand(opts));
+  .action((opts: any) => inventoryCommand(opts));
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Watch mode & Agent

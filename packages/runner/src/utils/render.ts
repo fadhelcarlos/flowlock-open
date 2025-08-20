@@ -16,7 +16,7 @@ export async function renderMermaidCLI(input: string, output: string): Promise<b
 
   for (const c of candidates) {
     try {
-      await exec(c.cmd, c.args, { stdio: "ignore" as any });
+      await exec(c.cmd, c.args);
       return true;
     } catch {
       // try next
