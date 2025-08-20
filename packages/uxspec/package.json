@@ -1,6 +1,6 @@
 {
   "name": "flowlock-uxspec",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "UX specification definitions for FlowLock",
   "publishConfig": {
     "access": "public"

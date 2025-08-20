@@ -83,15 +83,23 @@ function ensureCoreUiStates(states?: string[]): string[] {
   for (const s of req) set.add(s);
   return Array.from(set);
 }
-function groupOf(id: string): "HONEST"|"CREATABLE"|"REACHABILITY"|"UI"|"STATE"|"SCREEN"|"SPEC"|"OTHER" {
+function groupOf(id: string): string {
   const x = id.toLowerCase();
   if (x.startsWith("honest")) return "HONEST";
   if (x.startsWith("creatable")) return "CREATABLE";
   if (x.startsWith("reach")) return "REACHABILITY";
   if (x.startsWith("ui_") || x.startsWith("ui-") || x.startsWith("ui")) return "UI";
-  if (x.startsWith("state")) return "STATE";
+  if (x.startsWith("state_machine")) return "STATE";
   if (x.startsWith("screen")) return "SCREEN";
   if (x.startsWith("spec")) return "SPEC";
+  if (x.startsWith("jtbd")) return "JTBD";
+  if (x.startsWith("relations")) return "RELATIONS";
+  if (x.startsWith("routes")) return "ROUTES";
+  if (x.startsWith("ctas")) return "CTAS";
+  if (x.startsWith("inventory")) return "INVENTORY";
+  if (x.startsWith("runtime_determinism")) return "DETERMINISM";
+  if (x.startsWith("database")) return "DATABASE";
+  if (x.startsWith("migration")) return "MIGRATION";
   return "OTHER";
 }
 function hasErrors(checks: CheckResult[]): boolean {
@@ -208,9 +216,15 @@ async function runRunnerWithHeal(specPath: string, outDir: string, allowHeal: bo
 /* =========================== Printing =========================== */
 function printSummary(checks: CheckResult[], specPath: string) {
   const groups: Record<string, CheckResult[]> = {
-    HONEST: [], CREATABLE: [], REACHABILITY: [], UI: [], STATE: [], SCREEN: [], SPEC: [], OTHER: []
+    HONEST: [], CREATABLE: [], REACHABILITY: [], UI: [], STATE: [], SCREEN: [], SPEC: [],
+    JTBD: [], RELATIONS: [], ROUTES: [], CTAS: [],
+    INVENTORY: [], DETERMINISM: [], DATABASE: [], MIGRATION: [], OTHER: []
   };
-  for (const r of checks) groups[groupOf(r.id)].push(r);
+  for (const r of checks) {
+    const group = groupOf(r.id);
+    if (!groups[group]) groups[group] = [];
+    groups[group].push(r);
+  }
 
   const hasFail = (arr: CheckResult[]) => arr.some(r => String(r.status).toLowerCase() === "fail");
 
@@ -262,6 +276,39 @@ function printSummary(checks: CheckResult[], specPath: string) {
     console.log("\n📋 SPEC");
     console.log("  ⚠️  Could not compute coverage.");
   }
+
+  // Print the new checks
+  console.log("\n📋 JTBD");
+  if (!hasFail(groups.JTBD)) console.log("  ✅ All Jobs To Be Done are addressed by flows");
+  else for (const r of groups.JTBD) if (r.status === "fail") console.log("  ❌ " + r.message);
+
+  console.log("\n📋 RELATIONS");
+  if (!hasFail(groups.RELATIONS)) console.log("  ✅ All entity relations are properly defined");
+  else for (const r of groups.RELATIONS) if (r.status === "fail") console.log("  ❌ " + r.message);
+
+  console.log("\n📋 ROUTES");
+  if (!hasFail(groups.ROUTES)) console.log("  ✅ All routes are unique and properly formatted");
+  else for (const r of groups.ROUTES) if (r.status === "fail") console.log("  ❌ " + r.message);
+
+  console.log("\n📋 CTAS");
+  if (!hasFail(groups.CTAS)) console.log("  ✅ All CTAs point to valid screens");
+  else for (const r of groups.CTAS) if (r.status === "fail") console.log("  ❌ " + r.message);
+
+  console.log("\n📋 INVENTORY");
+  if (!hasFail(groups.INVENTORY)) console.log("  ✅ Runtime inventory is complete and consistent");
+  else for (const r of groups.INVENTORY) if (r.status === "fail") console.log("  ❌ " + r.message);
+
+  console.log("\n📋 DETERMINISM");
+  if (!hasFail(groups.DETERMINISM)) console.log("  ✅ Audit results are deterministic");
+  else for (const r of groups.DETERMINISM) if (r.status === "fail") console.log("  ❌ " + r.message);
+
+  console.log("\n📋 DATABASE");
+  if (!hasFail(groups.DATABASE)) console.log("  ✅ Database structure follows best practices");
+  else for (const r of groups.DATABASE) if (r.status === "fail") console.log("  ❌ " + r.message);
+
+  console.log("\n📋 MIGRATION");
+  if (!hasFail(groups.MIGRATION)) console.log("  ✅ Migrations are safe and reversible");
+  else for (const r of groups.MIGRATION) if (r.status === "fail") console.log("  ❌ " + r.message);
 }
 
 /* ============================ Command =========================== */

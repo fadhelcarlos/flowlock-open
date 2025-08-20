@@ -1,6 +1,6 @@
 {
   "name": "flowlock-shared",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared utilities and types for FlowLock system",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,5 +12,5 @@
     "@types/node": "^20.10.0",
     "typescript": "^5.3.2"
   },
-  "private": true
+  "private": false
 }
