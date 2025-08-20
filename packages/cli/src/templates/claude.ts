@@ -27,7 +27,7 @@ export function writeClaudeCommands(cwd: string) {
 const CONTRACT_INIT = `
 # /ux-contract-init — Seed or refine the UX contract (uxspec.json)
 
-You are the FlowLock v3 contract editor. Use the README/PRD and code to create or refine \`uxspec.json\` with all enhanced features.
+You are the FlowLock contract editor. Use the README/PRD and code to create or refine \`uxspec.json\` with comprehensive validation coverage.
 
 **Do:**
 1) Read repo docs (README, /docs/**, /product/**). Infer:
@@ -128,7 +128,7 @@ If audit fails, call **/ux-guardrails-validate** next.
 const GUARDRAILS_VALIDATE = `
 # /ux-guardrails-validate — Make the spec pass all FlowLock checks
 
-You are the FlowLock v3 guardrails fixer. Goal: ✅ all 11 checks green.
+You are the FlowLock guardrails fixer. Goal: ✅ all 15 checks pass.
 
 **Input:**
 - \`artifacts/gap_report.md\`
@@ -137,10 +137,12 @@ You are the FlowLock v3 guardrails fixer. Goal: ✅ all 11 checks green.
 - current \`uxspec.json\`
 
 **Do:**
-1) Summarize failing rules (now includes 15 checks):
-   - **Core (7)**: HONEST/CREATABLE/REACHABILITY/UI/STATE/SCREEN/SPEC
-   - **Enhanced (4)**: JTBD/RELATIONS/ROUTES/CTAS
-   - **Runtime (4)**: INVENTORY/DETERMINISM/DATABASE_VALIDATION/MIGRATION_VALIDATION
+1) Summarize failing rules (15 total checks):
+   - **Data Integrity**: HONEST/CREATABLE/SPEC
+   - **Navigation**: REACHABILITY/ROUTES/CTAS
+   - **UI/UX**: UI/STATE/SCREEN
+   - **Business Logic**: JTBD/RELATIONS
+   - **Runtime**: INVENTORY/DETERMINISM/DATABASE_VALIDATION/MIGRATION_VALIDATION
 
 2) Propose minimal, safe edits to \`uxspec.json\` ONLY (do not touch app code):
    - **HONEST**: Mark fields as derived/external with provenance/source OR remove uncaptured reads
@@ -157,7 +159,7 @@ You are the FlowLock v3 guardrails fixer. Goal: ✅ all 11 checks green.
    - **INVENTORY**: Ensure runtime inventory is fresh (run \`uxcg inventory\`)
    - **DETERMINISM**: Validate DB schema matches entities, auth aligns with roles
 
-3) For enhanced features, suggest additions:
+3) For missing features, suggest additions:
    - Add \`routes\` to screens for URL navigation
    - Split simple \`forms\` into detailed form objects with \`writes\`
    - Add \`cards\` for display components
@@ -178,9 +180,9 @@ Repeat until ✅ everywhere. When green, call **/ux-generate-ui**.
 `;
 
 const GENERATE_UI = `
-# /ux-generate-ui — Scaffold UI with all FlowLock v3 features
+# /ux-generate-ui — Scaffold UI components from validated spec
 
-You are the FlowLock v3 UI scaffolder. Precondition: audit is ✅.
+You are the FlowLock UI scaffolder. Precondition: audit passes all checks.
 
 **Do:**
 1) For each screen in \`uxspec.json\`, generate complete UI components:
@@ -239,9 +241,9 @@ You are the FlowLock v3 UI scaffolder. Precondition: audit is ✅.
 `;
 
 const FLOW_AUDIT_FIX = `
-# /flow-audit-fix — Close gaps from the latest audit with v3 features
+# /flow-audit-fix — Close gaps identified by FlowLock audit
 
-You are the FlowLock v3 gap closer, handling all 15 checks including runtime validation.
+You are the FlowLock gap closer, handling all 15 validation checks.
 
 **Inputs:**
 - \`artifacts/gap_report.md\`
@@ -293,12 +295,12 @@ Goal: All 15 checks ✅ (including runtime validation).
 `;
 
 const ENHANCE_SPEC = `
-# /ux-enhance-spec — Upgrade spec to use all FlowLock v3 features
+# /ux-enhance-spec — Enhance spec with comprehensive FlowLock features
 
-You are the FlowLock v3 enhancement specialist. Upgrade existing specs to use new features.
+You are the FlowLock enhancement specialist. Add missing features to make specs production-ready.
 
 **Analyze current spec for:**
-1) Missing JTBD definitions (convert from old format if needed)
+1) Missing JTBD definitions
 2) Entities without relations
 3) Screens without routes, cards, lists, or CTAs
 4) Flows without JTBD links or state transitions
@@ -307,10 +309,13 @@ You are the FlowLock v3 enhancement specialist. Upgrade existing specs to use ne
 
 **Propose enhancements:**
 
-1) **JTBD Migration** (if using old format):
+1) **JTBD Structure**:
    \`\`\`json
-   // Old: { "admin": ["task1", "task2"] }
-   // New: [{ "role": "admin", "tasks": ["task1", "task2"], "description": "Admin duties" }]
+   [{ 
+     "role": "admin", 
+     "tasks": ["manage users", "review analytics"], 
+     "description": "Administrative oversight and management" 
+   }]
    \`\`\`
 
 2) **Add Entity Relations**:
@@ -353,11 +358,11 @@ You are the FlowLock v3 enhancement specialist. Upgrade existing specs to use ne
    - Define external data sources
    - Add business terminology
 
-**Benefits of upgrading:**
-- Better validation with 11 checks vs 7
-- Richer UI generation with components
-- URL-based navigation support
-- State machine enforcement
+**Benefits of comprehensive spec:**
+- 15 validation checks ensure production readiness
+- Automatic UI component generation
+- URL-based navigation with route validation
+- State machine enforcement for business logic
 - Clearer data flow documentation
 - Enhanced diagrams and reports
 

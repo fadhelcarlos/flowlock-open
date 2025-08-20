@@ -1,55 +1,85 @@
-# FlowLock Open v3
+# FlowLock
 
 **Agent-native UX contract and guardrails system** for consistent, auditable delivery without hallucinations.
 
 [![npm version](https://img.shields.io/npm/v/flowlock-uxcg.svg)](https://www.npmjs.com/package/flowlock-uxcg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-## 🎉 FlowLock v3 - Complete Feature Parity with Original UXCG
+## 🛵 Stop AI agents from hallucinating your UI
 
-FlowLock v3 brings 100% feature parity with the original UX Contract Guardrails (UXCG) implementation, plus significant enhancements for modern development workflows.
+FlowLock ensures AI coding assistants follow your exact UX requirements through deterministic validation and runtime inventory extraction.
 
 ## 🚀 Quick Start
 
 ```bash
-# Install CLI globally
+# No installation required - use npx
+npx flowlock-uxcg@latest init
+npx flowlock-uxcg@latest audit
+
+# Or install globally for convenience
 npm install -g flowlock-uxcg@latest
-
-# Initialize a new project
 uxcg init
-
-# Run validation (11 checks)
-uxcg audit
-
-# Auto-fix issues
 uxcg audit --fix
 
-# Generate diagrams only
-uxcg diagrams
+# For existing projects
+npx flowlock-uxcg@latest init-existing
+npx flowlock-uxcg@latest inventory
+npx flowlock-uxcg@latest audit --inventory
 ```
+
+## 🔒 Security & Trust
+
+FlowLock mitigates AI hallucinations through deterministic validation:
+
+### Example: HONEST Check Prevents Phantom Fields
+**Without FlowLock:** AI might generate UI that reads `user.lastLogin` when that field doesn't exist in your database.
+**With FlowLock:** The HONEST check fails immediately, blocking deployment of broken code.
+
+```json
+// ❌ AI tries to read undeclared field
+"reads": ["user.lastLogin"]  
+
+// ✅ FlowLock blocks it: "HONEST_READS failed: user.lastLogin not in entity"
+```
+
+Each of the 15 checks prevents specific failure modes, creating a safety net for AI-generated code.
+
+## 🎯 FlowLock vs Schema-First Tools
+
+| Feature | FlowLock | OpenAPI | JSON Schema | Storybook |
+|---------|----------|---------|-------------|----------|
+| **Jobs To Be Done (JTBD)** | ✅ Native support | ❌ | ❌ | ❌ |
+| **Screen Routes** | ✅ With params | ⚖️ API only | ❌ | ❌ |
+| **Role-Based Access** | ✅ Per screen | ⚖️ Global | ❌ | ❌ |
+| **UI State Management** | ✅ Required | ❌ | ❌ | ⚖️ Manual |
+| **Contract Validation** | ✅ 15 checks | ⚖️ Schema only | ⚖️ Schema only | ❌ |
+| **Agent Safety** | ✅ Hallucination prevention | ❌ | ❌ | ❌ |
+| **Runtime Inventory** | ✅ DB/API/UI extraction | ❌ | ❌ | ❌ |
+| **Deterministic Audits** | ✅ SHA-256 hashing | ❌ | ❌ | ❌ |
 
 ## 📦 Latest Versions
 
-| Package | Version | Install |
-|---------|---------|---------|
-| [flowlock-uxcg](https://www.npmjs.com/package/flowlock-uxcg) (CLI) | 0.5.0 | `npm i -g flowlock-uxcg` |
-| [flowlock-uxspec](https://www.npmjs.com/package/flowlock-uxspec) | 0.4.1 | `npm i flowlock-uxspec` |
-| [flowlock-runner](https://www.npmjs.com/package/flowlock-runner) | 0.4.1 | `npm i flowlock-runner` |
-| [flowlock-checks-core](https://www.npmjs.com/package/flowlock-checks-core) | 0.4.1 | `npm i flowlock-checks-core` |
-| [flowlock-plugin-sdk](https://www.npmjs.com/package/flowlock-plugin-sdk) | 0.4.1 | `npm i flowlock-plugin-sdk` |
-| [flowlock-mcp](https://www.npmjs.com/package/flowlock-mcp) | 0.3.0 | `npm i flowlock-mcp` |
+| Package | Version | NPM | Install |
+|---------|---------|-----|---------|
+| **flowlock-uxcg** (CLI) | 0.5.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-uxcg) | `npm i -g flowlock-uxcg` |
+| **flowlock-uxspec** | 0.4.1 | [🔗 npm](https://www.npmjs.com/package/flowlock-uxspec) | `npm i flowlock-uxspec` |
+| **flowlock-runner** | 0.4.1 | [🔗 npm](https://www.npmjs.com/package/flowlock-runner) | `npm i flowlock-runner` |
+| **flowlock-checks-core** | 0.4.1 | [🔗 npm](https://www.npmjs.com/package/flowlock-checks-core) | `npm i flowlock-checks-core` |
+| **flowlock-plugin-sdk** | 0.4.1 | [🔗 npm](https://www.npmjs.com/package/flowlock-plugin-sdk) | `npm i flowlock-plugin-sdk` |
+| **flowlock-mcp** | 0.3.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-mcp) | `npm i flowlock-mcp` |
+| **flowlock-inventory** | 0.1.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-inventory) | `npm i flowlock-inventory` |
 
 ## 📚 Documentation
 
 - **[Comprehensive Guide](docs/FLOWLOCK_COMPREHENSIVE_GUIDE.md)** - Complete documentation of all features
 - **[Quick Reference](docs/QUICK_REFERENCE.md)** - Quick lookup for commands and syntax
 - **[API Reference](docs/API_REFERENCE.md)** - Programmatic usage and custom checks
-- **[Claude Commands v3](docs/CLAUDE_COMMANDS_V3.md)** - AI assistant integration guide
+- **[Claude Commands](docs/CLAUDE_COMMANDS_V3.md)** - AI assistant integration guide
 - **[Architecture](docs/flowlock-architecture.md)** - System design and components
 
-## ✨ What's New in v3
+## ✨ Core Features
 
-### 🎯 Enhanced Schema Features
+### 🎯 Comprehensive Schema
 
 - **JTBD (Jobs To Be Done)** - Track user goals and link flows to specific outcomes
 - **Entity Relations** - Define 1:1, 1:many, many:1, many:many relationships
@@ -61,9 +91,9 @@ uxcg diagrams
 - **State Machines** - Entity state transitions with triggers
 - **Glossary** - Document derived fields and external sources
 
-### ✅ 11 Validation Checks (up from 7)
+### ✅ 15 Validation Checks
 
-**Core Checks:**
+**Data Integrity:**
 1. **HONEST** - Screens only read properly captured/derived/external fields
 2. **CREATABLE** - Create forms have detail screens with discoverable paths
 3. **REACHABILITY** - Success screens reachable within 3 steps
@@ -72,11 +102,17 @@ uxcg diagrams
 6. **SCREEN** - All screens declare allowed roles
 7. **SPEC** - Coverage metrics and completeness
 
-**New Checks in v3:**
+**Business Logic:**
 8. **JTBD** - Validates all Jobs To Be Done are addressed by flows
 9. **RELATIONS** - Validates entity relationships and detects circular references
 10. **ROUTES** - Ensures unique routes with proper formatting
 11. **CTAS** - Validates navigation targets and detects orphaned screens
+
+**Runtime Validation:**
+12. **INVENTORY** - Ensures DB/API/UI extraction is complete
+13. **DETERMINISM** - Guarantees reproducible audit results
+14. **DATABASE** - Validates transactions, indexes, and pooling
+15. **MIGRATIONS** - Ensures safe, reversible database changes
 
 ### 🔧 Enhanced Auto-Healing
 
@@ -89,15 +125,15 @@ The `--fix` flag now handles:
 - State machine fixes
 - Glossary generation
 
-### 🤖 Enhanced AI Agent Integration
+### 🤖 AI Agent Integration
 
-- **5 Claude/Cursor commands** (up from 4)
-  - `/ux-contract-init` - Create/refine spec with v3 features
-  - `/ux-guardrails-validate` - Fix all 11 checks
-  - `/ux-generate-ui` - Scaffold complete UI
-  - `/flow-audit-fix` - Close audit gaps
-  - `/ux-enhance-spec` ✨ NEW - Upgrade v2 specs to v3
-- **MCP server** - Fixed and working with Cursor/Claude Desktop
+- **5 Claude/Cursor commands**
+  - `/ux-contract-init` - Create/refine spec with comprehensive validation
+  - `/ux-guardrails-validate` - Fix all 15 checks
+  - `/ux-generate-ui` - Scaffold complete UI components
+  - `/flow-audit-fix` - Close audit gaps automatically
+  - `/ux-enhance-spec` - Add missing features to existing specs
+- **MCP server** - Native integration with Cursor/Claude Desktop
 - **Better error messages** - Agent-friendly with actionable fixes
 
 ### 📊 Enhanced Artifacts
@@ -113,7 +149,36 @@ Every audit generates:
 - **Gap reports** (Markdown)
 - **Acceptance criteria** (Gherkin)
 
-## 🎯 Example `uxspec.json` (v3)
+## 🎯 Jobs To Be Done (JTBD) Examples
+
+JTBD captures what users need to accomplish, not just features:
+
+```json
+"jtbd": [
+  {
+    "role": "admin",
+    "tasks": [
+      "onboard new employees",
+      "review team performance", 
+      "manage access permissions"
+    ],
+    "description": "Manage team operations and ensure security compliance"
+  },
+  {
+    "role": "customer",
+    "tasks": [
+      "find products within budget",
+      "compare similar items",
+      "complete purchase quickly"
+    ],
+    "description": "Make informed purchasing decisions efficiently"
+  }
+]
+```
+
+These aren't just labels - FlowLock validates that every JTBD task has a corresponding flow implementation.
+
+## 🎯 Example `uxspec.json`
 
 ```json
 {

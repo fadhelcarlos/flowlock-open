@@ -1,6 +1,8 @@
 {
   "version": "1.0.0",
-  "name": "Demo spec with gaps (triggers heal + agent fix)",
+  "project": "demo-app",
+  "name": "FlowLock Demo Application",
+  "description": "Comprehensive demo showcasing all FlowLock features",
   "entities": [
     {
       "id": "user",
@@ -37,6 +39,18 @@
           "type": "date",
           "derived": true,
           "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "orders",
+          "to": "order",
+          "kind": "1:many"
+        },
+        {
+          "id": "profile",
+          "to": "profile",
+          "kind": "1:1"
         }
       ]
     },
@@ -82,6 +96,18 @@
           "external": true,
           "source": "catalog_api"
         }
+      ],
+      "relations": [
+        {
+          "id": "category",
+          "to": "category",
+          "kind": "many:1"
+        },
+        {
+          "id": "reviews",
+          "to": "review",
+          "kind": "1:many"
+        }
       ]
     }
   ],
@@ -105,6 +131,30 @@
         "empty",
         "loading",
         "error"
+      ],
+      "routes": ["/users", "/admin/users"],
+      "lists": [
+        {
+          "id": "user_table",
+          "reads": ["user.id", "user.name", "user.email", "user.role"],
+          "sortable": true,
+          "filterable": true,
+          "paginated": true
+        }
+      ],
+      "ctas": [
+        {
+          "id": "create_user",
+          "label": "Add User",
+          "to": "user_create",
+          "type": "primary"
+        },
+        {
+          "id": "view_details",
+          "label": "View",
+          "to": "user_detail",
+          "type": "link"
+        }
       ]
     },
     {
@@ -127,6 +177,27 @@
         "empty",
         "loading",
         "error"
+      ],
+      "routes": ["/users/:id"],
+      "cards": [
+        {
+          "id": "user_info",
+          "reads": ["user.name", "user.email", "user.role", "user.createdAt"]
+        }
+      ],
+      "ctas": [
+        {
+          "id": "edit_user",
+          "label": "Edit",
+          "to": "user_edit",
+          "type": "primary"
+        },
+        {
+          "id": "back_to_list",
+          "label": "Back",
+          "to": "user_list",
+          "type": "link"
+        }
       ]
     },
     {
@@ -152,7 +223,8 @@
               "fieldId": "role",
               "label": "User Role"
             }
-          ]
+          ],
+          "writes": ["user.email", "user.name", "user.role"]
         }
       ],
       "roles": [
@@ -163,6 +235,21 @@
         "empty",
         "loading",
         "error"
+      ],
+      "routes": ["/users/new"],
+      "ctas": [
+        {
+          "id": "submit",
+          "label": "Create User",
+          "to": "user_created",
+          "type": "primary"
+        },
+        {
+          "id": "cancel",
+          "label": "Cancel",
+          "to": "user_list",
+          "type": "secondary"
+        }
       ]
     },
     {
@@ -177,6 +264,21 @@
         "empty",
         "loading",
         "error"
+      ],
+      "routes": ["/users/success"],
+      "ctas": [
+        {
+          "id": "view_user",
+          "label": "View User",
+          "to": "user_detail",
+          "type": "primary"
+        },
+        {
+          "id": "create_another",
+          "label": "Create Another",
+          "to": "user_create",
+          "type": "secondary"
+        }
       ]
     },
     {
@@ -198,6 +300,24 @@
         "empty",
         "loading",
         "error"
+      ],
+      "routes": ["/products", "/catalog"],
+      "lists": [
+        {
+          "id": "product_grid",
+          "reads": ["product.id", "product.name", "product.price", "product.stock"],
+          "sortable": true,
+          "filterable": true,
+          "paginated": true
+        }
+      ],
+      "ctas": [
+        {
+          "id": "view_product",
+          "label": "View Details",
+          "to": "product_detail",
+          "type": "primary"
+        }
       ]
     },
     {
@@ -220,6 +340,27 @@
         "empty",
         "loading",
         "error"
+      ],
+      "routes": ["/products/:id"],
+      "cards": [
+        {
+          "id": "product_info",
+          "reads": ["product.name", "product.description", "product.price", "product.stock"]
+        }
+      ],
+      "ctas": [
+        {
+          "id": "add_to_cart",
+          "label": "Add to Cart",
+          "to": "cart",
+          "type": "primary"
+        },
+        {
+          "id": "back_to_catalog",
+          "label": "Back",
+          "to": "product_list",
+          "type": "link"
+        }
       ]
     }
   ],
@@ -227,6 +368,8 @@
     {
       "id": "create_user_flow",
       "name": "Create User Flow",
+      "jtbd": "admin",
+      "role": "admin",
       "entryStepId": "cu_1",
       "steps": [
         {
@@ -236,7 +379,8 @@
             {
               "targetStepId": "cu_2"
             }
-          ]
+          ],
+          "reads": ["user.id", "user.name", "user.email"]
         },
         {
           "id": "cu_2",
@@ -245,7 +389,13 @@
             {
               "targetStepId": "cu_3"
             }
-          ]
+          ],
+          "writes": ["user.email", "user.name", "user.role"],
+          "transition": {
+            "entity": "user",
+            "from": "pending",
+            "to": "active"
+          }
         },
         {
           "id": "cu_3",
@@ -258,13 +408,20 @@
         },
         {
           "id": "cu_4",
-          "screenId": "user_detail"
+          "screenId": "user_detail",
+          "reads": ["user.id", "user.name", "user.email", "user.role", "user.createdAt"]
         }
-      ]
+      ],
+      "success": {
+        "screen": "user_detail",
+        "message": "User created successfully"
+      }
     },
     {
       "id": "browse_products_flow",
       "name": "Browse Products",
+      "jtbd": "viewer",
+      "role": "viewer",
       "entryStepId": "bp_1",
       "steps": [
         {
@@ -283,25 +440,70 @@
       ]
     }
   ],
-  "jtbd": {
-    "admin": [
-      "Create user",
-      "Review users",
-      "Review products"
-    ],
-    "viewer": [
-      "Browse products",
-      "See product detail"
-    ]
-  },
+  "jtbd": [
+    {
+      "role": "admin",
+      "tasks": [
+        "Create user",
+        "Review users",
+        "Manage user permissions",
+        "Monitor system activity"
+      ],
+      "description": "Administrative oversight and user management"
+    },
+    {
+      "role": "viewer",
+      "tasks": [
+        "Browse products",
+        "See product detail",
+        "Compare products",
+        "Find items within budget"
+      ],
+      "description": "Browse and discover products efficiently"
+    }
+  ],
   "roles": [
     {
       "id": "admin",
-      "name": "Admin"
+      "name": "Administrator",
+      "permissions": ["create", "read", "update", "delete"]
     },
     {
       "id": "viewer",
-      "name": "Viewer"
+      "name": "Viewer",
+      "permissions": ["read"]
+    }
+  ],
+  "states": [
+    {
+      "entity": "user",
+      "allowed": ["pending", "active", "suspended", "deleted"],
+      "initial": "pending",
+      "terminal": ["deleted"],
+      "transitions": [
+        { "from": "pending", "to": "active", "trigger": "verify" },
+        { "from": "active", "to": "suspended", "trigger": "suspend" },
+        { "from": "suspended", "to": "active", "trigger": "reactivate" },
+        { "from": "active", "to": "deleted", "trigger": "delete" },
+        { "from": "suspended", "to": "deleted", "trigger": "delete" }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "system.uuid",
+      "definition": "System-generated unique identifier",
+      "formula": "crypto.randomUUID()"
+    },
+    {
+      "term": "system.timestamp",
+      "definition": "Server-generated timestamp",
+      "formula": "new Date().toISOString()"
+    },
+    {
+      "term": "catalog_api",
+      "definition": "External product catalog service",
+      "source": "https://api.catalog.example/v1"
     }
   ]
 }
