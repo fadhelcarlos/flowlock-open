@@ -5,6 +5,7 @@ import { writeClaudeCommands } from "../claude";
 import { setupHusky } from "../husky";
 import { createGlossaryFiles } from "../glossary";
 import { starterSpec } from "../starter-spec";
+import { copyFlowLockResources } from "../../utils/copy-resources";
 
 export type InitChoices = {
   mode: "current" | "scaffold";
@@ -43,6 +44,9 @@ export async function scaffoldProject(cwd: string, c: InitChoices) {
 async function applyFlowLockBasics(target: string, c: InitChoices) {
   seedUxspec(target);
   
+  // Copy FlowLock resources (examples, docs, README)
+  copyFlowLockResources(target);
+  
   if (c.addGlossary) {
     const glossaryFiles = createGlossaryFiles();
     for (const [file, content] of Object.entries(glossaryFiles)) {
@@ -73,6 +77,9 @@ async function applyFlowLockBasics(target: string, c: InitChoices) {
   }
   
   console.log(`\n✅ FlowLock ready in: ${path.relative(process.cwd(), target) || "."}`);
+  console.log(`   - .flowlock/examples (sample implementations)`);
+  console.log(`   - .flowlock/docs (documentation)`);
+  console.log(`   - .flowlock/README.md (getting started guide)`);
   console.log(`   - uxspec.json`);
   if (c.addGlossary) console.log(`   - uxspec/glossary.yml & glossary.md`);
   if (c.addClaudeCmds) console.log(`   - .claude/commands/*`);

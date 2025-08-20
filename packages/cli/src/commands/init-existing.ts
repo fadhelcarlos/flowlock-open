@@ -1,12 +1,17 @@
 // packages/cli/src/commands/init-existing.ts
-import fs from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { copyFlowLockResources } from "../utils/copy-resources";
 
 const CONFIG = "flowlock.config.json";
 const CLAUDE_DIR = ".claude/commands";
 
 export const initExistingCommand = async () => {
   try {
+  // Copy FlowLock resources (examples, docs, README) first
+  console.log("Copying FlowLock resources...");
+  copyFlowLockResources(process.cwd());
+  
   if (!fs.existsSync(CONFIG)) {
     fs.writeFileSync(
       CONFIG,
@@ -71,6 +76,10 @@ export const initExistingCommand = async () => {
   }
 
   console.log("\n✓ FlowLock initialization complete!");
+  console.log("\nResources added:");
+  console.log("  - .flowlock/examples (sample implementations)");
+  console.log("  - .flowlock/docs (documentation)");
+  console.log("  - .flowlock/README.md (getting started guide)");
   console.log("\nNext steps:");
   console.log("  1. Edit flowlock.config.json to match your project structure");
   console.log("  2. Run 'npx flowlock-uxcg inventory' to extract runtime inventory");
