@@ -37,12 +37,14 @@ FlowLock is an **agent-native UX contract and guardrails system** that ensures A
 - **MCP integration** - Model Context Protocol server for AI assistants
 
 ### Latest Versions (npm)
-- `flowlock-uxspec`: 0.4.0
-- `flowlock-plugin-sdk`: 0.4.0
-- `flowlock-checks-core`: 0.4.0
-- `flowlock-runner`: 0.4.0
-- `flowlock-uxcg`: 0.4.0 (CLI)
-- `flowlock-mcp`: 0.4.0
+- `flowlock-uxspec`: 0.6.0
+- `flowlock-plugin-sdk`: 0.6.0
+- `flowlock-checks-core`: 0.6.0
+- `flowlock-runner`: 0.6.0
+- `flowlock-uxcg`: 0.9.1 (CLI)
+- `flowlock-mcp`: 0.5.0
+- `flowlock-inventory`: 0.3.1
+- `flowlock-shared`: 0.3.1
 
 ---
 

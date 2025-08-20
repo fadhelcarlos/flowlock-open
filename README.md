@@ -64,14 +64,14 @@ Each of the 15 checks prevents specific failure modes, creating a safety net for
 
 | Package | Version | NPM | Install |
 |---------|---------|-----|---------|
-| **flowlock-uxcg** (CLI) | 0.9.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-uxcg) | `npm i -g flowlock-uxcg` |
+| **flowlock-uxcg** (CLI) | 0.9.1 | [🔗 npm](https://www.npmjs.com/package/flowlock-uxcg) | `npm i -g flowlock-uxcg` |
 | **flowlock-uxspec** | 0.6.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-uxspec) | `npm i flowlock-uxspec` |
 | **flowlock-runner** | 0.6.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-runner) | `npm i flowlock-runner` |
 | **flowlock-checks-core** | 0.6.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-checks-core) | `npm i flowlock-checks-core` |
 | **flowlock-plugin-sdk** | 0.6.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-plugin-sdk) | `npm i flowlock-plugin-sdk` |
 | **flowlock-mcp** | 0.5.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-mcp) | `npm i flowlock-mcp` |
-| **flowlock-inventory** | 0.3.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-inventory) | `npm i flowlock-inventory` |
-| **flowlock-shared** | 0.3.0 | [🔗 npm](https://www.npmjs.com/package/flowlock-shared) | `npm i flowlock-shared` |
+| **flowlock-inventory** | 0.3.1 | [🔗 npm](https://www.npmjs.com/package/flowlock-inventory) | `npm i flowlock-inventory` |
+| **flowlock-shared** | 0.3.1 | [🔗 npm](https://www.npmjs.com/package/flowlock-shared) | `npm i flowlock-shared` |
 
 ## 📚 Documentation
 

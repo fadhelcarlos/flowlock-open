@@ -219,12 +219,14 @@ artifacts/
 ## NPM Packages
 | Package | Version | Install |
 |---------|---------|---------|
-| flowlock-uxspec | 0.2.1 | `npm i flowlock-uxspec` |
-| flowlock-plugin-sdk | 0.2.1 | `npm i flowlock-plugin-sdk` |
-| flowlock-checks-core | 0.2.1 | `npm i flowlock-checks-core` |
-| flowlock-runner | 0.2.1 | `npm i flowlock-runner` |
-| flowlock-uxcg | 0.2.1 | `npm i -g flowlock-uxcg` |
-| flowlock-mcp | 0.1.1 | `npm i flowlock-mcp` |
+| flowlock-uxspec | 0.6.0 | `npm i flowlock-uxspec` |
+| flowlock-plugin-sdk | 0.6.0 | `npm i flowlock-plugin-sdk` |
+| flowlock-checks-core | 0.6.0 | `npm i flowlock-checks-core` |
+| flowlock-runner | 0.6.0 | `npm i flowlock-runner` |
+| flowlock-uxcg | 0.9.1 | `npm i -g flowlock-uxcg` |
+| flowlock-mcp | 0.5.0 | `npm i flowlock-mcp` |
+| flowlock-inventory | 0.3.1 | `npm i flowlock-inventory` |
+| flowlock-shared | 0.3.1 | `npm i flowlock-shared` |
 
 ## Common Patterns
 
