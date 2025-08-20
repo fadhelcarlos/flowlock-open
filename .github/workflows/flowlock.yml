@@ -23,12 +23,17 @@ jobs:
       - run: pnpm install
 
       # Build all workspace packages so ./packages/cli/dist/index.js exists
-      # Build dependencies first to ensure type definitions are available
-      - name: Build dependencies first
-        run: pnpm -r --filter flowlock-uxspec --filter flowlock-plugin-sdk build
-      
-      - name: Build all packages
-        run: pnpm -r --filter "./packages/*" build
+      # Build in dependency order to ensure type definitions are available
+      - name: Build packages in order
+        run: |
+          pnpm --filter flowlock-uxspec build
+          pnpm --filter flowlock-plugin-sdk build
+          pnpm --filter flowlock-shared build
+          pnpm --filter flowlock-checks-core build
+          pnpm --filter flowlock-runner build
+          pnpm --filter flowlock-inventory build
+          pnpm --filter flowlock-uxcg build
+          pnpm --filter flowlock-mcp build
 
       - name: Run FlowLock audit
         run: pnpm -w uxcg audit
