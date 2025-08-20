@@ -4,6 +4,7 @@
   "private": true,
   "description": "UX specification validation and code generation framework",
   "scripts": {
+    "prebuild": "pnpm -r --filter flowlock-uxspec --filter flowlock-plugin-sdk build",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
