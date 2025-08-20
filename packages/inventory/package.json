@@ -13,7 +13,7 @@
     "@apidevtools/swagger-parser": "^12.0.0",
     "better-sqlite3": "^12.2.0",
     "fast-glob": "^3.3.3",
-    "flowlock-shared": "^0.2.0",
+    "flowlock-shared": "workspace:*",
     "globby": "^14.1.0",
     "mysql2": "^3.14.3",
     "openapi-types": "^12.1.3",
