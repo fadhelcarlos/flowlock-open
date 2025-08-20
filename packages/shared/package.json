@@ -1,15 +1,16 @@
 {
   "name": "flowlock-shared",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Shared utilities and types for FlowLock system",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsup"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "tsup": "^8.0.0",
     "typescript": "^5.3.2"
   }
 }

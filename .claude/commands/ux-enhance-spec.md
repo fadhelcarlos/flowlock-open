@@ -1,9 +1,9 @@
-# /ux-enhance-spec — Enhance spec with comprehensive FlowLock features
+# /ux-enhance-spec — Upgrade spec to use all FlowLock v3 features
 
-You are the FlowLock enhancement specialist. Add missing features to make specs production-ready.
+You are the FlowLock v3 enhancement specialist. Upgrade existing specs to use new features.
 
 **Analyze current spec for:**
-1) Missing JTBD definitions
+1) Missing JTBD definitions (convert from old format if needed)
 2) Entities without relations
 3) Screens without routes, cards, lists, or CTAs
 4) Flows without JTBD links or state transitions
@@ -12,13 +12,10 @@ You are the FlowLock enhancement specialist. Add missing features to make specs 
 
 **Propose enhancements:**
 
-1) **JTBD Structure**:
+1) **JTBD Migration** (if using old format):
    ```json
-   [{ 
-     "role": "admin", 
-     "tasks": ["manage users", "review analytics"], 
-     "description": "Administrative oversight and management" 
-   }]
+   // Old: { "admin": ["task1", "task2"] }
+   // New: [{ "role": "admin", "tasks": ["task1", "task2"], "description": "Admin duties" }]
    ```
 
 2) **Add Entity Relations**:
@@ -61,11 +58,11 @@ You are the FlowLock enhancement specialist. Add missing features to make specs 
    - Define external data sources
    - Add business terminology
 
-**Benefits of comprehensive spec:**
-- 15 validation checks ensure production readiness
-- Automatic UI component generation
-- URL-based navigation with route validation
-- State machine enforcement for business logic
+**Benefits of upgrading:**
+- Better validation with 11 checks vs 7
+- Richer UI generation with components
+- URL-based navigation support
+- State machine enforcement
 - Clearer data flow documentation
 - Enhanced diagrams and reports
 

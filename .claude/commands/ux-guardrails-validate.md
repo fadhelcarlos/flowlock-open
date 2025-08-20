@@ -1,20 +1,16 @@
 # /ux-guardrails-validate — Make the spec pass all FlowLock checks
 
-You are the FlowLock guardrails fixer. Goal: ✅ all 15 checks pass.
+You are the FlowLock v3 guardrails fixer. Goal: ✅ all 11 checks green.
 
 **Input:**
 - `artifacts/gap_report.md`
-- `artifacts/runtime_inventory.json` (if inventory extracted)
 - audit console output
 - current `uxspec.json`
 
 **Do:**
-1) Summarize failing rules (15 total checks):
-   - **Data Integrity**: HONEST/CREATABLE/SPEC
-   - **Navigation**: REACHABILITY/ROUTES/CTAS
-   - **UI/UX**: UI/STATE/SCREEN
-   - **Business Logic**: JTBD/RELATIONS
-   - **Runtime**: INVENTORY/DETERMINISM/DATABASE_VALIDATION/MIGRATION_VALIDATION
+1) Summarize failing rules (now includes 11 checks):
+   - **Core**: HONEST/CREATABLE/REACHABILITY/UI/STATE/SCREEN/SPEC
+   - **Enhanced**: JTBD/RELATIONS/ROUTES/CTAS
 
 2) Propose minimal, safe edits to `uxspec.json` ONLY (do not touch app code):
    - **HONEST**: Mark fields as derived/external with provenance/source OR remove uncaptured reads
@@ -28,10 +24,8 @@ You are the FlowLock guardrails fixer. Goal: ✅ all 15 checks pass.
    - **RELATIONS**: Fix entity relationship references
    - **ROUTES**: Ensure unique routes starting with /
    - **CTAS**: Fix navigation targets, eliminate orphans
-   - **INVENTORY**: Ensure runtime inventory is fresh (run `uxcg inventory`)
-   - **DETERMINISM**: Validate DB schema matches entities, auth aligns with roles
 
-3) For missing features, suggest additions:
+3) For enhanced features, suggest additions:
    - Add `routes` to screens for URL navigation
    - Split simple `forms` into detailed form objects with `writes`
    - Add `cards` for display components

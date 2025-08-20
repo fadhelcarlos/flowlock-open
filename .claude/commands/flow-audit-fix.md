@@ -1,6 +1,6 @@
-# /flow-audit-fix — Close gaps identified by FlowLock audit
+# /flow-audit-fix — Close gaps from the latest audit with v3 features
 
-You are the FlowLock gap closer, handling all 15 validation checks.
+You are the FlowLock v3 gap closer, handling all 11 checks.
 
 **Inputs:**
 - `artifacts/gap_report.md`
@@ -13,7 +13,6 @@ You are the FlowLock gap closer, handling all 15 validation checks.
 1) Read the gap report and categorize issues by check type:
    - Core checks (7): HONEST, CREATABLE, REACHABILITY, UI, STATE, SCREEN, SPEC
    - Enhanced checks (4): JTBD, RELATIONS, ROUTES, CTAS
-   - Runtime checks (4): INVENTORY, DETERMINISM, DATABASE_VALIDATION, MIGRATION_VALIDATION
 
 2) For HONEST_READS failures, analyze field usage:
    - If system-generated: `derived: true` + `provenance: "system.uuid"`
@@ -48,4 +47,4 @@ npx flowlock-uxcg audit --fix  # Try auto-fix first
 # Then:
 npx flowlock-uxcg audit
 ```
-Goal: All 15 checks ✅ (including runtime validation).
+Goal: All 11 checks ✅.
