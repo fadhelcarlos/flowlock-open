@@ -30,13 +30,28 @@ uxcg init
 # Follow interactive prompts
 ```
 
-### `uxcg audit [--fix]`
-Run validation checks on your UX specification.
+### `uxcg audit [--level <level>] [--fix]`
+Run validation checks on your UX specification with graduated validation levels.
 
 **Options:**
+- `--level <level>` - Validation level: basic|enhanced|strict (default: enhanced)
 - `--fix` - Enable auto-healing for common issues
 - `--spec <file>` - Specify spec file (default: uxspec.json)
 - `--outDir <dir>` - Output directory (default: artifacts)
+- `--inventory` - Require runtime inventory (auto-enabled for strict level)
+- `--only <checks>` - Run only specific checks (comma-separated)
+- `--skip <checks>` - Skip specific checks (comma-separated)
+- `--json` - Output results as JSON
+- `--quiet` - Suppress non-error output
+
+**Validation Levels:**
+- **basic** - Core 7 checks only for essential UX consistency
+  - HONEST, CREATABLE, REACHABILITY, UI, STATE, SCREEN, SPEC
+- **enhanced** (default) - Basic + Extended checks for comprehensive validation
+  - Adds: JTBD, RELATIONS, ROUTES, CTAS, RUNTIME_DETERMINISM
+- **strict** - Enhanced + Runtime checks for full system validation
+  - Adds: INVENTORY, DATABASE_VALIDATION, MIGRATION_VALIDATION
+  - Requires runtime inventory (run `uxcg inventory` first)
 
 **Auto-fix capabilities:**
 - Adds missing top-level roles
@@ -46,16 +61,28 @@ Run validation checks on your UX specification.
 - Generates missing IDs from names
 - Assigns roles to screens
 
-**Example:**
+**Examples:**
 ```bash
-# Basic audit
-uxcg audit
+# Basic validation (Core 7 checks only)
+npx flowlock-uxcg audit --level=basic
 
-# With auto-fix
-uxcg audit --fix
+# Enhanced validation (default)
+npx flowlock-uxcg audit
+# or explicitly
+npx flowlock-uxcg audit --level=enhanced
+
+# Strict validation (requires inventory)
+npx flowlock-uxcg inventory  # Generate inventory first
+npx flowlock-uxcg audit --level=strict
+
+# With auto-fix at any level
+npx flowlock-uxcg audit --level=basic --fix
 
 # Custom paths
-uxcg audit --spec my-spec.json --outDir my-artifacts
+npx flowlock-uxcg audit --spec my-spec.json --outDir my-artifacts
+
+# JSON output for CI/CD
+npx flowlock-uxcg audit --level=enhanced --json
 ```
 
 ### `uxcg diagrams`
@@ -102,6 +129,28 @@ uxcg watch
 
 # With cloud sync
 uxcg watch --cloud --cloudUrl https://flowlock-cloud.onrender.com --projectId my-project
+```
+
+### `uxcg inventory [options]`
+Build runtime inventory from your codebase for strict validation.
+
+**Options:**
+- `--config <path>` - Path to flowlock.config.json (default: flowlock.config.json)
+- `--out <file>` - Output file path (default: artifacts/runtime_inventory.json)
+- `--db-only` - Extract only database entities
+- `--api-only` - Extract only API endpoints
+- `--ui-only` - Extract only UI reads/writes
+
+**Example:**
+```bash
+# Build full inventory
+npx flowlock-uxcg inventory
+
+# Database entities only
+npx flowlock-uxcg inventory --db-only
+
+# Custom output location
+npx flowlock-uxcg inventory --out my-inventory.json
 ```
 
 ### `uxcg agent [options]`

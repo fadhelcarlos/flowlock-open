@@ -41,12 +41,133 @@ export type InventoryConfig = {
   };
 };
 
+/**
+ * Validates the inventory configuration structure
+ */
+function validateInventoryConfig(cfg: any): string[] {
+  const errors: string[] = [];
+  
+  if (!cfg?.inventory) {
+    errors.push("Missing 'inventory' section in config. Add an 'inventory' object to your flowlock.config.json");
+    return errors;
+  }
+  
+  const inv = cfg.inventory;
+  
+  // Validate DB config
+  if (inv.db) {
+    if (inv.db.mode && !["schema", "live", "auto"].includes(inv.db.mode)) {
+      errors.push(`Invalid db.mode '${inv.db.mode}'. Must be one of: schema, live, auto`);
+    }
+    if (inv.db.dialect && !["postgres", "mysql", "sqlite"].includes(inv.db.dialect)) {
+      errors.push(`Invalid db.dialect '${inv.db.dialect}'. Must be one of: postgres, mysql, sqlite`);
+    }
+    if (inv.db.schemaFiles && !Array.isArray(inv.db.schemaFiles)) {
+      errors.push(`db.schemaFiles must be an array of file paths`);
+    }
+  }
+  
+  // Validate API config
+  if (inv.api) {
+    if (inv.api.scan && !Array.isArray(inv.api.scan)) {
+      errors.push(`api.scan must be an array of glob patterns`);
+    }
+  }
+  
+  // Validate UI config  
+  if (inv.ui) {
+    if (inv.ui.scan && !Array.isArray(inv.ui.scan)) {
+      errors.push(`ui.scan must be an array of glob patterns`);
+    }
+  }
+  
+  return errors;
+}
+
+/**
+ * Validates the generated inventory structure
+ */
+function validateRuntimeInventory(inv: RuntimeInventory): string[] {
+  const errors: string[] = [];
+  
+  // Check for empty inventory
+  const hasData = 
+    (inv.db?.entities?.length > 0) ||
+    (inv.api?.endpoints?.length > 0) ||
+    (inv.ui?.reads?.length > 0) ||
+    (inv.ui?.writes?.length > 0);
+    
+  if (!hasData) {
+    errors.push("Warning: Generated inventory is empty. Check your configuration:");
+    errors.push("  - For DB: Ensure schemaFiles point to valid schema files or DATABASE_URL is set");
+    errors.push("  - For API: Ensure scan patterns match your API files");
+    errors.push("  - For UI: Ensure scan patterns match your component files and they contain data attributes");
+  }
+  
+  // Validate entity names
+  for (const entity of inv.db?.entities || []) {
+    if (!entity.id.match(/^[A-Z][a-zA-Z0-9]*$/)) {
+      errors.push(`Warning: Entity name '${entity.id}' should be PascalCase (e.g., User, ProductItem)`);
+    }
+  }
+  
+  // Validate API paths
+  for (const endpoint of inv.api?.endpoints || []) {
+    if (!endpoint.path.startsWith("/")) {
+      errors.push(`Warning: API path '${endpoint.path}' should start with '/'`);
+    }
+    if (endpoint.methods.length === 0) {
+      errors.push(`Warning: API endpoint '${endpoint.path}' has no HTTP methods`);
+    }
+  }
+  
+  // Validate UI reads/writes format
+  const validateFieldRef = (refs: string[], type: string) => {
+    for (const ref of refs) {
+      if (!ref.includes(".")) {
+        errors.push(`Warning: UI ${type} '${ref}' should be in 'Entity.field' format`);
+      } else {
+        const [entity, field] = ref.split(".");
+        if (!entity || !field) {
+          errors.push(`Warning: Invalid UI ${type} '${ref}' - both entity and field required`);
+        }
+      }
+    }
+  };
+  
+  validateFieldRef(inv.ui?.reads || [], "read");
+  validateFieldRef(inv.ui?.writes || [], "write");
+  
+  return errors;
+}
+
 export async function buildInventory(cfgPath = "flowlock.config.json", outFile = "artifacts/runtime_inventory.json") {
   // --- Load config (JSON or YAML) -------------------------------------------
-  let raw = fs.readFileSync(cfgPath, "utf8");
-  const cfg = cfgPath.endsWith(".yaml") || cfgPath.endsWith(".yml")
-    ? YAML.parse(raw)
-    : JSON.parse(raw);
+  if (!fs.existsSync(cfgPath)) {
+    throw new Error(`Config file not found: ${cfgPath}. Create a flowlock.config.json or specify a different path.`);
+  }
+  
+  let raw: string;
+  try {
+    raw = fs.readFileSync(cfgPath, "utf8");
+  } catch (err: any) {
+    throw new Error(`Failed to read config file ${cfgPath}: ${err.message}`);
+  }
+  
+  let cfg: any;
+  try {
+    cfg = cfgPath.endsWith(".yaml") || cfgPath.endsWith(".yml")
+      ? YAML.parse(raw)
+      : JSON.parse(raw);
+  } catch (err: any) {
+    throw new Error(`Failed to parse config file ${cfgPath}: ${err.message}. Ensure it's valid JSON or YAML.`);
+  }
+  
+  // Validate config structure
+  const configErrors = validateInventoryConfig(cfg);
+  if (configErrors.length > 0) {
+    throw new Error(`Invalid inventory configuration:\n  ${configErrors.join("\n  ")}`);
+  }
 
   const inv: RuntimeInventory = { db: { dialect: cfg.inventory.db?.dialect, entities: [] }, api: { endpoints: [] }, ui: { reads: [], writes: [] } };
 
@@ -56,7 +177,10 @@ export async function buildInventory(cfgPath = "flowlock.config.json", outFile =
 
   if (mode === "schema" || mode === "auto") {
     for (const file of (cfg.inventory.db?.schemaFiles ?? [])) {
-      if (!fs.existsSync(file)) continue;
+      if (!fs.existsSync(file)) {
+        console.warn(`  Warning: Schema file not found: ${file}`);
+        continue;
+      }
       const src = fs.readFileSync(file, "utf8");
       if (file.endsWith(".prisma")) {
         const modelRe = /model\s+(\w+)\s+\{([\s\S]*?)\}/g;
@@ -78,19 +202,42 @@ export async function buildInventory(cfgPath = "flowlock.config.json", outFile =
     }
   }
 
-  if ((mode === "live" || (mode === "auto" && inv.db.entities.length === 0)) && process.env[cfg.inventory.db?.urlEnv || "DATABASE_URL"]) {
-    const url = process.env[cfg.inventory.db?.urlEnv || "DATABASE_URL"] as string;
-    if (dialect === "postgres") await introspectPostgres(url, inv);
-    if (dialect === "mysql")    await introspectMySQL(url, inv);
-    if (dialect === "sqlite")   await introspectSQLite(url, inv);
+  if ((mode === "live" || (mode === "auto" && inv.db.entities.length === 0))) {
+    const envVar = cfg.inventory.db?.urlEnv || "DATABASE_URL";
+    const url = process.env[envVar];
+    
+    if (!url) {
+      if (mode === "live") {
+        console.warn(`  Warning: Database URL not found in environment variable '${envVar}'. Skipping live introspection.`);
+      }
+    } else {
+      try {
+        if (dialect === "postgres") await introspectPostgres(url, inv);
+        if (dialect === "mysql")    await introspectMySQL(url, inv);
+        if (dialect === "sqlite")   await introspectSQLite(url, inv);
+      } catch (err: any) {
+        console.warn(`  Warning: Database introspection failed: ${err.message}`);
+        if (mode === "live") {
+          throw new Error(`Database introspection required in 'live' mode but failed: ${err.message}`);
+        }
+      }
+    }
   }
 
   // --- API: OpenAPI (preferred) ---------------------------------------------
   const apiGlobs: string[] = cfg.inventory.api?.scan ?? [];
-  const openapiFiles = await fg(apiGlobs.filter(g=>/openapi\.(yml|yaml|json)/.test(g)));
-  if (openapiFiles.length) {
+  const openapiGlobs = apiGlobs.filter(g=>/openapi\.(yml|yaml|json)/.test(g));
+  const openapiFiles = openapiGlobs.length > 0 ? await fg(openapiGlobs) : [];
+  
+  if (openapiFiles.length > 0) {
     const file = openapiFiles[0];
-    const doc: any = await SwaggerParser.dereference(path.resolve(file));
+    let doc: any;
+    try {
+      doc = await SwaggerParser.dereference(path.resolve(file));
+    } catch (err: any) {
+      console.warn(`  Warning: Failed to parse OpenAPI file ${file}: ${err.message}`);
+      doc = { paths: {} };
+    }
     for (const [p, methods] of Object.entries<any>(doc.paths || {})) {
       const ep: ApiEndpoint = { path: normalizeApiPath(String(p)), methods: Object.keys(methods).map(m=>m.toUpperCase()) };
       const get = (methods.get || methods.post || methods.put || methods.patch);
@@ -127,8 +274,30 @@ export async function buildInventory(cfgPath = "flowlock.config.json", outFile =
     inv.ui.writes.push(...[...src.matchAll(new RegExp(`${writeAttr}=['"\`]([\\w]+\\.[\\w]+)['"\`]`,'g'))].map(m=>m[1]));
   }
 
-  fs.mkdirSync(path.dirname(outFile), { recursive: true });
-  fs.writeFileSync(outFile, JSON.stringify(inv, null, 2));
+  // Validate generated inventory
+  const inventoryWarnings = validateRuntimeInventory(inv);
+  if (inventoryWarnings.length > 0) {
+    console.warn("\nInventory validation warnings:");
+    inventoryWarnings.forEach(w => console.warn(`  ${w}`));
+  }
+  
+  // Write output
+  try {
+    fs.mkdirSync(path.dirname(outFile), { recursive: true });
+    fs.writeFileSync(outFile, JSON.stringify(inv, null, 2));
+    
+    // Log summary
+    console.log(`\n✓ Inventory generated: ${outFile}`);
+    console.log(`  Entities: ${inv.db.entities.length}`);
+    console.log(`  Fields: ${inv.db.entities.reduce((sum, e) => sum + e.fields.length, 0)}`);
+    console.log(`  API endpoints: ${inv.api.endpoints.length}`);
+    console.log(`  UI reads: ${inv.ui.reads.length}`);
+    console.log(`  UI writes: ${inv.ui.writes.length}`);
+    
+  } catch (err: any) {
+    throw new Error(`Failed to write inventory to ${outFile}: ${err.message}`);
+  }
+  
   return outFile;
 }
 

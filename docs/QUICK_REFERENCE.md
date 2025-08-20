@@ -1,4 +1,4 @@
-# FlowLock v3 Quick Reference
+# FlowLock Quick Reference
 
 ## Installation
 ```bash
@@ -12,8 +12,8 @@ npm install flowlock-uxspec@latest flowlock-runner@latest flowlock-checks-core@l
 npm install flowlock-mcp@latest
 ```
 
-## What's New in v3
-- **11 validation checks** (up from 7): Added JTBD, RELATIONS, ROUTES, CTAS
+## Key Features
+- **15 validation checks** (up from 7): Core (7) + Extended (5) + Runtime (3)
 - **Enhanced schema**: JTBD, entity relations, routes, CTAs, state machines
 - **5 Claude commands** (up from 4): New `/ux-enhance-spec`
 - **Backward compatible**: All v2 specs work without changes
@@ -23,13 +23,16 @@ npm install flowlock-mcp@latest
 uxcg init                    # Initialize project
 uxcg audit                   # Run validation
 uxcg audit --fix            # Auto-heal issues
+uxcg audit --verbose        # Show detailed debug output
+uxcg debug <check>          # Debug specific check failures
+uxcg debug creatable --entity=user  # Debug creatable for specific entity
 uxcg diagrams               # Generate diagrams only
 uxcg export junit           # Export test results
 uxcg watch --cloud          # Dev mode with sync
 uxcg agent --cloud <url>    # Connect to cloud
 ```
 
-## uxspec.json Structure (v3 Enhanced)
+## uxspec.json Structure (Enhanced)
 ```json
 {
   "version": "1.0.0",
@@ -119,7 +122,7 @@ uxcg agent --cloud <url>    # Connect to cloud
 - `email` - Email address
 - `url` - Web URL
 - `text` - Long text
-- `enum` - Enumeration (v3 - with enum array)
+- `enum` - Enumeration (with enum array)
 
 ## Field Modifiers
 - `required: true` - Must be provided
@@ -139,7 +142,7 @@ uxcg agent --cloud <url>    # Connect to cloud
 - `loading` - Fetching
 - `error` - Failed
 
-## 11 Validation Checks (v3)
+## 15 Validation Checks
 
 ### Core Checks (7)
 | Check | ID | Purpose |
@@ -152,24 +155,32 @@ uxcg agent --cloud <url>    # Connect to cloud
 | SCREEN | `screen` | All screens declare roles |
 | SPEC | `spec_coverage` | Coverage percentages |
 
-### New v3 Checks (4)
+### Extended Checks (5)
 | Check | ID | Purpose |
 |-------|-----|---------|
 | JTBD | `jtbd` | Jobs To Be Done mapped to flows |
 | RELATIONS | `relations` | Entity relations are valid |
 | ROUTES | `routes` | Screen routes are unique |
 | CTAS | `ctas` | Navigation targets exist |
+| RUNTIME_DETERMINISM | `runtime_determinism` | Guarantees reproducible audit results |
 
-## Generated Artifacts (Enhanced in v3)
+### Runtime Checks (3)
+| Check | ID | Purpose |
+|-------|-----|---------|
+| INVENTORY | `inventory` | Validates DB/API/UI extraction against spec |
+| DATABASE_VALIDATION | `database_validation` | Validates transactions, indexes, and pooling |
+| MIGRATION_VALIDATION | `migration_validation` | Ensures safe, reversible database changes |
+
+## Generated Artifacts (Enhanced)
 ```
 artifacts/
 ├── er.svg                       # Entity diagram (with relations)
 ├── flow.svg                     # Flow diagram (with JTBD & CTAs)
 ├── screens.csv                  # Screen list (with routes & components)
-├── entities.csv                 # Entity details (v3 - NEW)
-├── flows.csv                    # Flow summary (v3 - NEW)
-├── jtbd.csv                     # JTBD mapping (v3 - NEW)
-├── results.junit.xml           # Test results (11 checks)
+├── entities.csv                 # Entity details (NEW)
+├── flows.csv                    # Flow summary (NEW)
+├── jtbd.csv                     # JTBD mapping (NEW)
+├── results.junit.xml           # Test results (15 checks)
 ├── gap_report.md               # Issues found
 ├── acceptance_criteria.feature # Gherkin tests
 ├── er.mmd                      # Mermaid source

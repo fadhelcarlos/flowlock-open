@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0] - 2025-01-18 (CLI) / [0.4.1] - 2025-01-18 (Core Packages)
 
-### 🎉 Major Release: FlowLock v3 - Complete UXCG Feature Parity
+### 🎉 Major Release: FlowLock - Complete UXCG Feature Parity
 
 This release brings FlowLock to 100% feature parity with the original UX Contract Guardrails (UXCG) implementation, plus significant enhancements.
 
@@ -24,18 +24,32 @@ This release brings FlowLock to 100% feature parity with the original UX Contrac
 - **State Machines** - Enhanced state transitions with triggers and terminal states
 - **Glossary** - Document derived fields with formulas and external sources
 
-#### New Validation Checks (4 new, 11 total)
-- **JTBD Check** - Validates all Jobs To Be Done are addressed by flows
-- **Relations Check** - Validates entity relationships and detects circular references
-- **Routes Check** - Ensures unique routes with proper formatting
-- **CTAs Check** - Validates navigation targets and detects orphaned screens
+#### New Validation Checks (8 new, 15 total)
+- **Core Checks (7)**:
+  - **HONEST Check** - Validates data honesty and integrity
+  - **CREATABLE Check** - Ensures entities can be created with required fields
+  - **REACHABILITY Check** - Validates all screens are reachable from navigation
+  - **UI Check** - Validates UI component consistency
+  - **STATE Check** - Validates state machine transitions
+  - **SCREEN Check** - Validates screen structure and components
+  - **SPEC Check** - Validates overall spec structure
+- **Extended Checks (5)**:
+  - **JTBD Check** - Validates all Jobs To Be Done are addressed by flows
+  - **Relations Check** - Validates entity relationships and detects circular references
+  - **Routes Check** - Ensures unique routes with proper formatting
+  - **CTAs Check** - Validates navigation targets and detects orphaned screens
+  - **Runtime Determinism Check** - Validates runtime behavior is deterministic
+- **Runtime Checks (3)**:
+  - **Inventory Check** - Validates runtime inventory tracking
+  - **Database Validation** - Validates database schema against spec
+  - **Migration Validation** - Validates database migrations
 
 #### CLI Enhancements (`flowlock-uxcg` 0.5.0)
 - **Husky Integration** - Optional git hooks for pre-commit validation
 - **Glossary Templates** - Auto-generates `glossary.yml` and `glossary.md`
-- **Enhanced Starter Spec** - Comprehensive template with all v3 features
-- **New Claude Command** - `/ux-enhance-spec` for upgrading v2 specs to v3
-- **Updated Claude Commands** - All 5 commands now support v3 features
+- **Enhanced Starter Spec** - Comprehensive template with all features
+- **New Claude Command** - `/ux-enhance-spec` for upgrading legacy specs
+- **Updated Claude Commands** - All 5 commands now support enhanced features
 
 #### Generator Updates
 - **Enhanced ER Diagrams** - Show entity relations with proper Mermaid notation
@@ -52,7 +66,7 @@ This release brings FlowLock to 100% feature parity with the original UX Contrac
 
 #### Package Updates
 - `flowlock-uxspec` 0.4.1 - Enhanced schema with backward compatibility
-- `flowlock-checks-core` 0.4.1 - 11 checks (up from 7)
+- `flowlock-checks-core` 0.4.1 - 15 checks (up from 7)
 - `flowlock-runner` 0.4.1 - Enhanced generators and JTBD support
 - `flowlock-plugin-sdk` 0.4.1 - Support for new check types
 - `flowlock-mcp` 0.3.0 - Fixed ES module/CommonJS issues
@@ -64,11 +78,11 @@ This release brings FlowLock to 100% feature parity with the original UX Contrac
 - **JTBD Validation** - Handles both old and new formats without errors
 
 ### Documentation
-- **Comprehensive Guide** - Updated with all v3 features
+- **Comprehensive Guide** - Updated with all features
 - **API Reference** - Complete schema documentation
 - **Claude Commands Guide** - New documentation for AI integration
 - **Quick Reference** - Updated with new commands and features
-- **Migration Guide** - Instructions for upgrading from v2 to v3
+- **Migration Guide** - Instructions for upgrading legacy specs
 
 ## [0.2.1] - 2025-01-10
 
@@ -155,7 +169,7 @@ New format (recommended):
 
 | FlowLock Version | Node.js | npm | Features |
 |-----------------|---------|-----|----------|
-| 0.5.0 (CLI)     | ≥18     | ≥9  | Full v3 features, 11 checks |
+| 0.5.0 (CLI)     | ≥18     | ≥9  | Full features, 15 checks |
 | 0.4.1 (Core)    | ≥18     | ≥9  | Enhanced schema, backward compatible |
 | 0.2.x           | ≥16     | ≥8  | 7 checks, MCP server |
 | 0.1.x           | ≥16     | ≥8  | Initial release |

@@ -1,0 +1,95 @@
+{
+  "db": {
+    "dialect": "postgres",
+    "entities": [
+      {
+        "id": "User",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "email", "type": "varchar" },
+          { "id": "name", "type": "varchar" },
+          { "id": "role", "type": "enum" },
+          { "id": "createdAt", "type": "timestamp" },
+          { "id": "updatedAt", "type": "timestamp" }
+        ]
+      },
+      {
+        "id": "Product",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "name", "type": "varchar" },
+          { "id": "description", "type": "text" },
+          { "id": "price", "type": "decimal" },
+          { "id": "inStock", "type": "boolean" },
+          { "id": "categoryId", "type": "uuid" }
+        ]
+      },
+      {
+        "id": "Order",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "userId", "type": "uuid" },
+          { "id": "status", "type": "varchar" },
+          { "id": "total", "type": "decimal" },
+          { "id": "createdAt", "type": "timestamp" }
+        ]
+      }
+    ]
+  },
+  "api": {
+    "endpoints": [
+      {
+        "path": "/api/users",
+        "methods": ["GET", "POST"],
+        "returns": {
+          "entity": "User",
+          "fields": ["id", "email", "name", "role"]
+        }
+      },
+      {
+        "path": "/api/users/:id",
+        "methods": ["GET", "PUT", "DELETE"],
+        "returns": {
+          "entity": "User",
+          "fields": ["id", "email", "name", "role", "createdAt"]
+        }
+      },
+      {
+        "path": "/api/products",
+        "methods": ["GET", "POST"],
+        "returns": {
+          "entity": "Product",
+          "fields": ["id", "name", "price", "inStock"]
+        }
+      },
+      {
+        "path": "/api/orders",
+        "methods": ["GET", "POST"],
+        "returns": {
+          "entity": "Order",
+          "fields": ["id", "userId", "status", "total", "createdAt"]
+        }
+      }
+    ]
+  },
+  "ui": {
+    "reads": [
+      "User.name",
+      "User.email",
+      "User.role",
+      "Product.name",
+      "Product.price",
+      "Product.inStock",
+      "Order.status",
+      "Order.total"
+    ],
+    "writes": [
+      "User.email",
+      "User.name",
+      "Product.name",
+      "Product.price",
+      "Product.description",
+      "Order.status"
+    ]
+  }
+}

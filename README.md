@@ -25,6 +25,9 @@ uxcg audit --fix
 npx flowlock-uxcg@latest init-existing
 npx flowlock-uxcg@latest inventory
 npx flowlock-uxcg@latest audit --inventory
+
+# Debug check failures
+npx flowlock-uxcg@latest debug <check> --verbose
 ```
 
 ## 🔒 Security & Trust
@@ -74,8 +77,10 @@ Each of the 15 checks prevents specific failure modes, creating a safety net for
 - **[Comprehensive Guide](docs/FLOWLOCK_COMPREHENSIVE_GUIDE.md)** - Complete documentation of all features
 - **[Quick Reference](docs/QUICK_REFERENCE.md)** - Quick lookup for commands and syntax
 - **[API Reference](docs/API_REFERENCE.md)** - Programmatic usage and custom checks
-- **[Claude Commands](docs/CLAUDE_COMMANDS_V3.md)** - AI assistant integration guide
+- **[Claude Commands](docs/CLAUDE_COMMANDS.md)** - AI assistant integration guide
 - **[Architecture](docs/flowlock-architecture.md)** - System design and components
+- **[Debug Guide](docs/debug-command.md)** - Troubleshooting check failures
+- **[Debug Examples](examples/debug-usage.md)** - Real-world debugging scenarios
 
 ## ✨ Core Features
 
@@ -109,10 +114,10 @@ Each of the 15 checks prevents specific failure modes, creating a safety net for
 11. **CTAS** - Validates navigation targets and detects orphaned screens
 
 **Runtime Validation:**
-12. **INVENTORY** - Ensures DB/API/UI extraction is complete
-13. **DETERMINISM** - Guarantees reproducible audit results
-14. **DATABASE** - Validates transactions, indexes, and pooling
-15. **MIGRATIONS** - Ensures safe, reversible database changes
+12. **RUNTIME_DETERMINISM** - Guarantees reproducible audit results
+13. **INVENTORY** - Validates DB/API/UI extraction against spec
+14. **DATABASE_VALIDATION** - Validates transactions, indexes, and pooling
+15. **MIGRATION_VALIDATION** - Ensures safe, reversible database changes
 
 ### 🔧 Enhanced Auto-Healing
 
@@ -185,7 +190,7 @@ These aren't just labels - FlowLock validates that every JTBD task has a corresp
   "version": "1.0.0",
   "project": "user-mgmt",
   "name": "User Management System",
-  "description": "Complete user management with all v3 features",
+  "description": "Complete user management with all features",
   
   "roles": [
     { 
@@ -279,7 +284,7 @@ These aren't just labels - FlowLock validates that every JTBD task has a corresp
 
 ## 🔄 Migration from v2
 
-FlowLock v3 is **fully backward compatible**. Existing specs continue to work!
+FlowLock is **fully backward compatible**. Existing specs continue to work!
 
 ### Automatic Migration
 
@@ -349,15 +354,15 @@ npx flowlock-uxcg init
 ```
 flowlock-open/
 ├── packages/
-│   ├── uxspec/         # Schema definitions (Zod) - v3 enhanced
+│   ├── uxspec/         # Schema definitions (Zod) - enhanced
 │   ├── plugin-sdk/     # Plugin interface
-│   ├── checks-core/    # 11 validation checks (4 new)
+│   ├── checks-core/    # 15 validation checks (8 new)
 │   ├── runner/         # Orchestration with enhanced generators
 │   ├── cli/            # CLI with 5 Claude commands
-│   └── mcp/            # MCP server (fixed for v3)
+│   └── mcp/            # MCP server
 ├── apps/
 │   └── site/           # Documentation site (Next.js)
-└── docs/               # Comprehensive v3 documentation
+└── docs/               # Comprehensive documentation
 ```
 
 ## 🛠️ Development
@@ -385,15 +390,15 @@ pnpm -r publish --access public
 ## 🎓 Learning Resources
 
 - **[Quick Start Tutorial](docs/QUICK_REFERENCE.md)** - Get started in 5 minutes
-- **[Check Reference](docs/FLOWLOCK_COMPREHENSIVE_GUIDE.md#built-in-checks)** - Understand all 11 checks
+- **[Check Reference](docs/FLOWLOCK_COMPREHENSIVE_GUIDE.md#built-in-checks)** - Understand all 15 checks
 - **[Schema Reference](docs/API_REFERENCE.md)** - Complete schema documentation
-- **[Examples](example/)** - Sample projects with v3 features
+- **[Examples](example/)** - Sample projects with enhanced features
 
 ## 📈 Roadmap
 
-- [x] Complete UXCG feature parity (v3.0)
+- [x] Complete UXCG feature parity
 - [x] Enhanced Claude/Cursor commands
-- [x] 11 validation checks
+- [x] 15 validation checks
 - [x] JTBD, relations, routes, CTAs
 - [ ] Visual spec editor
 - [ ] VSCode extension
@@ -425,7 +430,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🏆 Acknowledgments
 
-FlowLock v3 achieves full feature parity with the original UX Contract Guardrails (UXCG) implementation, while adding:
+FlowLock achieves full feature parity with the original UX Contract Guardrails (UXCG) implementation, while adding:
 - Modular architecture
 - Better AI integration
 - Cloud capabilities

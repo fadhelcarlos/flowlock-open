@@ -1,0 +1,38 @@
+{
+  "db": {
+    "dialect": "sqlite",
+    "entities": [
+      {
+        "id": "Task",
+        "fields": [
+          { "id": "id", "type": "INTEGER" },
+          { "id": "title", "type": "TEXT" },
+          { "id": "completed", "type": "INTEGER" },
+          { "id": "createdAt", "type": "TEXT" }
+        ]
+      }
+    ]
+  },
+  "api": {
+    "endpoints": [
+      {
+        "path": "/api/tasks",
+        "methods": ["GET", "POST"]
+      },
+      {
+        "path": "/api/tasks/:id",
+        "methods": ["PUT", "DELETE"]
+      }
+    ]
+  },
+  "ui": {
+    "reads": [
+      "Task.title",
+      "Task.completed"
+    ],
+    "writes": [
+      "Task.title",
+      "Task.completed"
+    ]
+  }
+}

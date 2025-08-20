@@ -97,6 +97,7 @@ export const ScreenSchema = z.object({
   id: z.string(),
   name: z.string(),
   type: z.enum(['list', 'detail', 'form', 'dashboard', 'success', 'error', 'home']),
+  entity: z.string().optional(), // Support both 'entity' and 'entityId'
   entityId: z.string().optional(),
   routes: z.array(z.string()).optional(), // NEW - URL routes
   forms: z.array(FormSchema).optional(),

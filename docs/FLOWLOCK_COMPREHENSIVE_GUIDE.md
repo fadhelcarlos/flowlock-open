@@ -28,7 +28,8 @@ FlowLock is an **agent-native UX contract and guardrails system** that ensures A
 
 ### Key Features
 - **Specification-driven development** - Define your entire UX in a single JSON file
-- **Deterministic validation** - 7 core checks ensure consistency and completeness
+- **Comprehensive validation** - 15 validation checks across core, extended, and runtime categories
+- **Graduated validation levels** - Flexible check behavior based on project maturity
 - **Auto-healing** - Automatic fixes for common structural issues
 - **Agent-friendly** - Built for AI agents with Claude/Cursor command cards
 - **CI/CD ready** - GitHub Actions integration out of the box
@@ -36,12 +37,12 @@ FlowLock is an **agent-native UX contract and guardrails system** that ensures A
 - **MCP integration** - Model Context Protocol server for AI assistants
 
 ### Latest Versions (npm)
-- `flowlock-uxspec`: 0.3.0
-- `flowlock-plugin-sdk`: 0.3.0
-- `flowlock-checks-core`: 0.3.0
-- `flowlock-runner`: 0.3.0
-- `flowlock-uxcg`: 0.3.0 (CLI)
-- `flowlock-mcp`: 0.2.0
+- `flowlock-uxspec`: 0.4.0
+- `flowlock-plugin-sdk`: 0.4.0
+- `flowlock-checks-core`: 0.4.0
+- `flowlock-runner`: 0.4.0
+- `flowlock-uxcg`: 0.4.0 (CLI)
+- `flowlock-mcp`: 0.4.0
 
 ---
 
@@ -64,7 +65,7 @@ FlowLock is an **agent-native UX contract and guardrails system** that ensures A
           │      │                                     │
     ┌─────▼──────▼─────┐                    ┌─────────▼─────────┐
     │  Validation      │                    │   Artifact        │
-    │  Checks (7)      │                    │   Generation      │
+    │  Checks (15)     │                    │   Generation      │
     └──────────────────┘                    └─────────┬─────────┘
                                                       │
                                             ┌─────────▼─────────┐
@@ -80,7 +81,7 @@ FlowLock is an **agent-native UX contract and guardrails system** that ensures A
 ## Package Documentation
 
 ### flowlock-uxspec
-**Version:** 0.3.0  
+**Version:** 0.4.0  
 **Purpose:** Core schema definitions and validation using Zod
 
 #### Key Exports
@@ -135,13 +136,14 @@ npm install flowlock-uxspec
 ---
 
 ### flowlock-plugin-sdk
-**Version:** 0.3.0  
-**Purpose:** Plugin interface for custom validation checks
+**Version:** 0.4.0  
+**Purpose:** Plugin interface for custom validation checks with graduated validation support
 
 #### Key Exports
 ```typescript
 export type CheckLevel = 'error' | 'warning' | 'info';
 export type CheckStatus = 'pass' | 'fail' | 'skip';
+export type ValidationLevel = 'strict' | 'standard' | 'lenient';
 
 export interface CheckResult {
   id: string;
@@ -155,6 +157,8 @@ export interface FlowlockCheck {
   id: string;
   name: string;
   description: string;
+  category: 'core' | 'extended' | 'runtime';
+  validationLevel?: ValidationLevel;
   run(spec: UXSpec): CheckResult | CheckResult[] | Promise<CheckResult | CheckResult[]>;
 }
 ```
@@ -167,93 +171,180 @@ npm install flowlock-plugin-sdk
 ---
 
 ### flowlock-checks-core
-**Version:** 0.3.0  
-**Purpose:** Core validation checks (11 built-in checks)
+**Version:** 0.4.0  
+**Purpose:** Comprehensive validation checks (15 total) with graduated validation support
 
-#### Built-in Checks
+#### Validation Checks (15 Total)
 
-Core Checks:
-1. **HONEST_READS** (`honest_reads`)
+##### Core Checks (7)
+These fundamental checks ensure basic UX consistency:
+
+1. **HONEST** (`honest`)
    - Ensures screens only read fields that are:
      - Captured by forms in the same flow
      - Marked as `derived` with `provenance`
      - Marked as `external` with `source`
+   - Validation levels:
+     - `strict`: All reads must have valid sources
+     - `standard`: Warns for missing sources
+     - `lenient`: Info-only reporting
 
-2. **CREATABLE_NEEDS_DETAIL** (`creatable_needs_detail`)
+2. **CREATABLE** (`creatable`)
    - Every entity with a create form must have:
      - A detail screen to view created items
      - A discoverable path to reach that screen
+   - Validation levels:
+     - `strict`: All creatable entities need detail screens
+     - `standard`: Warns for missing detail screens
+     - `lenient`: Info-only suggestions
 
 3. **REACHABILITY** (`reachability`)
    - Success screens must be reachable from flow entry
    - Maximum 3 steps by default (configurable)
+   - Validation levels:
+     - `strict`: Max 3 steps enforced
+     - `standard`: Max 5 steps allowed
+     - `lenient`: Max 7 steps, warnings only
 
-4. **UI_STATES** (`ui_states`)
+4. **UI** (`ui`)
    - All screens must declare UI states:
      - `empty` - No data to display
      - `loading` - Fetching data
      - `error` - Error occurred
+   - Validation levels:
+     - `strict`: All states required
+     - `standard`: Loading/error required
+     - `lenient`: Suggests states only
 
-5. **STATE_MACHINES** (`state_machines`)
+5. **STATE** (`stateMachine`)
    - Validates state machine structures
    - Ensures terminal states exist
    - Validates transitions
+   - Validation levels:
+     - `strict`: Complete state machines required
+     - `standard`: Basic validation only
+     - `lenient`: Optional state machines
 
 6. **SCREEN** (`screen`)
    - All screens must declare allowed roles
    - Ensures role-based access control
+   - Validation levels:
+     - `strict`: Roles required on all screens
+     - `standard`: Warns for missing roles
+     - `lenient`: Suggests role additions
 
-7. **SPEC_COVERAGE** (`spec_coverage`)
+7. **SPEC** (`spec`)
    - Reports coverage percentages:
      - % of entities/fields used in forms
      - % of screens with roles defined
      - % of screens with UI states
+   - Always informational regardless of validation level
 
-Enhanced Checks (v2.0):
+##### Extended Checks (5)
+These checks provide deeper validation for mature projects:
+
 8. **JTBD** (`jtbd`)
    - Validates all Jobs To Be Done are addressed by flows
    - Ensures flows link back to JTBD roles
+   - Validation levels:
+     - `strict`: All JTBD must have flows
+     - `standard`: Warns for unaddressed JTBD
+     - `lenient`: Info-only reporting
 
 9. **RELATIONS** (`relations`)
    - Validates entity relationships are properly defined
    - Checks for circular references
    - Ensures target entities exist
+   - Validation levels:
+     - `strict`: All relations must be valid
+     - `standard`: Warns for issues
+     - `lenient`: Suggests improvements
 
 10. **ROUTES** (`routes`)
     - Ensures screen routes are unique
     - Validates route format (must start with /)
     - Checks route parameters match entity fields
+    - Validation levels:
+      - `strict`: Unique, valid routes required
+      - `standard`: Warns for duplicates
+      - `lenient`: Suggests route patterns
 
 11. **CTAS** (`ctas`)
     - Validates Call-to-Actions point to valid screens
     - Detects orphaned screens with no incoming CTAs
     - Warns about self-referencing CTAs
+    - Validation levels:
+      - `strict`: All CTAs must be valid
+      - `standard`: Warns for broken CTAs
+      - `lenient`: Info-only suggestions
 
-12. **INVENTORY** (`inventory`)
-    - Ensures runtime inventory was extracted
-    - Validates DB entities match spec entities
-    - Checks API endpoints coverage
-    - Verifies UI reads/writes alignment
-
-13. **RUNTIME_DETERMINISM** (`runtime_determinism`)
+12. **RUNTIME_DETERMINISM** (`runtimeDeterminism`)
     - Verifies deterministic audits across runs
     - Computes SHA-256 hash of spec + inventory
     - Ensures same inputs always yield same results
     - Critical for CI/CD pipeline stability
+    - Always runs at strict level (determinism is binary)
 
-14. **DATABASE_VALIDATION** (`database_validation`)
+##### Runtime Checks (3)
+These checks validate against actual implementation:
+
+13. **INVENTORY** (`inventory`)
+    - Ensures runtime inventory was extracted
+    - Validates DB entities match spec entities
+    - Checks API endpoints coverage
+    - Verifies UI reads/writes alignment
+    - Validation levels:
+      - `strict`: Full inventory match required
+      - `standard`: Warns for mismatches
+      - `lenient`: Suggests alignments
+
+14. **DATABASE_VALIDATION** (`databaseValidation`)
     - Validates transaction boundaries
     - Checks for missing indexes on frequently queried fields
     - Verifies auth table integration with roles
     - Validates connection pooling configuration
     - Ensures data integrity constraints
+    - Validation levels:
+      - `strict`: All DB patterns enforced
+      - `standard`: Critical issues only
+      - `lenient`: Performance suggestions
 
-15. **MIGRATION_VALIDATION** (`migration_validation`)
+15. **MIGRATION_VALIDATION** (`migrationValidation`)
     - Validates migration safety and reversibility
     - Checks for transaction support in DDL operations
     - Verifies rollback scripts exist
     - Ensures data integrity in migrations
     - Validates migration dependencies
+    - Validation levels:
+      - `strict`: Full migration safety required
+      - `standard`: Critical safety checks only
+      - `lenient`: Best practice suggestions
+
+#### Graduated Validation Configuration
+
+Set validation levels in `flowlock.config.json`:
+```json
+{
+  "validationLevels": {
+    "default": "standard",
+    "checks": {
+      "honest": "strict",
+      "creatable": "standard",
+      "reachability": "lenient",
+      "inventory": "strict"
+    }
+  }
+}
+```
+
+Or via CLI:
+```bash
+# Set default level
+uxcg audit --validation-level standard
+
+# Override specific checks
+uxcg audit --strict honest,inventory --lenient reachability
+```
 
 **Installation:**
 ```bash
@@ -263,11 +354,12 @@ npm install flowlock-checks-core
 ---
 
 ### flowlock-runner
-**Version:** 0.3.0  
-**Purpose:** Orchestrates checks and generates artifacts
+**Version:** 0.4.0  
+**Purpose:** Orchestrates checks and generates artifacts with graduated validation support
 
 #### Key Features
-- Runs all validation checks
+- Runs all 15 validation checks
+- Supports graduated validation levels
 - Generates Mermaid diagrams (ER & Flow)
 - Creates CSV reports
 - Produces JUnit XML for CI
@@ -277,11 +369,20 @@ npm install flowlock-checks-core
 ```typescript
 import { Runner } from "flowlock-runner";
 
-// From file
-const runner = await Runner.fromFile("uxspec.json");
+// From file with config
+const runner = await Runner.fromFile("uxspec.json", {
+  validationLevel: 'standard',
+  checkOverrides: {
+    honest: 'strict',
+    reachability: 'lenient'
+  }
+});
 
 // From object
-const runner = new Runner({ spec: mySpecObject });
+const runner = new Runner({ 
+  spec: mySpecObject,
+  validationLevel: 'standard'
+});
 
 // Run checks
 const result = await runner.run();
@@ -297,6 +398,7 @@ const result = await runner.runAndSave("artifacts");
 - `results.junit.xml` - Test results
 - `gap_report.md` - Issues and recommended fixes
 - `acceptance_criteria.feature` - Gherkin scenarios
+- `validation_report.json` - Detailed check results with levels
 
 **Installation:**
 ```bash
@@ -306,8 +408,8 @@ npm install flowlock-runner
 ---
 
 ### flowlock-uxcg (CLI)
-**Version:** 0.3.0  
-**Purpose:** Command-line interface for FlowLock
+**Version:** 0.4.0  
+**Purpose:** Command-line interface for FlowLock with full graduated validation support
 
 #### Commands
 
@@ -318,9 +420,10 @@ Initialize a new FlowLock project with enhanced features
 - Adds Claude/Cursor command cards
 - Sets up GitHub Actions workflow
 - Adds npm scripts (audit, fix, watch)
-- **NEW**: Optional Husky git hooks for pre-commit validation
-- **NEW**: Creates `uxspec/glossary.yml` and `glossary.md`
-- **NEW**: Enhanced starter spec with JTBD, relations, CTAs, and more
+- Optional Husky git hooks for pre-commit validation
+- Creates `uxspec/glossary.yml` and `glossary.md`
+- Enhanced starter spec with JTBD, relations, CTAs, and more
+- Configures default validation levels
 
 ##### `uxcg init-existing`
 Initialize FlowLock in an existing project (aliases: `wire`)
@@ -344,16 +447,22 @@ Extract runtime inventory from your codebase (alias: `inv`)
 
 ##### `uxcg audit [options]`
 Run validation checks and generate artifacts
-- `--fix` flag enables auto-healing:
-  - Adds missing roles
-  - Ensures UI states (empty/loading/error)
-  - Infers screen types from names
-  - Fixes structural issues
+- `--fix` - Enable auto-healing for common issues
 - `--inventory` - Require runtime inventory (fails if missing/stale)
 - `--only <checks>` - Run only specific checks (comma-separated)
 - `--skip <checks>` - Skip specific checks (comma-separated)
+- `--validation-level <level>` - Set default validation level (strict/standard/lenient)
+- `--strict <checks>` - Apply strict validation to specific checks
+- `--standard <checks>` - Apply standard validation to specific checks  
+- `--lenient <checks>` - Apply lenient validation to specific checks
 - `--json` - Output results as JSON
 - `--quiet` - Suppress non-error output
+
+##### `uxcg debug [check]`
+Debug specific validation checks or the entire system
+- Shows detailed execution trace for checks
+- Helpful for understanding validation failures
+- Displays validation level per check
 
 ##### `uxcg diagrams`
 Generate only diagram artifacts (ER & Flow)
@@ -363,12 +472,14 @@ Export specific artifact formats:
 - `junit` - Test results XML
 - `csv` - Screen inventory
 - `svg` - Diagram images
+- `validation` - Validation report with levels
 
 ##### `uxcg watch [options]`
 Watch mode for development
 - `--cloud` - Enable cloud sync
 - `--cloudUrl <url>` - Cloud endpoint
 - `--projectId <id>` - Project identifier
+- `--validation-level <level>` - Set validation level for watch mode
 
 ##### `uxcg agent [options]`
 Connect to FlowLock Cloud for remote control
@@ -389,18 +500,19 @@ uxcg audit
 ---
 
 ### flowlock-mcp
-**Version:** 0.2.0  
-**Purpose:** Model Context Protocol server for AI assistants
+**Version:** 0.4.0  
+**Purpose:** Model Context Protocol server for AI assistants with graduated validation support
 
 #### Features
 MCP server that exposes FlowLock functionality to AI assistants like Claude Desktop.
 
 #### Available Tools
 1. **ping** - Health check
-2. **audit** - Run FlowLock audit (with optional --fix)
+2. **audit** - Run FlowLock audit (with optional --fix and validation levels)
 3. **diagrams** - Generate diagram artifacts
 4. **init** - Initialize FlowLock project
 5. **write_claude_commands** - Ensure .claude/commands exist
+6. **debug** - Debug specific checks or validation
 
 #### Setup for Claude Desktop
 Add to your Claude Desktop config:
@@ -439,6 +551,9 @@ uxcg audit
 
 # 5. Fix any issues (or use --fix for auto-healing)
 uxcg audit --fix
+
+# 6. Adjust validation levels as needed
+uxcg audit --validation-level lenient
 ```
 
 ### Project Setup Options
@@ -446,8 +561,7 @@ uxcg audit --fix
 #### Option 1: Add to Existing Project
 ```bash
 cd your-project
-uxcg init
-# Choose "Use current folder"
+uxcg init-existing
 ```
 
 #### Option 2: Scaffold New Project
@@ -461,11 +575,11 @@ uxcg init
 
 ## UX Specification Format
 
-### Enhanced Features (v2.0)
+### Enhanced Features
 
-FlowLock now supports comprehensive UX specification features from the original UXCG implementation:
+FlowLock supports comprehensive UX specification features:
 
-#### New Schema Fields
+#### Core Schema Fields
 
 1. **JTBD (Jobs To Be Done)**
    - Track user goals and tasks
@@ -594,10 +708,16 @@ FlowLock now supports comprehensive UX specification features from the original 
 
 ## Validation Checks
 
-### Check Severity Levels
-- **ERROR** - Must be fixed, causes audit failure
-- **WARNING** - Should be addressed but won't fail audit
-- **INFO** - Informational, no action required
+### Check Categories and Severity
+- **Core Checks (7)** - Fundamental UX consistency
+- **Extended Checks (5)** - Deeper validation for mature projects  
+- **Runtime Checks (3)** - Validation against implementation
+
+### Graduated Validation Levels
+Each check can operate at three levels:
+- **strict** - Errors fail the audit, enforce all rules
+- **standard** - Balance between strictness and flexibility
+- **lenient** - Warnings/info only, never fails audit
 
 ### Auto-Healing with `--fix`
 The audit command with `--fix` flag automatically:
@@ -610,41 +730,42 @@ The audit command with `--fix` flag automatically:
 
 ### Example Output
 ```bash
-$ uxcg audit
+$ uxcg audit --validation-level standard
 
-🔍 Running FlowLock audit...
+🔍 Running FlowLock audit (validation: standard)...
 
-📋 HONEST
-  ✅ All screen reads are properly captured, derived, or external
+📋 Core Checks (7)
+  ✅ HONEST - All screen reads are properly captured
+  ✅ CREATABLE - All entities have detail screens
+  ✅ REACHABILITY - Success screens reachable
+  ⚠️  UI - Screen 'user-list' missing UI state: error [standard]
+  ✅ STATE - State machines valid
+  ✅ SCREEN - All screens have roles
+  ℹ️  SPEC - Coverage: Roles 75%, UI states 50%
 
-📋 CREATABLE
-  ✅ All creatable entities have detail screens with discoverable paths
+📋 Extended Checks (5)
+  ✅ JTBD - All jobs addressed
+  ✅ RELATIONS - Entity relationships valid
+  ⚠️  ROUTES - Duplicate route: /users [standard]
+  ✅ CTAS - All CTAs valid
+  ✅ RUNTIME_DETERMINISM - Audit deterministic
 
-📋 REACHABILITY
-  ✅ All success screens are reachable within 3 steps
+📋 Runtime Checks (3)
+  ⚠️  INVENTORY - DB mismatch: user.lastLogin [standard]
+  ✅ DATABASE_VALIDATION - DB patterns valid
+  ✅ MIGRATION_VALIDATION - Migrations safe
 
-📋 UI
-  ❌ Screen 'user-list' missing UI state: error
-  ❌ Screen 'user-create' missing UI states: empty
+Summary: 12 passed, 3 warnings, 0 errors
 
-📋 STATE
-  ✅ All state machines are structurally valid or not required
-
-📋 SCREEN
-  ✅ All screens declare allowed roles
-
-📋 SPEC
-  ⚠️  Spec coverage — Roles: 75% — UI states: 50%
-
- Artifacts generated:
+Artifacts generated:
   • artifacts/er.svg
   • artifacts/flow.svg
   • artifacts/screens.csv
   • artifacts/results.junit.xml
   • artifacts/gap_report.md
-  • artifacts/acceptance_criteria.feature
+  • artifacts/validation_report.json
 
-❌ Audit failed with errors
+✅ Audit passed with warnings
 ```
 
 ---
@@ -657,6 +778,7 @@ $ uxcg audit
 - PR comment integration
 - Team collaboration
 - SSE live updates
+- Validation level tracking
 
 ### Agent Mode
 Connect your local environment to cloud:
@@ -698,9 +820,10 @@ Add to Claude Desktop config (`~/AppData/Roaming/Claude/claude_desktop_config.js
 ### Using with Claude
 Once configured, Claude can:
 - Initialize FlowLock projects
-- Run audits and view results
+- Run audits with graduated validation
 - Generate diagrams
 - Apply fixes automatically
+- Debug specific checks
 
 ---
 
@@ -716,17 +839,18 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: FlowLock Audit
         uses: ./action/uxcg-action
         with:
+          validation-level: ${{ github.ref == 'refs/heads/main' && 'strict' || 'standard' }}
           cloud-url: ${{ secrets.FLOWLOCK_CLOUD_URL }}
           project-id: ${{ github.repository }}
           auth-token: ${{ secrets.FLOWLOCK_TOKEN }}
       
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: flowlock-artifacts
@@ -738,7 +862,12 @@ jobs:
 flowlock_audit:
   script:
     - npm install -g flowlock-uxcg
-    - uxcg audit
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "main" ]; then
+        uxcg audit --validation-level strict
+      else
+        uxcg audit --validation-level standard
+      fi
   artifacts:
     paths:
       - artifacts/
@@ -765,12 +894,18 @@ flowlock_audit:
 5. Run `uxcg audit --fix` frequently
 6. Commit small, focused changes
 
-### 3. Field Types
+### 3. Graduated Validation Strategy
+- **Early Development**: Use `lenient` to focus on structure
+- **Pre-Production**: Switch to `standard` for balance
+- **Production**: Use `strict` for maximum safety
+- **Legacy Projects**: Start `lenient`, gradually increase
+
+### 4. Field Types
 - **Required fields** - User must provide
 - **Derived fields** - System calculates (needs provenance)
 - **External fields** - From other systems (needs source)
 
-### 4. Screen Types
+### 5. Screen Types
 - `list` - Collection views
 - `detail` - Single item display
 - `form` - Data entry
@@ -778,9 +913,10 @@ flowlock_audit:
 - `success` - Completion confirmation
 - `error` - Failure states
 
-### 5. Agent Integration
+### 6. Agent Integration
 - Use Claude command cards (`.claude/commands/`)
 - Let agents run `audit --fix` for auto-healing
+- Configure appropriate validation levels
 - Review agent-proposed spec changes
 - Maintain audit trail in git
 
@@ -803,6 +939,9 @@ npm install
 # Use auto-fix first
 uxcg audit --fix
 
+# Try lenient validation during development
+uxcg audit --validation-level lenient
+
 # Then manually address remaining issues
 ```
 
@@ -821,6 +960,12 @@ uxcg audit --fix
 
 ### Debug Mode
 ```bash
+# Debug specific check
+uxcg debug honest
+
+# Debug all checks
+uxcg debug
+
 # Verbose output
 DEBUG=* uxcg audit
 
@@ -832,11 +977,28 @@ uxcg --version
 
 ## Migration Guide
 
-### From v0.1.x to v0.2.x
-1. Update all packages to 0.2.1
+### From Earlier Versions to 0.4.x
+1. Update all packages to 0.4.x
 2. Run `uxcg audit --fix` to update spec structure
-3. Review generated `.claude/commands/` files
-4. Update CI/CD configs if needed
+3. Configure validation levels in `flowlock.config.json`
+4. Review generated `.claude/commands/` files
+5. Update CI/CD configs to use validation levels
+
+### Validation Level Migration
+```json
+// Add to flowlock.config.json
+{
+  "validationLevels": {
+    "default": "standard",
+    "checks": {
+      // Customize per check as needed
+      "honest": "strict",
+      "inventory": "strict",
+      "reachability": "lenient"
+    }
+  }
+}
+```
 
 ---
 
@@ -844,7 +1006,7 @@ uxcg --version
 
 - **GitHub Issues**: Report bugs and request features
 - **Documentation**: This guide and architecture docs
-- **Examples**: Check `/example` and `/ui` directories
+- **Examples**: Check `/examples` directory
 - **Community**: Discussions and Q&A on GitHub
 
 ---
@@ -855,5 +1017,5 @@ MIT License - See LICENSE file for details
 
 ---
 
-*Last updated: August 2025*
-*FlowLock v0.2.1*
+*Last updated: January 2025*
+*FlowLock v0.4.0*

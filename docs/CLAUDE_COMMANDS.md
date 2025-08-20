@@ -1,18 +1,18 @@
-# FlowLock v3 Claude/Cursor Command Cards
+# FlowLock Claude/Cursor Command Cards
 
 This document describes the updated Claude/Cursor command cards that are automatically generated when you run `npx flowlock-uxcg init`. These commands help AI assistants work with FlowLock more effectively.
 
 ## Overview
 
-FlowLock v3 includes 5 command cards (up from 4 in v2):
+FlowLock includes 5 command cards:
 
 1. **`/ux-contract-init`** - Create or refine the UX specification
 2. **`/ux-guardrails-validate`** - Fix failing validation checks
 3. **`/ux-generate-ui`** - Scaffold UI components from spec
 4. **`/flow-audit-fix`** - Close gaps identified by audit
-5. **`/ux-enhance-spec`** ✨ NEW - Upgrade specs to use v3 features
+5. **`/ux-enhance-spec`** - Enhance specs with advanced features
 
-## What's New in v3 Commands
+## Command Features
 
 ### Enhanced Features Support
 
@@ -30,9 +30,9 @@ All commands now understand and work with:
 
 ### New Validation Checks
 
-Commands now handle 11 checks (up from 7):
+Commands now handle 15 checks (up from 7):
 
-**Core Checks:**
+**Core Checks (7):**
 - HONEST - Field read validation
 - CREATABLE - Create forms need detail screens
 - REACHABILITY - 3-click rule
@@ -41,11 +41,17 @@ Commands now handle 11 checks (up from 7):
 - SCREEN - Role-based access
 - SPEC - Coverage reporting
 
-**New Checks:**
+**Extended Checks (5):**
 - JTBD - Jobs to flows mapping
 - RELATIONS - Entity relationship validation
 - ROUTES - Unique URL patterns
 - CTAS - Navigation validation
+- RUNTIME_DETERMINISM - Audit result consistency
+
+**Runtime Checks (3):**
+- INVENTORY - Runtime extraction validation
+- DATABASE_VALIDATION - Database best practices
+- MIGRATION_VALIDATION - Safe migration patterns
 
 ## Command Details
 
@@ -53,7 +59,7 @@ Commands now handle 11 checks (up from 7):
 
 Creates or refines `uxspec.json` from your PRD/README.
 
-**New in v3:**
+**New Features:**
 - Generates enhanced entity relations
 - Creates screen routes and CTAs
 - Links flows to JTBD
@@ -86,8 +92,8 @@ Creates or refines `uxspec.json` from your PRD/README.
 
 Fixes validation failures to get all checks green.
 
-**New in v3:**
-- Handles 11 checks instead of 7
+**New Features:**
+- Handles 15 checks instead of 7
 - Suggests route additions
 - Recommends CTA improvements
 - Proposes state machine definitions
@@ -102,7 +108,7 @@ npx flowlock-uxcg audit --fix
 
 Scaffolds complete UI from specification.
 
-**New in v3:**
+**New Features:**
 - Generates routing from screen routes
 - Creates card components
 - Builds sortable/filterable lists
@@ -128,8 +134,8 @@ src/
 
 Closes gaps from audit reports.
 
-**New in v3:**
-- Categorizes issues by all 11 checks
+**New Features:**
+- Categorizes issues by all 15 checks
 - Suggests enhanced feature additions
 - Handles JTBD linking
 - Fixes relation issues
@@ -137,7 +143,7 @@ Closes gaps from audit reports.
 
 ### /ux-enhance-spec (NEW)
 
-Upgrades existing specs to use v3 features.
+Upgrades existing specs to use enhanced features.
 
 **What it does:**
 - Migrates old JTBD format to new
@@ -148,7 +154,7 @@ Upgrades existing specs to use v3 features.
 - Documents in glossary
 
 **Benefits:**
-- Better validation (11 vs 7 checks)
+- Better validation (15 vs 7 checks)
 - Richer UI generation
 - URL navigation support
 - State enforcement
@@ -199,11 +205,11 @@ This creates:
 
 ## Backward Compatibility
 
-All v3 commands support both:
+All commands support both:
 - **Old format**: JTBD as object, simple forms
 - **New format**: JTBD as array, enhanced components
 
-This ensures smooth migration from v2 to v3.
+This ensures smooth migration from legacy specs.
 
 ## Best Practices
 
@@ -242,10 +248,10 @@ npm install -g flowlock-uxcg@latest
 
 ## Summary
 
-FlowLock v3 commands provide:
+FlowLock commands provide:
 - ✅ Full support for all new features
 - ✅ Backward compatibility with v2 specs
-- ✅ 11 validation checks vs 7
+- ✅ 15 validation checks vs 7
 - ✅ Enhanced UI generation
 - ✅ Better AI assistance
 

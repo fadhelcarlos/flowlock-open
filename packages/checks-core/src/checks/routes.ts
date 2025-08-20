@@ -1,4 +1,5 @@
 import type { UXSpec } from 'flowlock-uxspec';
+import { getEntityId } from '../utils/entity-utils';
 
 /**
  * Validates that screen routes are unique and properly formatted
@@ -33,7 +34,7 @@ export function checkRoutes(spec: UXSpec): any[] {
       // Check for route parameters consistency
       if (route.includes(':')) {
         const params = route.match(/:(\w+)/g) || [];
-        const entityId = screen.entityId;
+        const entityId = getEntityId(screen);
         
         if (entityId && params.length > 0) {
           // Validate that route params match entity fields

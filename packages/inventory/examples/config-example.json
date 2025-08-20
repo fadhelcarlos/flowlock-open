@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schema.flowlock.dev/config.v1.json",
+  "projectName": "example-app",
+  "inventory": {
+    "db": {
+      "mode": "auto",
+      "dialect": "postgres",
+      "urlEnv": "DATABASE_URL",
+      "schemaFiles": [
+        "prisma/schema.prisma",
+        "src/db/schema.ts",
+        "src/entities/**/*.entity.ts",
+        "src/models/**/*.model.ts"
+      ]
+    },
+    "api": {
+      "scan": [
+        "app/api/**/route.ts",
+        "app/api/**/route.tsx",
+        "pages/api/**/*.ts",
+        "src/**/*.controller.ts",
+        "src/routes/**/*.ts",
+        "src/api/**/*.ts",
+        "openapi.yml",
+        "openapi.yaml",
+        "openapi.json",
+        "swagger.json"
+      ],
+      "jsdoc": true,
+      "openapiPrefer": true
+    },
+    "ui": {
+      "scan": [
+        "app/**/*.tsx",
+        "app/**/*.jsx",
+        "src/components/**/*.tsx",
+        "src/components/**/*.jsx",
+        "src/pages/**/*.tsx",
+        "src/pages/**/*.jsx",
+        "src/views/**/*.tsx",
+        "src/views/**/*.jsx"
+      ],
+      "readAttribute": "data-fl-read",
+      "writeAttribute": "data-fl-write"
+    }
+  },
+  "audit": {
+    "requireInventory": true,
+    "checks": [
+      "INVENTORY",
+      "DB_SCHEMA",
+      "API_SURFACE",
+      "DB_PROVENANCE",
+      "PII_BOUNDARY",
+      "ROUTES",
+      "CTAS",
+      "HONEST_READS"
+    ]
+  }
+}

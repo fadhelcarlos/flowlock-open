@@ -52,6 +52,8 @@ export interface AuditOptions {
   skip?: string;    // skip specific checks
   json?: boolean;   // output as JSON
   quiet?: boolean;  // suppress non-error output
+  verbose?: boolean; // show detailed debug output
+  level?: 'basic' | 'enhanced' | 'strict'; // validation level (default: enhanced)
 }
 
 /* ========================= Small utils ========================== */
@@ -97,10 +99,60 @@ function groupOf(id: string): string {
   if (x.startsWith("routes")) return "ROUTES";
   if (x.startsWith("ctas")) return "CTAS";
   if (x.startsWith("inventory")) return "INVENTORY";
-  if (x.startsWith("runtime_determinism")) return "DETERMINISM";
-  if (x.startsWith("database")) return "DATABASE";
-  if (x.startsWith("migration")) return "MIGRATION";
+  if (x.startsWith("runtime_determinism") || x.startsWith("runtime-determinism")) return "RUNTIME_DETERMINISM";
+  if (x.startsWith("database_validation") || x.startsWith("database-validation")) return "DATABASE_VALIDATION";
+  if (x.startsWith("migration_validation") || x.startsWith("migration-validation")) return "MIGRATION_VALIDATION";
   return "OTHER";
+}
+
+/* ========================= Validation Levels ========================= */
+/**
+ * Validation levels control which checks are run:
+ * - Basic: 7 checks (core UX consistency)
+ * - Enhanced: 12 checks (basic + extended validation) - DEFAULT
+ * - Strict: 15 checks (enhanced + runtime validation, requires inventory)
+ * 
+ * All 15 checks:
+ * 1. honest_reads (HONEST)
+ * 2. creatable_needs_detail (CREATABLE)
+ * 3. reachability (REACHABILITY)
+ * 4. ui_states (UI)
+ * 5. state_machines (STATE)
+ * 6. screen (SCREEN)
+ * 7. spec_coverage (SPEC)
+ * 8. jtbd (JTBD)
+ * 9. relations (RELATIONS)
+ * 10. routes (ROUTES)
+ * 11. ctas (CTAS)
+ * 12. runtime_determinism (RUNTIME_DETERMINISM)
+ * 13. inventory (INVENTORY)
+ * 14. database_validation (DATABASE_VALIDATION)
+ * 15. migration_validation (MIGRATION_VALIDATION)
+ */
+const VALIDATION_LEVELS = {
+  basic: {
+    name: 'Basic',
+    description: 'Core 7 checks only - essential UX consistency',
+    groups: ['HONEST', 'CREATABLE', 'REACHABILITY', 'UI', 'STATE', 'SCREEN', 'SPEC']
+  },
+  enhanced: {
+    name: 'Enhanced',
+    description: 'Basic + Extended checks (12 total) - comprehensive validation',
+    groups: ['HONEST', 'CREATABLE', 'REACHABILITY', 'UI', 'STATE', 'SCREEN', 'SPEC',
+             'JTBD', 'RELATIONS', 'ROUTES', 'CTAS', 'RUNTIME_DETERMINISM']
+  },
+  strict: {
+    name: 'Strict',
+    description: 'All 15 checks - full system validation (requires inventory)',
+    groups: ['HONEST', 'CREATABLE', 'REACHABILITY', 'UI', 'STATE', 'SCREEN', 'SPEC',
+             'JTBD', 'RELATIONS', 'ROUTES', 'CTAS', 'RUNTIME_DETERMINISM', 
+             'INVENTORY', 'DATABASE_VALIDATION', 'MIGRATION_VALIDATION']
+  }
+};
+
+function shouldRunCheck(checkGroup: string, level: 'basic' | 'enhanced' | 'strict'): boolean {
+  const config = VALIDATION_LEVELS[level];
+  return config.groups.includes(checkGroup);
 }
 function hasErrors(checks: CheckResult[]): boolean {
   return checks.some(r => String(r.status).toLowerCase() === "fail" && String(r.level).toLowerCase() === "error");
@@ -214,11 +266,11 @@ async function runRunnerWithHeal(specPath: string, outDir: string, allowHeal: bo
 }
 
 /* =========================== Printing =========================== */
-function printSummary(checks: CheckResult[], specPath: string) {
+function printSummary(checks: CheckResult[], specPath: string, level: 'basic' | 'enhanced' | 'strict') {
   const groups: Record<string, CheckResult[]> = {
     HONEST: [], CREATABLE: [], REACHABILITY: [], UI: [], STATE: [], SCREEN: [], SPEC: [],
     JTBD: [], RELATIONS: [], ROUTES: [], CTAS: [],
-    INVENTORY: [], DETERMINISM: [], DATABASE: [], MIGRATION: [], OTHER: []
+    RUNTIME_DETERMINISM: [], INVENTORY: [], DATABASE_VALIDATION: [], MIGRATION_VALIDATION: [], OTHER: []
   };
   for (const r of checks) {
     const group = groupOf(r.id);
@@ -228,87 +280,126 @@ function printSummary(checks: CheckResult[], specPath: string) {
 
   const hasFail = (arr: CheckResult[]) => arr.some(r => String(r.status).toLowerCase() === "fail");
 
-  console.log("\n📋 HONEST");
-  if (!hasFail(groups.HONEST)) {
-    console.log("  ✅ All screen reads are properly captured, derived, or external");
-  } else {
-    for (const r of groups.HONEST) if (r.status === "fail") console.log("  ❌ " + r.message + (r.meta?.field ? `\n     → ${r.meta?.field}` : ""));
-  }
+  // Print validation level header
+  const levelConfig = VALIDATION_LEVELS[level];
+  console.log(`\n🎯 Validation Level: ${levelConfig.name}`);
+  console.log(`   ${levelConfig.description}`);
+  console.log('');
 
-  console.log("\n📋 CREATABLE");
-  if (!hasFail(groups.CREATABLE)) console.log("  ✅ All creatable entities have detail screens with discoverable paths");
-  else for (const r of groups.CREATABLE) if (r.status === "fail") console.log("  ❌ " + r.message);
-
-  console.log("\n📋 REACHABILITY");
-  if (!hasFail(groups.REACHABILITY)) console.log("  ✅ All success screens are reachable within 3 steps");
-  else for (const r of groups.REACHABILITY) if (r.status === "fail") console.log("  ❌ " + r.message);
-
-  console.log("\n📋 UI");
-  if (!hasFail(groups.UI)) console.log("  ✅ All screens declare empty/loading/error states.");
-  else for (const r of groups.UI) if (r.status === "fail") console.log("  ❌ " + r.message);
-
-  console.log("\n📋 STATE");
-  if (!hasFail(groups.STATE)) console.log("  ✅ All state machines are structurally valid or not required.");
-  else for (const r of groups.STATE) if (r.status === "fail") console.log("  ❌ " + r.message);
-
-  console.log("\n📋 SCREEN");
-  if (!hasFail(groups.SCREEN)) console.log("  ✅ All screens declare allowed roles.");
-  else for (const r of groups.SCREEN) if (r.status === "fail") console.log("  ❌ " + r.message);
-
-  try {
-    const spec = loadJson<UXSpec>(specPath);
-    const screens = spec.screens || [];
-    const total = screens.length || 1;
-    const rolesOk = screens.filter(s => Array.isArray(s.roles) && s.roles.length > 0).length;
-    const uiOk = screens.filter(s => {
-      const st = new Set(s.uiStates || []);
-      return st.has("empty") && st.has("loading") && st.has("error");
-    }).length;
-    const rPct = Math.round((rolesOk / total) * 100);
-    const uPct = Math.round((uiOk / total) * 100);
-    console.log("\n📋 SPEC");
-    if (rPct === 100 && uPct === 100) {
-      console.log(`  ✅ Spec coverage — Roles: ${rPct}% — UI states: ${uPct}%`);
+  // Basic checks (always run at all levels)
+  if (shouldRunCheck('HONEST', level)) {
+    console.log("\n📋 HONEST");
+    if (!hasFail(groups.HONEST)) {
+      console.log("  ✅ All screen reads are properly captured, derived, or external");
     } else {
-      console.log(`  ⚠️  Spec coverage — Roles: ${rPct}% — UI states: ${uPct}%`);
+      for (const r of groups.HONEST) if (r.status === "fail") console.log("  ❌ " + r.message + (r.meta?.field ? `\n     → ${r.meta?.field}` : ""));
     }
-  } catch {
-    console.log("\n📋 SPEC");
-    console.log("  ⚠️  Could not compute coverage.");
   }
 
-  // Print the new checks
-  console.log("\n📋 JTBD");
-  if (!hasFail(groups.JTBD)) console.log("  ✅ All Jobs To Be Done are addressed by flows");
-  else for (const r of groups.JTBD) if (r.status === "fail") console.log("  ❌ " + r.message);
+  if (shouldRunCheck('CREATABLE', level)) {
+    console.log("\n📋 CREATABLE");
+    if (!hasFail(groups.CREATABLE)) console.log("  ✅ All creatable entities have detail screens with discoverable paths");
+    else for (const r of groups.CREATABLE) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
 
-  console.log("\n📋 RELATIONS");
-  if (!hasFail(groups.RELATIONS)) console.log("  ✅ All entity relations are properly defined");
-  else for (const r of groups.RELATIONS) if (r.status === "fail") console.log("  ❌ " + r.message);
+  if (shouldRunCheck('REACHABILITY', level)) {
+    console.log("\n📋 REACHABILITY");
+    if (!hasFail(groups.REACHABILITY)) console.log("  ✅ All success screens are reachable within 3 steps");
+    else for (const r of groups.REACHABILITY) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
 
-  console.log("\n📋 ROUTES");
-  if (!hasFail(groups.ROUTES)) console.log("  ✅ All routes are unique and properly formatted");
-  else for (const r of groups.ROUTES) if (r.status === "fail") console.log("  ❌ " + r.message);
+  if (shouldRunCheck('UI', level)) {
+    console.log("\n📋 UI");
+    if (!hasFail(groups.UI)) console.log("  ✅ All screens declare empty/loading/error states.");
+    else for (const r of groups.UI) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
 
-  console.log("\n📋 CTAS");
-  if (!hasFail(groups.CTAS)) console.log("  ✅ All CTAs point to valid screens");
-  else for (const r of groups.CTAS) if (r.status === "fail") console.log("  ❌ " + r.message);
+  if (shouldRunCheck('STATE', level)) {
+    console.log("\n📋 STATE");
+    if (!hasFail(groups.STATE)) console.log("  ✅ All state machines are structurally valid or not required.");
+    else for (const r of groups.STATE) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
 
-  console.log("\n📋 INVENTORY");
-  if (!hasFail(groups.INVENTORY)) console.log("  ✅ Runtime inventory is complete and consistent");
-  else for (const r of groups.INVENTORY) if (r.status === "fail") console.log("  ❌ " + r.message);
+  if (shouldRunCheck('SCREEN', level)) {
+    console.log("\n📋 SCREEN");
+    if (!hasFail(groups.SCREEN)) console.log("  ✅ All screens declare allowed roles.");
+    else for (const r of groups.SCREEN) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
 
-  console.log("\n📋 DETERMINISM");
-  if (!hasFail(groups.DETERMINISM)) console.log("  ✅ Audit results are deterministic");
-  else for (const r of groups.DETERMINISM) if (r.status === "fail") console.log("  ❌ " + r.message);
+  if (shouldRunCheck('SPEC', level)) {
+    try {
+      const spec = loadJson<UXSpec>(specPath);
+      const screens = spec.screens || [];
+      const total = screens.length || 1;
+      const rolesOk = screens.filter(s => Array.isArray(s.roles) && s.roles.length > 0).length;
+      const uiOk = screens.filter(s => {
+        const st = new Set(s.uiStates || []);
+        return st.has("empty") && st.has("loading") && st.has("error");
+      }).length;
+      const rPct = Math.round((rolesOk / total) * 100);
+      const uPct = Math.round((uiOk / total) * 100);
+      console.log("\n📋 SPEC");
+      if (rPct === 100 && uPct === 100) {
+        console.log(`  ✅ Spec coverage — Roles: ${rPct}% — UI states: ${uPct}%`);
+      } else {
+        console.log(`  ⚠️  Spec coverage — Roles: ${rPct}% — UI states: ${uPct}%`);
+      }
+    } catch {
+      console.log("\n📋 SPEC");
+      console.log("  ⚠️  Could not compute coverage.");
+    }
+  }
 
-  console.log("\n📋 DATABASE");
-  if (!hasFail(groups.DATABASE)) console.log("  ✅ Database structure follows best practices");
-  else for (const r of groups.DATABASE) if (r.status === "fail") console.log("  ❌ " + r.message);
+  // Enhanced checks (run at enhanced and strict levels)
+  if (shouldRunCheck('JTBD', level)) {
+    console.log("\n📋 JTBD");
+    if (!hasFail(groups.JTBD)) console.log("  ✅ All Jobs To Be Done are addressed by flows");
+    else for (const r of groups.JTBD) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
 
-  console.log("\n📋 MIGRATION");
-  if (!hasFail(groups.MIGRATION)) console.log("  ✅ Migrations are safe and reversible");
-  else for (const r of groups.MIGRATION) if (r.status === "fail") console.log("  ❌ " + r.message);
+  if (shouldRunCheck('RELATIONS', level)) {
+    console.log("\n📋 RELATIONS");
+    if (!hasFail(groups.RELATIONS)) console.log("  ✅ All entity relations are properly defined");
+    else for (const r of groups.RELATIONS) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
+
+  if (shouldRunCheck('ROUTES', level)) {
+    console.log("\n📋 ROUTES");
+    if (!hasFail(groups.ROUTES)) console.log("  ✅ All routes are unique and properly formatted");
+    else for (const r of groups.ROUTES) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
+
+  if (shouldRunCheck('CTAS', level)) {
+    console.log("\n📋 CTAS");
+    if (!hasFail(groups.CTAS)) console.log("  ✅ All CTAs point to valid screens");
+    else for (const r of groups.CTAS) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
+
+  // Runtime determinism check (run at enhanced and strict levels)
+  if (shouldRunCheck('RUNTIME_DETERMINISM', level)) {
+    console.log("\n📋 RUNTIME_DETERMINISM");
+    if (!hasFail(groups.RUNTIME_DETERMINISM)) console.log("  ✅ Audit results are deterministic");
+    else for (const r of groups.RUNTIME_DETERMINISM) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
+
+  // Strict checks (run only at strict level)
+  if (shouldRunCheck('INVENTORY', level)) {
+    console.log("\n📋 INVENTORY");
+    if (!hasFail(groups.INVENTORY)) console.log("  ✅ Runtime inventory is complete and consistent");
+    else for (const r of groups.INVENTORY) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
+
+  if (shouldRunCheck('DATABASE_VALIDATION', level)) {
+    console.log("\n📋 DATABASE_VALIDATION");
+    if (!hasFail(groups.DATABASE_VALIDATION)) console.log("  ✅ Database structure follows best practices");
+    else for (const r of groups.DATABASE_VALIDATION) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
+
+  if (shouldRunCheck('MIGRATION_VALIDATION', level)) {
+    console.log("\n📋 MIGRATION_VALIDATION");
+    if (!hasFail(groups.MIGRATION_VALIDATION)) console.log("  ✅ Migrations are safe and reversible");
+    else for (const r of groups.MIGRATION_VALIDATION) if (r.status === "fail") console.log("  ❌ " + r.message);
+  }
 }
 
 /* ============================ Command =========================== */
@@ -316,13 +407,27 @@ export async function auditCommand(opts?: AuditOptions) {
   const cwd = process.cwd();
   const specPath = path.join(cwd, opts?.spec || "uxspec.json");
   const outDir = opts?.outDir || "artifacts";
+  const level = opts?.level || 'enhanced'; // Default to enhanced level
 
-  // Check for runtime inventory if --inventory flag is set
-  if (opts?.inventory) {
+  // Validate level option
+  if (level && !['basic', 'enhanced', 'strict'].includes(level)) {
+    console.error(`❌ Invalid validation level: ${level}`);
+    console.error("   Valid levels are: basic, enhanced, strict");
+    process.exitCode = 1;
+    return;
+  }
+
+  // Auto-enable inventory flag for strict level
+  const requireInventory = opts?.inventory || level === 'strict';
+
+  // Check for runtime inventory if required
+  if (requireInventory) {
     const inventoryPath = path.join(outDir, "runtime_inventory.json");
     if (!fs.existsSync(inventoryPath)) {
       console.error("❌ Runtime inventory required but not found at:", inventoryPath);
-      console.error("   Run 'npx uxcg inventory' first to generate the inventory.");
+      console.error(level === 'strict' 
+        ? "   Strict level requires inventory. Run 'npx flowlock-uxcg inventory' first or use --level=enhanced"
+        : "   Run 'npx flowlock-uxcg inventory' first to generate the inventory.");
       process.exitCode = 1;
       return;
     }
@@ -335,21 +440,41 @@ export async function auditCommand(opts?: AuditOptions) {
     }
   }
 
+  // Set verbose environment variable if needed
+  if (opts?.verbose) {
+    process.env.FLOWLOCK_VERBOSE = "true";
+    process.env.FLOWLOCK_DEBUG = "true";
+  }
+
   // Run once; if schema fails and --fix is set, we will heal & retry inside this helper
   const res = await runRunnerWithHeal(specPath, outDir, !!opts?.fix);
 
+  // Filter check results based on validation level
+  const filteredResults = (res.checkResults as CheckResult[]).filter(check => {
+    const group = groupOf(check.id);
+    return shouldRunCheck(group, level);
+  });
+
   if (!opts?.quiet) {
-    console.log("🔍 Running FlowLock audit...\\n");
+    console.log("🔍 Running FlowLock audit...\n");
   }
   if (opts?.json) {
-    console.log(JSON.stringify(res.checkResults, null, 2));
+    const output = {
+      level,
+      levelDescription: VALIDATION_LEVELS[level].description,
+      results: filteredResults
+    };
+    console.log(JSON.stringify(output, null, 2));
   } else if (!opts?.quiet) {
-    printSummary(res.checkResults as any, specPath);
+    printSummary(filteredResults, specPath, level);
     listArtifacts(outDir);
   }
 
-  process.exitCode = hasErrors(res.checkResults as any) ? 1 : 0;
+  process.exitCode = hasErrors(filteredResults) ? 1 : 0;
   if (!opts?.quiet && !opts?.json) {
-    console.log(process.exitCode ? "\n❌ Audit failed with errors" : "\n✅ Audit completed successfully");
+    const totalChecks = VALIDATION_LEVELS[level].groups.length;
+    const checkCounts = { basic: 7, enhanced: 12, strict: 15 };
+    console.log(`\n📊 Summary: Ran ${checkCounts[level]} of 15 total checks (${level} level)`);
+    console.log(process.exitCode ? "❌ Audit failed with errors" : "✅ Audit completed successfully");
   }
 }

@@ -1,0 +1,273 @@
+{
+  "db": {
+    "dialect": "postgres",
+    "entities": [
+      {
+        "id": "User",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "email", "type": "varchar" },
+          { "id": "firstName", "type": "varchar" },
+          { "id": "lastName", "type": "varchar" },
+          { "id": "passwordHash", "type": "varchar" },
+          { "id": "phoneNumber", "type": "varchar" },
+          { "id": "role", "type": "enum" },
+          { "id": "emailVerified", "type": "boolean" },
+          { "id": "createdAt", "type": "timestamp" },
+          { "id": "updatedAt", "type": "timestamp" }
+        ]
+      },
+      {
+        "id": "Product",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "sku", "type": "varchar" },
+          { "id": "name", "type": "varchar" },
+          { "id": "description", "type": "text" },
+          { "id": "price", "type": "decimal" },
+          { "id": "compareAtPrice", "type": "decimal" },
+          { "id": "cost", "type": "decimal" },
+          { "id": "quantity", "type": "integer" },
+          { "id": "weight", "type": "decimal" },
+          { "id": "categoryId", "type": "uuid" },
+          { "id": "brandId", "type": "uuid" },
+          { "id": "isActive", "type": "boolean" },
+          { "id": "createdAt", "type": "timestamp" },
+          { "id": "updatedAt", "type": "timestamp" }
+        ]
+      },
+      {
+        "id": "Category",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "name", "type": "varchar" },
+          { "id": "slug", "type": "varchar" },
+          { "id": "description", "type": "text" },
+          { "id": "parentId", "type": "uuid" },
+          { "id": "imageUrl", "type": "varchar" },
+          { "id": "sortOrder", "type": "integer" }
+        ]
+      },
+      {
+        "id": "Order",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "orderNumber", "type": "varchar" },
+          { "id": "userId", "type": "uuid" },
+          { "id": "status", "type": "enum" },
+          { "id": "subtotal", "type": "decimal" },
+          { "id": "tax", "type": "decimal" },
+          { "id": "shipping", "type": "decimal" },
+          { "id": "total", "type": "decimal" },
+          { "id": "notes", "type": "text" },
+          { "id": "createdAt", "type": "timestamp" },
+          { "id": "updatedAt", "type": "timestamp" }
+        ]
+      },
+      {
+        "id": "OrderItem",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "orderId", "type": "uuid" },
+          { "id": "productId", "type": "uuid" },
+          { "id": "quantity", "type": "integer" },
+          { "id": "price", "type": "decimal" },
+          { "id": "total", "type": "decimal" }
+        ]
+      },
+      {
+        "id": "Cart",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "userId", "type": "uuid" },
+          { "id": "sessionId", "type": "varchar" },
+          { "id": "expiresAt", "type": "timestamp" },
+          { "id": "createdAt", "type": "timestamp" },
+          { "id": "updatedAt", "type": "timestamp" }
+        ]
+      },
+      {
+        "id": "CartItem",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "cartId", "type": "uuid" },
+          { "id": "productId", "type": "uuid" },
+          { "id": "quantity", "type": "integer" }
+        ]
+      },
+      {
+        "id": "Address",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "userId", "type": "uuid" },
+          { "id": "type", "type": "enum" },
+          { "id": "street1", "type": "varchar" },
+          { "id": "street2", "type": "varchar" },
+          { "id": "city", "type": "varchar" },
+          { "id": "state", "type": "varchar" },
+          { "id": "postalCode", "type": "varchar" },
+          { "id": "country", "type": "varchar" },
+          { "id": "isDefault", "type": "boolean" }
+        ]
+      },
+      {
+        "id": "Payment",
+        "fields": [
+          { "id": "id", "type": "uuid" },
+          { "id": "orderId", "type": "uuid" },
+          { "id": "method", "type": "enum" },
+          { "id": "status", "type": "enum" },
+          { "id": "amount", "type": "decimal" },
+          { "id": "transactionId", "type": "varchar" },
+          { "id": "createdAt", "type": "timestamp" }
+        ]
+      }
+    ]
+  },
+  "api": {
+    "endpoints": [
+      {
+        "path": "/api/auth/register",
+        "methods": ["POST"],
+        "returns": {
+          "entity": "User",
+          "fields": ["id", "email", "firstName", "lastName"]
+        }
+      },
+      {
+        "path": "/api/auth/login",
+        "methods": ["POST"],
+        "returns": {
+          "entity": "User",
+          "fields": ["id", "email", "firstName", "lastName", "role"]
+        }
+      },
+      {
+        "path": "/api/products",
+        "methods": ["GET"],
+        "returns": {
+          "entity": "Product",
+          "fields": ["id", "name", "price", "compareAtPrice", "quantity", "categoryId"]
+        }
+      },
+      {
+        "path": "/api/products/:id",
+        "methods": ["GET"],
+        "returns": {
+          "entity": "Product",
+          "fields": ["id", "sku", "name", "description", "price", "compareAtPrice", "quantity", "weight", "categoryId", "brandId"]
+        }
+      },
+      {
+        "path": "/api/categories",
+        "methods": ["GET"],
+        "returns": {
+          "entity": "Category",
+          "fields": ["id", "name", "slug", "parentId", "imageUrl"]
+        }
+      },
+      {
+        "path": "/api/cart",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "returns": {
+          "entity": "Cart",
+          "fields": ["id", "userId", "sessionId"]
+        }
+      },
+      {
+        "path": "/api/cart/items",
+        "methods": ["POST", "PUT", "DELETE"],
+        "returns": {
+          "entity": "CartItem",
+          "fields": ["id", "cartId", "productId", "quantity"]
+        }
+      },
+      {
+        "path": "/api/orders",
+        "methods": ["GET", "POST"],
+        "returns": {
+          "entity": "Order",
+          "fields": ["id", "orderNumber", "status", "total", "createdAt"]
+        }
+      },
+      {
+        "path": "/api/orders/:id",
+        "methods": ["GET", "PUT"],
+        "returns": {
+          "entity": "Order",
+          "fields": ["id", "orderNumber", "userId", "status", "subtotal", "tax", "shipping", "total", "notes", "createdAt"]
+        }
+      },
+      {
+        "path": "/api/checkout",
+        "methods": ["POST"],
+        "returns": {
+          "entity": "Order",
+          "fields": ["id", "orderNumber", "total"]
+        }
+      },
+      {
+        "path": "/api/payments",
+        "methods": ["POST"],
+        "returns": {
+          "entity": "Payment",
+          "fields": ["id", "orderId", "method", "status", "amount", "transactionId"]
+        }
+      },
+      {
+        "path": "/api/addresses",
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "returns": {
+          "entity": "Address",
+          "fields": ["id", "type", "street1", "city", "state", "postalCode", "country", "isDefault"]
+        }
+      }
+    ]
+  },
+  "ui": {
+    "reads": [
+      "User.firstName",
+      "User.lastName",
+      "User.email",
+      "Product.name",
+      "Product.price",
+      "Product.compareAtPrice",
+      "Product.description",
+      "Product.quantity",
+      "Category.name",
+      "Category.imageUrl",
+      "Cart.id",
+      "CartItem.quantity",
+      "Order.orderNumber",
+      "Order.status",
+      "Order.total",
+      "Order.createdAt",
+      "OrderItem.quantity",
+      "OrderItem.price",
+      "OrderItem.total",
+      "Address.street1",
+      "Address.city",
+      "Address.state",
+      "Address.postalCode",
+      "Payment.method",
+      "Payment.status",
+      "Payment.amount"
+    ],
+    "writes": [
+      "User.email",
+      "User.firstName",
+      "User.lastName",
+      "User.phoneNumber",
+      "CartItem.quantity",
+      "Address.type",
+      "Address.street1",
+      "Address.street2",
+      "Address.city",
+      "Address.state",
+      "Address.postalCode",
+      "Address.country",
+      "Address.isDefault",
+      "Order.notes"
+    ]
+  }
+}

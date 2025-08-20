@@ -1,0 +1,414 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2024-01-20T10:30:00Z",
+  "discovery": {
+    "mode": "automatic",
+    "sources": ["codebase", "database", "api", "components"],
+    "confidence": 0.95
+  },
+  "components": {
+    "screens": [
+      {
+        "id": "home",
+        "path": "src/screens/Home.tsx",
+        "discovered": true,
+        "implemented": true,
+        "routes": ["/", "/home"],
+        "components": ["FeaturedProducts", "CategoryGrid", "PromoBanners", "NewArrivals"],
+        "dataFetching": ["useProducts", "useCategories"],
+        "stateManagement": "redux"
+      },
+      {
+        "id": "product_list",
+        "path": "src/screens/ProductList.tsx",
+        "discovered": true,
+        "implemented": true,
+        "routes": ["/products", "/catalog", "/shop"],
+        "components": ["ProductGrid", "FilterPanel", "SortDropdown", "Pagination"],
+        "dataFetching": ["useProductSearch", "useFilters"],
+        "stateManagement": "context"
+      },
+      {
+        "id": "product_detail",
+        "path": "src/screens/ProductDetail.tsx",
+        "discovered": true,
+        "implemented": true,
+        "routes": ["/products/:slug", "/p/:id"],
+        "components": ["ImageGallery", "ProductInfo", "ReviewList", "AddToCartButton"],
+        "dataFetching": ["useProduct", "useReviews"],
+        "stateManagement": "local"
+      },
+      {
+        "id": "cart",
+        "path": "src/screens/Cart.tsx",
+        "discovered": true,
+        "implemented": true,
+        "routes": ["/cart"],
+        "components": ["CartItemList", "CartSummary", "PromoCodeInput"],
+        "dataFetching": ["useCart", "useCartCalculations"],
+        "stateManagement": "redux"
+      },
+      {
+        "id": "checkout",
+        "path": "src/screens/Checkout.tsx",
+        "discovered": true,
+        "implemented": true,
+        "routes": ["/checkout"],
+        "components": ["CheckoutSteps", "AddressForm", "PaymentForm", "OrderSummary"],
+        "dataFetching": ["useAddresses", "usePaymentMethods"],
+        "stateManagement": "formik"
+      },
+      {
+        "id": "admin_dashboard",
+        "path": "src/screens/admin/Dashboard.tsx",
+        "discovered": true,
+        "implemented": true,
+        "routes": ["/admin", "/admin/dashboard"],
+        "components": ["SalesChart", "OrdersTable", "LowStockAlert", "PendingReviews"],
+        "dataFetching": ["useAdminStats", "useOrders"],
+        "stateManagement": "redux"
+      }
+    ],
+    "entities": [
+      {
+        "id": "user",
+        "models": {
+          "database": "src/models/User.model.ts",
+          "api": "src/api/models/User.ts",
+          "frontend": "src/types/User.interface.ts"
+        },
+        "discovered": true,
+        "implemented": true,
+        "fieldsImplemented": 14,
+        "fieldsTotal": 14,
+        "relationsImplemented": 6,
+        "relationsTotal": 6,
+        "validations": ["email", "password_strength", "unique_email"],
+        "hooks": ["beforeCreate", "afterCreate", "beforeUpdate"]
+      },
+      {
+        "id": "product",
+        "models": {
+          "database": "src/models/Product.model.ts",
+          "api": "src/api/models/Product.ts",
+          "frontend": "src/types/Product.interface.ts"
+        },
+        "discovered": true,
+        "implemented": true,
+        "fieldsImplemented": 18,
+        "fieldsTotal": 18,
+        "relationsImplemented": 5,
+        "relationsTotal": 5,
+        "validations": ["sku_format", "price_positive", "stock_non_negative"],
+        "hooks": ["beforeSave", "afterUpdate", "beforeDelete"],
+        "indexes": ["sku", "slug", "status", "category_id"]
+      },
+      {
+        "id": "order",
+        "models": {
+          "database": "src/models/Order.model.ts",
+          "api": "src/api/models/Order.ts",
+          "frontend": "src/types/Order.interface.ts"
+        },
+        "discovered": true,
+        "implemented": true,
+        "fieldsImplemented": 20,
+        "fieldsTotal": 20,
+        "relationsImplemented": 4,
+        "relationsTotal": 4,
+        "validations": ["payment_method", "address_required"],
+        "hooks": ["beforeCreate", "afterStatusChange", "beforeDelete"],
+        "triggers": ["calculate_totals", "send_confirmation_email"]
+      },
+      {
+        "id": "cart",
+        "models": {
+          "database": "src/models/Cart.model.ts",
+          "api": "src/api/models/Cart.ts",
+          "frontend": "src/types/Cart.interface.ts"
+        },
+        "discovered": true,
+        "implemented": true,
+        "fieldsImplemented": 9,
+        "fieldsTotal": 9,
+        "relationsImplemented": 2,
+        "relationsTotal": 2,
+        "validations": ["user_or_session", "expiry_date"],
+        "hooks": ["afterItemAdd", "afterItemRemove", "beforeConvert"]
+      }
+    ],
+    "flows": [
+      {
+        "id": "user_signup_flow",
+        "path": "src/flows/UserSignup.flow.ts",
+        "discovered": true,
+        "implemented": true,
+        "stepsImplemented": 5,
+        "stepsTotal": 5,
+        "transitions": ["pending->active"],
+        "integrations": ["email_service", "analytics"]
+      },
+      {
+        "id": "browse_and_purchase_flow",
+        "path": "src/flows/Purchase.flow.ts",
+        "discovered": true,
+        "implemented": true,
+        "stepsImplemented": 7,
+        "stepsTotal": 7,
+        "transitions": ["cart:active->converted", "order:pending->confirmed"],
+        "integrations": ["payment_gateway", "inventory_service", "shipping_api"]
+      }
+    ],
+    "apis": [
+      {
+        "path": "/api/auth",
+        "discovered": true,
+        "implemented": true,
+        "endpoints": ["POST /login", "POST /signup", "POST /logout", "GET /me", "POST /refresh"],
+        "authentication": "jwt",
+        "rateLimit": "100/hour"
+      },
+      {
+        "path": "/api/products",
+        "discovered": true,
+        "implemented": true,
+        "endpoints": ["GET /", "GET /:id", "POST /", "PUT /:id", "DELETE /:id"],
+        "authentication": "optional",
+        "caching": "redis",
+        "pagination": true
+      },
+      {
+        "path": "/api/orders",
+        "discovered": true,
+        "implemented": true,
+        "endpoints": ["GET /", "GET /:id", "POST /", "PUT /:id/status", "POST /:id/cancel"],
+        "authentication": "required",
+        "authorization": "role-based"
+      },
+      {
+        "path": "/api/cart",
+        "discovered": true,
+        "implemented": true,
+        "endpoints": ["GET /", "POST /items", "PUT /items/:id", "DELETE /items/:id", "POST /checkout"],
+        "authentication": "optional",
+        "sessionHandling": true
+      }
+    ],
+    "stateMachines": [
+      {
+        "entity": "user",
+        "discovered": true,
+        "implemented": true,
+        "states": ["pending", "active", "suspended", "deleted"],
+        "transitions": 5,
+        "guards": ["email_verified", "admin_approval"],
+        "actions": ["send_welcome_email", "cleanup_data"]
+      },
+      {
+        "entity": "order",
+        "discovered": true,
+        "implemented": true,
+        "states": ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "refunded"],
+        "transitions": 8,
+        "guards": ["payment_verified", "stock_available", "can_cancel"],
+        "actions": ["charge_payment", "update_inventory", "send_tracking", "process_refund"]
+      },
+      {
+        "entity": "product",
+        "discovered": true,
+        "implemented": true,
+        "states": ["draft", "active", "out_of_stock", "discontinued"],
+        "transitions": 6,
+        "guards": ["has_required_fields", "stock_check"],
+        "actions": ["publish_to_catalog", "notify_subscribers", "archive_data"]
+      }
+    ],
+    "integrations": [
+      {
+        "name": "stripe",
+        "type": "payment",
+        "discovered": true,
+        "implemented": true,
+        "config": "src/integrations/stripe.config.ts",
+        "usage": ["checkout", "refunds", "subscriptions"],
+        "webhooks": ["payment.succeeded", "payment.failed", "refund.created"]
+      },
+      {
+        "name": "sendgrid",
+        "type": "email",
+        "discovered": true,
+        "implemented": true,
+        "config": "src/integrations/sendgrid.config.ts",
+        "usage": ["transactional", "marketing"],
+        "templates": ["welcome", "order_confirmation", "shipping_notification", "password_reset"]
+      },
+      {
+        "name": "redis",
+        "type": "cache",
+        "discovered": true,
+        "implemented": true,
+        "config": "src/integrations/redis.config.ts",
+        "usage": ["session", "product_cache", "rate_limiting"],
+        "ttl": { "session": 3600, "product": 300, "api": 60 }
+      },
+      {
+        "name": "elasticsearch",
+        "type": "search",
+        "discovered": true,
+        "implemented": true,
+        "config": "src/integrations/elastic.config.ts",
+        "usage": ["product_search", "order_search", "analytics"],
+        "indexes": ["products", "orders", "users", "reviews"]
+      }
+    ],
+    "middleware": [
+      {
+        "name": "authentication",
+        "path": "src/middleware/auth.middleware.ts",
+        "discovered": true,
+        "implemented": true,
+        "type": "global",
+        "order": 1
+      },
+      {
+        "name": "rateLimiter",
+        "path": "src/middleware/rateLimit.middleware.ts",
+        "discovered": true,
+        "implemented": true,
+        "type": "global",
+        "order": 2
+      },
+      {
+        "name": "validation",
+        "path": "src/middleware/validation.middleware.ts",
+        "discovered": true,
+        "implemented": true,
+        "type": "route",
+        "schemas": 25
+      },
+      {
+        "name": "errorHandler",
+        "path": "src/middleware/error.middleware.ts",
+        "discovered": true,
+        "implemented": true,
+        "type": "global",
+        "order": 99
+      }
+    ],
+    "database": {
+      "type": "postgresql",
+      "version": "14.5",
+      "discovered": true,
+      "tables": 15,
+      "views": 3,
+      "procedures": 8,
+      "triggers": 5,
+      "indexes": 42,
+      "migrations": {
+        "path": "src/migrations",
+        "count": 23,
+        "latest": "20240120_add_vendor_support.sql"
+      }
+    },
+    "tests": {
+      "unit": {
+        "discovered": true,
+        "path": "tests/unit",
+        "files": 45,
+        "coverage": 82
+      },
+      "integration": {
+        "discovered": true,
+        "path": "tests/integration",
+        "files": 18,
+        "coverage": 75
+      },
+      "e2e": {
+        "discovered": true,
+        "path": "tests/e2e",
+        "files": 12,
+        "coverage": 68
+      }
+    }
+  },
+  "coverage": {
+    "entities": {
+      "total": 15,
+      "implemented": 15,
+      "percentage": 100
+    },
+    "screens": {
+      "total": 15,
+      "implemented": 15,
+      "percentage": 100
+    },
+    "flows": {
+      "total": 5,
+      "implemented": 5,
+      "percentage": 100
+    },
+    "routes": {
+      "total": 25,
+      "implemented": 25,
+      "percentage": 100
+    },
+    "relations": {
+      "total": 28,
+      "implemented": 28,
+      "percentage": 100
+    },
+    "stateMachines": {
+      "total": 6,
+      "implemented": 6,
+      "percentage": 100
+    }
+  },
+  "issues": [
+    {
+      "type": "warning",
+      "entity": "review",
+      "field": "verified_purchase",
+      "message": "Field defined but validation logic not implemented",
+      "severity": "low"
+    },
+    {
+      "type": "info",
+      "screen": "order_tracking",
+      "message": "Screen referenced in CTAs but not defined in screens array",
+      "severity": "medium"
+    },
+    {
+      "type": "optimization",
+      "entity": "product",
+      "message": "Consider adding compound index on (category_id, status, featured) for homepage query",
+      "severity": "low"
+    }
+  ],
+  "recommendations": [
+    {
+      "category": "performance",
+      "suggestion": "Implement GraphQL for mobile clients to reduce over-fetching"
+    },
+    {
+      "category": "scalability",
+      "suggestion": "Consider moving to microservices for order processing and inventory management"
+    },
+    {
+      "category": "security",
+      "suggestion": "Add 2FA support for admin and vendor accounts"
+    },
+    {
+      "category": "monitoring",
+      "suggestion": "Integrate APM tool for real-time performance monitoring"
+    }
+  ],
+  "metrics": {
+    "linesOfCode": 45230,
+    "components": 127,
+    "apiEndpoints": 89,
+    "databaseQueries": 156,
+    "averageResponseTime": "120ms",
+    "testCoverage": 75,
+    "technicalDebt": "medium"
+  }
+}

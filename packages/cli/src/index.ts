@@ -10,6 +10,7 @@ import { writeClaudeCommands } from "./templates/claude";
 // NEW: added commands for existing-project init and inventory builder
 import { initExistingCommand } from "./commands/init-existing";
 import { inventoryCommand } from "./commands/inventory";
+import { debugCommand } from "./commands/debug";
 
 const program = new Command();
 
@@ -42,6 +43,7 @@ program
   .command("audit")
   .alias("check")
   .description("Run UX specification checks and generate artifacts")
+  .option("--level <level>", "Validation level: basic|enhanced|strict (default: enhanced)")
   .option("--fix", "Autofix roles/uiStates and obvious HONEST reads, then re-run")
   .option("--inventory", "Require runtime inventory (fails if missing/stale)")
   .option("--only <checks>", "Run only specific checks (comma-separated)")
@@ -73,6 +75,22 @@ program
   .option("--api-only", "Extract only API endpoints")
   .option("--ui-only", "Extract only UI reads/writes")
   .action((opts: any) => inventoryCommand(opts));
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Debug command for troubleshooting check failures
+// ──────────────────────────────────────────────────────────────────────────────
+program
+  .command("debug <check>")
+  .description("Debug why a specific check is failing with detailed analysis")
+  .option("--entity <name>", "Focus on specific entity")
+  .option("--screen <id>", "Focus on specific screen")
+  .option("--flow <id>", "Focus on specific flow")
+  .option("--verbose", "Show detailed debug output")
+  .option("--show-paths", "Show flow paths analysis")
+  .option("--show-patterns", "Detect and show common patterns")
+  .option("--show-relations", "Show entity relationship graph")
+  .option("--all", "Show all debug information")
+  .action(debugCommand);
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Watch mode & Agent

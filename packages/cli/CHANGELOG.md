@@ -4,9 +4,9 @@
 
 ### Minor Changes
 
-- c3f2446: feat: Update Claude/Cursor commands to FlowLock v3
-  - All 5 command cards updated to support v3 features
-  - Commands now handle all 11 validation checks (up from 7)
+- c3f2446: feat: Update Claude/Cursor commands to FlowLock
+  - All 5 command cards updated to support enhanced features
+  - Commands now handle all 15 validation checks (up from 7)
   - Added new `/ux-enhance-spec` command for upgrading v2 specs
   - Full support for JTBD, relations, routes, CTAs, state machines
   - Enhanced UI generation with complete component structure
@@ -17,9 +17,9 @@
 
 ### Minor Changes
 
-- feat: Update Claude/Cursor commands to FlowLock v3
-  - All 5 command cards updated to support v3 features
-  - Commands now handle all 11 validation checks (up from 7)
+- feat: Update Claude/Cursor commands to FlowLock
+  - All 5 command cards updated to support enhanced features
+  - Commands now handle all 15 validation checks (up from 7)
   - Added new `/ux-enhance-spec` command for upgrading v2 specs
   - Full support for JTBD, relations, routes, CTAs, state machines
   - Enhanced UI generation with complete component structure
@@ -37,7 +37,7 @@
 
 ### Minor Changes
 
-- 29114aa: ## FlowLock v3.0 - Complete Feature Parity with Original UXCG
+- 29114aa: ## FlowLock - Complete Feature Parity with Original UXCG
 
   This major update brings FlowLock to feature parity with the original UX Contract Guardrails (UXCG) implementation, adding all missing features and enhancements.
 
@@ -81,7 +81,7 @@
   ### 📚 Documentation
   - Comprehensive guide updated with all new features
   - API reference includes new schema fields
-  - Migration guide for v2 to v3
+  - Migration guide for legacy specs
   - Examples updated with enhanced features
 
   ### 💔 Breaking Changes
@@ -111,7 +111,7 @@
 
 ### Minor Changes
 
-- ## FlowLock v3.0 - Complete Feature Parity with Original UXCG
+- ## FlowLock - Complete Feature Parity with Original UXCG
 
   This major update brings FlowLock to feature parity with the original UX Contract Guardrails (UXCG) implementation, adding all missing features and enhancements.
 
@@ -155,7 +155,7 @@
   ### 📚 Documentation
   - Comprehensive guide updated with all new features
   - API reference includes new schema fields
-  - Migration guide for v2 to v3
+  - Migration guide for legacy specs
   - Examples updated with enhanced features
 
   ### 💔 Breaking Changes

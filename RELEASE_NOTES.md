@@ -1,11 +1,11 @@
-# FlowLock v3 Release Notes
+# FlowLock Release Notes
 
 **Release Date:** January 18, 2025  
 **Version:** CLI 0.5.0 | Core Packages 0.4.1 | MCP 0.3.0
 
 ## 🎉 Headline
 
-**FlowLock v3 achieves 100% feature parity with the original UX Contract Guardrails (UXCG) implementation**, plus significant enhancements for modern AI-assisted development workflows.
+**FlowLock achieves 100% feature parity with the original UX Contract Guardrails (UXCG) implementation**, plus significant enhancements for modern AI-assisted development workflows.
 
 ## 📦 Published Packages
 
@@ -15,9 +15,9 @@ npm install -g flowlock-uxcg@latest  # CLI v0.5.0
 
 | Package | Version | Changes |
 |---------|---------|---------|
-| flowlock-uxcg | 0.5.0 | Enhanced CLI with v3 features |
+| flowlock-uxcg | 0.5.0 | Enhanced CLI with all features |
 | flowlock-uxspec | 0.4.1 | Schema enhancements, backward compatible |
-| flowlock-checks-core | 0.4.1 | 11 checks (4 new) |
+| flowlock-checks-core | 0.4.1 | 15 checks (8 new) |
 | flowlock-runner | 0.4.1 | Enhanced generators |
 | flowlock-plugin-sdk | 0.4.1 | Support for new checks |
 | flowlock-mcp | 0.3.0 | Fixed CommonJS issues |
@@ -36,21 +36,25 @@ npm install -g flowlock-uxcg@latest  # CLI v0.5.0
 - **State Machines** - Entity state transitions
 - **Glossary** - Derived field documentation
 
-### 2. New Validation Checks (11 total, up from 7)
+### 2. New Validation Checks (15 total, up from 7)
 
 **New Checks:**
 - **JTBD** - Jobs to flows mapping
 - **RELATIONS** - Entity relationship validation
 - **ROUTES** - Unique URL validation
 - **CTAS** - Navigation validation
+- **RUNTIME_DETERMINISM** - Audit result consistency
+- **INVENTORY** - Runtime extraction validation
+- **DATABASE_VALIDATION** - Database best practices
+- **MIGRATION_VALIDATION** - Safe migration patterns
 
 ### 3. Enhanced Claude/Cursor Commands (5 total)
 
-- `/ux-contract-init` - Create specs with v3 features
-- `/ux-guardrails-validate` - Fix all 11 checks
+- `/ux-contract-init` - Create specs with all features
+- `/ux-guardrails-validate` - Fix all 15 checks
 - `/ux-generate-ui` - Complete UI scaffolding
 - `/flow-audit-fix` - Close audit gaps
-- `/ux-enhance-spec` ✨ **NEW** - Upgrade v2 to v3
+- `/ux-enhance-spec` ✨ **NEW** - Upgrade legacy specs
 
 ### 4. Better Tooling
 
@@ -91,11 +95,11 @@ The system automatically handles both old and new formats:
 
 ## 📊 By the Numbers
 
-- **11** validation checks (up from 7)
+- **15** validation checks (up from 7)
 - **5** Claude commands (up from 4)
 - **100%** UXCG feature parity
 - **100%** backward compatible
-- **4** new check types
+- **8** new check types
 - **6** packages updated
 
 ## 🚀 Getting Started
@@ -104,7 +108,7 @@ The system automatically handles both old and new formats:
 # Install latest CLI
 npm install -g flowlock-uxcg@latest
 
-# Initialize project with v3 features
+# Initialize project with enhanced features
 uxcg init
 
 # Run enhanced audit
@@ -127,7 +131,7 @@ uxcg audit --fix
 }
 ```
 
-## 📝 Example v3 Spec
+## 📝 Example Enhanced Spec
 
 ```json
 {
@@ -183,14 +187,14 @@ uxcg audit --fix
 
 ## 📚 Documentation Updates
 
-- [README.md](README.md) - Complete v3 overview
+- [README.md](README.md) - Complete overview
 - [CHANGELOG.md](CHANGELOG.md) - Detailed version history
 - [FLOWLOCK_COMPREHENSIVE_GUIDE.md](docs/FLOWLOCK_COMPREHENSIVE_GUIDE.md) - Full feature documentation
-- [CLAUDE_COMMANDS_V3.md](docs/CLAUDE_COMMANDS_V3.md) - AI integration guide
+- [CLAUDE_COMMANDS.md](docs/CLAUDE_COMMANDS.md) - AI integration guide
 
 ## 🙏 Acknowledgments
 
-FlowLock v3 represents a major milestone in achieving complete feature parity with the original UXCG implementation while adding modern enhancements for AI-assisted development.
+FlowLock represents a major milestone in achieving complete feature parity with the original UXCG implementation while adding modern enhancements for AI-assisted development.
 
 ## 📞 Support
 

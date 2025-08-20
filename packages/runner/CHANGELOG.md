@@ -31,7 +31,7 @@
 
 ### Minor Changes
 
-- 29114aa: ## FlowLock v3.0 - Complete Feature Parity with Original UXCG
+- 29114aa: ## FlowLock - Complete Feature Parity with Original UXCG
 
   This major update brings FlowLock to feature parity with the original UX Contract Guardrails (UXCG) implementation, adding all missing features and enhancements.
 
@@ -75,7 +75,7 @@
   ### 📚 Documentation
   - Comprehensive guide updated with all new features
   - API reference includes new schema fields
-  - Migration guide for v2 to v3
+  - Migration guide for legacy specs
   - Examples updated with enhanced features
 
   ### 💔 Breaking Changes
@@ -113,7 +113,7 @@
 
 ### Minor Changes
 
-- ## FlowLock v3.0 - Complete Feature Parity with Original UXCG
+- ## FlowLock - Complete Feature Parity with Original UXCG
 
   This major update brings FlowLock to feature parity with the original UX Contract Guardrails (UXCG) implementation, adding all missing features and enhancements.
 
@@ -157,7 +157,7 @@
   ### 📚 Documentation
   - Comprehensive guide updated with all new features
   - API reference includes new schema fields
-  - Migration guide for v2 to v3
+  - Migration guide for legacy specs
   - Examples updated with enhanced features
 
   ### 💔 Breaking Changes

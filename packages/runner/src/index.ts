@@ -1,6 +1,7 @@
 import { parseSpec, type UXSpec } from "flowlock-uxspec";
 import { coreChecks } from "flowlock-checks-core";
 import type { CheckResult, FlowlockCheck } from "flowlock-plugin-sdk";
+import { formatError } from "flowlock-shared";
 import { generateERDiagram, generateFlowDiagram } from "./generators/mermaid";
 import { generateScreensCSV } from "./generators/csv";
 import { generateJUnitXML } from "./generators/junit";
@@ -75,11 +76,12 @@ try {
         if (Array.isArray(results)) checkResults.push(...results);
         else checkResults.push(results);
       } catch (error) {
+        const formattedMessage = formatError(error);
         checkResults.push({
           id: `${check.id}_error`,
           level: "error",
           status: "fail",
-          message: `Check '${check.name}' failed: ${error}`,
+          message: `Check '${check.name}' failed: ${formattedMessage}`
         });
       }
     }
@@ -103,6 +105,19 @@ try {
     const flowMmd = path.join(outputDir, "flow.mmd");
     await fs.writeFile(erMmd, result.artifacts.erDiagram, "utf8");
     await fs.writeFile(flowMmd, result.artifacts.flowDiagram, "utf8");
+    
+    // Save formatted results
+    const { formatCheckSummary, exportResultsJSON } = await import("./utils/format");
+    await fs.writeFile(
+      path.join(outputDir, "check-results.json"),
+      exportResultsJSON(result.checkResults),
+      "utf8"
+    );
+    await fs.writeFile(
+      path.join(outputDir, "check-summary.txt"),
+      formatCheckSummary(result.checkResults),
+      "utf8"
+    );
 
     // Try rendering SVGs; fallback writes a small notice SVG
     const erSvg = path.join(outputDir, "er.svg");
@@ -140,4 +155,6 @@ try {
 
 export * from "./generators/mermaid";
 export * from "./generators/csv";
+export * from "./utils/format";
 export * from "./generators/junit";
+export { DebugAnalyzer } from "./utils/debug";

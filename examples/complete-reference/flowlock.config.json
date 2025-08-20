@@ -1,0 +1,136 @@
+{
+  "version": "1.0.0",
+  "project": "ecommerce-reference",
+  "spec": "uxspec.json",
+  "inventory": "inventory.json",
+  "output": {
+    "artifacts": "./artifacts",
+    "generated": "./generated",
+    "types": "./generated/types",
+    "api": "./generated/api",
+    "ui": "./generated/ui"
+  },
+  "checks": {
+    "enabled": true,
+    "strict": true,
+    "parallel": true,
+    "failFast": false,
+    "timeout": 30000,
+    "retries": 3
+  },
+  "generation": {
+    "types": {
+      "enabled": true,
+      "format": "typescript",
+      "strict": true,
+      "includeValidation": true
+    },
+    "api": {
+      "enabled": true,
+      "framework": "express",
+      "includeAuth": true,
+      "includeValidation": true
+    },
+    "ui": {
+      "enabled": true,
+      "framework": "react",
+      "styling": "tailwind",
+      "includeTests": true
+    },
+    "database": {
+      "enabled": true,
+      "type": "postgresql",
+      "includeMigrations": true,
+      "includeSeeds": true
+    }
+  },
+  "integrations": {
+    "external": {
+      "inventory_api": {
+        "url": "https://api.inventory.example.com/v2",
+        "auth": "bearer",
+        "timeout": 5000
+      },
+      "shipping_api": {
+        "url": "https://api.shipping.example.com/v1",
+        "auth": "apikey",
+        "timeout": 10000
+      },
+      "cdn_api": {
+        "url": "https://cdn.example.com",
+        "auth": "none",
+        "timeout": 3000
+      }
+    }
+  },
+  "validation": {
+    "rules": {
+      "email": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "phone": "^\\+?[1-9]\\d{1,14}$",
+      "password": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+      "url": "^https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)$"
+    }
+  },
+  "security": {
+    "authentication": {
+      "type": "jwt",
+      "expiresIn": "7d",
+      "refreshTokens": true
+    },
+    "encryption": {
+      "algorithm": "aes-256-gcm",
+      "saltRounds": 10
+    },
+    "rateLimit": {
+      "enabled": true,
+      "windowMs": 900000,
+      "max": 100
+    },
+    "cors": {
+      "enabled": true,
+      "origins": ["http://localhost:3000", "https://example.com"]
+    }
+  },
+  "monitoring": {
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "destination": "stdout"
+    },
+    "metrics": {
+      "enabled": true,
+      "provider": "prometheus"
+    },
+    "tracing": {
+      "enabled": true,
+      "provider": "opentelemetry"
+    }
+  },
+  "development": {
+    "hotReload": true,
+    "sourceMaps": true,
+    "linting": true,
+    "formatting": true,
+    "testing": {
+      "unit": true,
+      "integration": true,
+      "e2e": true
+    }
+  },
+  "deployment": {
+    "environments": {
+      "development": {
+        "url": "http://localhost:3000",
+        "database": "postgresql://localhost/ecommerce_dev"
+      },
+      "staging": {
+        "url": "https://staging.example.com",
+        "database": "postgresql://staging.db.example.com/ecommerce"
+      },
+      "production": {
+        "url": "https://example.com",
+        "database": "postgresql://prod.db.example.com/ecommerce"
+      }
+    }
+  }
+}

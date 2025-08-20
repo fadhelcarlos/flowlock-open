@@ -6,4 +6,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
+  external: ['flowlock-shared', 'flowlock-uxspec', 'flowlock-checks-core', 'flowlock-plugin-sdk'],
 });

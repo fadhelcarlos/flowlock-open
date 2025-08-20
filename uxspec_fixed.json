@@ -1,0 +1,1340 @@
+{
+  "version": "1.0.0",
+  "project": "demo-app",
+  "name": "FlowLock Demo Application",
+  "description": "Comprehensive demo showcasing all FlowLock features",
+  "entities": [
+    {
+      "id": "user",
+      "name": "User",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
+        },
+        {
+          "id": "email",
+          "name": "Email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "id": "name",
+          "name": "Name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "role",
+          "name": "Role",
+          "type": "string"
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "orders",
+          "to": "order",
+          "kind": "1:many"
+        },
+        {
+          "id": "profile",
+          "to": "profile",
+          "kind": "1:1"
+        }
+      ]
+    },
+    {
+      "id": "product",
+      "name": "Product",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
+        },
+        {
+          "id": "name",
+          "name": "Name",
+          "type": "string",
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
+        },
+        {
+          "id": "description",
+          "name": "Description",
+          "type": "text",
+          "external": true,
+          "source": "catalog_api"
+        },
+        {
+          "id": "price",
+          "name": "Price",
+          "type": "number",
+          "required": true,
+          "external": true,
+          "source": "catalog_api"
+        },
+        {
+          "id": "stock",
+          "name": "Stock",
+          "type": "number",
+          "external": true,
+          "source": "catalog_api"
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "category",
+          "to": "category",
+          "kind": "many:1"
+        },
+        {
+          "id": "reviews",
+          "to": "review",
+          "kind": "1:many"
+        }
+      ]
+    },
+    {
+      "id": "order",
+      "name": "Order",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
+        },
+        {
+          "id": "order_number",
+          "name": "Order Number",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.order_number"
+        },
+        {
+          "id": "user_id",
+          "name": "User ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "total",
+          "name": "Total",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "status",
+          "name": "Status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "user",
+          "to": "user",
+          "kind": "many:1"
+        },
+        {
+          "id": "items",
+          "to": "order_item",
+          "kind": "1:many"
+        }
+      ]
+    },
+    {
+      "id": "profile",
+      "name": "Profile",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
+        },
+        {
+          "id": "user_id",
+          "name": "User ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "bio",
+          "name": "Bio",
+          "type": "text"
+        },
+        {
+          "id": "avatar_url",
+          "name": "Avatar URL",
+          "type": "string"
+        },
+        {
+          "id": "phone",
+          "name": "Phone",
+          "type": "string"
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "user",
+          "to": "user",
+          "kind": "1:1"
+        }
+      ]
+    },
+    {
+      "id": "category",
+      "name": "Category",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
+        },
+        {
+          "id": "name",
+          "name": "Name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "description",
+          "name": "Description",
+          "type": "text"
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "products",
+          "to": "product",
+          "kind": "1:many"
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "name": "Review",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
+        },
+        {
+          "id": "product_id",
+          "name": "Product ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "user_id",
+          "name": "User ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "rating",
+          "name": "Rating",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "comment",
+          "name": "Comment",
+          "type": "text"
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "product",
+          "to": "product",
+          "kind": "many:1"
+        },
+        {
+          "id": "user",
+          "to": "user",
+          "kind": "many:1"
+        }
+      ]
+    },
+    {
+      "id": "cart",
+      "name": "Cart",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
+        },
+        {
+          "id": "user_id",
+          "name": "User ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "session_id",
+          "name": "Session ID",
+          "type": "string"
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "user",
+          "to": "user",
+          "kind": "many:1"
+        },
+        {
+          "id": "items",
+          "to": "cart_item",
+          "kind": "1:many"
+        }
+      ]
+    },
+    {
+      "id": "cart_item",
+      "name": "Cart Item",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
+        },
+        {
+          "id": "cart_id",
+          "name": "Cart ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "product_id",
+          "name": "Product ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "quantity",
+          "name": "Quantity",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "price",
+          "name": "Price",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "cart",
+          "to": "cart",
+          "kind": "many:1"
+        },
+        {
+          "id": "product",
+          "to": "product",
+          "kind": "many:1"
+        }
+      ]
+    },
+    {
+      "id": "order_item",
+      "name": "Order Item",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "string",
+          "required": true,
+          "derived": true,
+          "provenance": "system.uuid"
+        },
+        {
+          "id": "order_id",
+          "name": "Order ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "product_id",
+          "name": "Product ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "id": "quantity",
+          "name": "Quantity",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "price",
+          "name": "Price",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        },
+        {
+          "id": "updated_at",
+          "name": "Updated At",
+          "type": "date",
+          "derived": true,
+          "provenance": "system.timestamp"
+        }
+      ],
+      "relations": [
+        {
+          "id": "order",
+          "to": "order",
+          "kind": "many:1"
+        },
+        {
+          "id": "product",
+          "to": "product",
+          "kind": "many:1"
+        }
+      ]
+    }
+  ],
+  "screens": [
+    {
+      "id": "user_list",
+      "name": "User List",
+      "type": "list",
+      "entityId": "user",
+      "reads": [
+        "user.id",
+        "user.name",
+        "user.email",
+        "user.role"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/users", "/admin/users"],
+      "lists": [
+        {
+          "id": "user_table",
+          "reads": ["user.id", "user.name", "user.email", "user.role"],
+          "sortable": true,
+          "filterable": true,
+          "paginated": true
+        }
+      ],
+      "ctas": [
+        {
+          "id": "create_user",
+          "label": "Add User",
+          "to": "user_create",
+          "type": "primary"
+        },
+        {
+          "id": "view_details",
+          "label": "View",
+          "to": "user_detail",
+          "type": "link"
+        }
+      ]
+    },
+    {
+      "id": "user_detail",
+      "name": "User Detail",
+      "entityId": "user",
+      "reads": [
+        "user.id",
+        "user.name",
+        "user.email",
+        "user.role",
+        "user.created_at"
+      ],
+      "type": "detail",
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/users/:id"],
+      "cards": [
+        {
+          "id": "user_info",
+          "reads": ["user.name", "user.email", "user.role", "user.created_at"]
+        }
+      ],
+      "ctas": [
+        {
+          "id": "edit_user",
+          "label": "Edit",
+          "to": "user_edit",
+          "type": "primary"
+        },
+        {
+          "id": "back_to_list",
+          "label": "Back",
+          "to": "user_list",
+          "type": "link"
+        }
+      ]
+    },
+    {
+      "id": "user_create",
+      "name": "Create User",
+      "type": "form",
+      "entityId": "user",
+      "forms": [
+        {
+          "id": "create_user_form",
+          "entityId": "user",
+          "type": "create",
+          "fields": [
+            {
+              "fieldId": "email",
+              "label": "Email Address"
+            },
+            {
+              "fieldId": "name",
+              "label": "Full Name"
+            },
+            {
+              "fieldId": "role",
+              "label": "User Role"
+            }
+          ],
+          "writes": ["user.email", "user.name", "user.role"]
+        }
+      ],
+      "roles": [
+        "admin"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error",
+        "submitting"
+      ],
+      "routes": ["/users/new"],
+      "ctas": [
+        {
+          "id": "submit",
+          "label": "Create User",
+          "to": "user_created",
+          "type": "primary"
+        },
+        {
+          "id": "cancel",
+          "label": "Cancel",
+          "to": "user_list",
+          "type": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "user_edit",
+      "name": "Edit User",
+      "type": "form",
+      "entityId": "user",
+      "reads": [
+        "user.id",
+        "user.email",
+        "user.name",
+        "user.role"
+      ],
+      "forms": [
+        {
+          "id": "edit_user_form",
+          "entityId": "user",
+          "type": "update",
+          "fields": [
+            {
+              "fieldId": "email",
+              "label": "Email Address"
+            },
+            {
+              "fieldId": "name",
+              "label": "Full Name"
+            },
+            {
+              "fieldId": "role",
+              "label": "User Role"
+            }
+          ],
+          "writes": ["user.email", "user.name", "user.role"]
+        }
+      ],
+      "roles": [
+        "admin"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error",
+        "submitting"
+      ],
+      "routes": ["/users/:id/edit"],
+      "ctas": [
+        {
+          "id": "submit",
+          "label": "Save Changes",
+          "to": "user_detail",
+          "type": "primary"
+        },
+        {
+          "id": "cancel",
+          "label": "Cancel",
+          "to": "user_detail",
+          "type": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "user_created",
+      "name": "User Created",
+      "type": "success",
+      "roles": [
+        "admin"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/users/success"],
+      "ctas": [
+        {
+          "id": "view_user",
+          "label": "View User",
+          "to": "user_detail",
+          "type": "primary"
+        },
+        {
+          "id": "create_another",
+          "label": "Create Another",
+          "to": "user_create",
+          "type": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "product_list",
+      "name": "Product Catalog",
+      "type": "list",
+      "entityId": "product",
+      "reads": [
+        "product.id",
+        "product.name",
+        "product.price",
+        "product.stock"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/products", "/catalog"],
+      "lists": [
+        {
+          "id": "product_grid",
+          "reads": ["product.id", "product.name", "product.price", "product.stock"],
+          "sortable": true,
+          "filterable": true,
+          "paginated": true
+        }
+      ],
+      "ctas": [
+        {
+          "id": "view_product",
+          "label": "View Details",
+          "to": "product_detail",
+          "type": "primary"
+        }
+      ]
+    },
+    {
+      "id": "product_detail",
+      "name": "Product Detail",
+      "entityId": "product",
+      "reads": [
+        "product.id",
+        "product.name",
+        "product.description",
+        "product.price",
+        "product.stock"
+      ],
+      "type": "detail",
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/products/:id"],
+      "cards": [
+        {
+          "id": "product_info",
+          "reads": ["product.name", "product.description", "product.price", "product.stock"]
+        }
+      ],
+      "ctas": [
+        {
+          "id": "add_to_cart",
+          "label": "Add to Cart",
+          "to": "cart",
+          "type": "primary"
+        },
+        {
+          "id": "back_to_catalog",
+          "label": "Back",
+          "to": "product_list",
+          "type": "link"
+        }
+      ]
+    },
+    {
+      "id": "cart",
+      "name": "Shopping Cart",
+      "type": "detail",
+      "entityId": "cart",
+      "reads": [
+        "cart.id",
+        "cart_item.product_id",
+        "cart_item.quantity",
+        "cart_item.price"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/cart"],
+      "lists": [
+        {
+          "id": "cart_items",
+          "reads": ["cart_item.product_id", "cart_item.quantity", "cart_item.price"],
+          "sortable": false,
+          "filterable": false,
+          "paginated": false
+        }
+      ],
+      "ctas": [
+        {
+          "id": "checkout",
+          "label": "Checkout",
+          "to": "checkout",
+          "type": "primary"
+        },
+        {
+          "id": "continue_shopping",
+          "label": "Continue Shopping",
+          "to": "product_list",
+          "type": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "checkout",
+      "name": "Checkout",
+      "type": "form",
+      "entityId": "order",
+      "forms": [
+        {
+          "id": "checkout_form",
+          "entityId": "order",
+          "type": "create",
+          "fields": [],
+          "writes": ["order.user_id", "order.total", "order.status"]
+        }
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error",
+        "submitting"
+      ],
+      "routes": ["/checkout"],
+      "ctas": [
+        {
+          "id": "place_order",
+          "label": "Place Order",
+          "to": "order_confirmed",
+          "type": "primary"
+        },
+        {
+          "id": "back_to_cart",
+          "label": "Back to Cart",
+          "to": "cart",
+          "type": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "order_confirmed",
+      "name": "Order Confirmed",
+      "type": "success",
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/order/success"],
+      "ctas": [
+        {
+          "id": "view_orders",
+          "label": "View Orders",
+          "to": "order_list",
+          "type": "primary"
+        },
+        {
+          "id": "continue_shopping",
+          "label": "Continue Shopping",
+          "to": "product_list",
+          "type": "secondary"
+        }
+      ]
+    },
+    {
+      "id": "order_list",
+      "name": "Order History",
+      "type": "list",
+      "entityId": "order",
+      "reads": [
+        "order.id",
+        "order.order_number",
+        "order.total",
+        "order.status",
+        "order.created_at"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/orders"],
+      "lists": [
+        {
+          "id": "order_table",
+          "reads": ["order.order_number", "order.total", "order.status", "order.created_at"],
+          "sortable": true,
+          "filterable": true,
+          "paginated": true
+        }
+      ],
+      "ctas": [
+        {
+          "id": "view_order",
+          "label": "View Details",
+          "to": "order_detail",
+          "type": "link"
+        }
+      ]
+    },
+    {
+      "id": "order_detail",
+      "name": "Order Detail",
+      "type": "detail",
+      "entityId": "order",
+      "reads": [
+        "order.id",
+        "order.order_number",
+        "order.total",
+        "order.status",
+        "order.created_at",
+        "order_item.product_id",
+        "order_item.quantity",
+        "order_item.price"
+      ],
+      "roles": [
+        "admin",
+        "viewer"
+      ],
+      "uiStates": [
+        "empty",
+        "loading",
+        "error"
+      ],
+      "routes": ["/orders/:id"],
+      "cards": [
+        {
+          "id": "order_info",
+          "reads": ["order.order_number", "order.total", "order.status", "order.created_at"]
+        }
+      ],
+      "lists": [
+        {
+          "id": "order_items",
+          "reads": ["order_item.product_id", "order_item.quantity", "order_item.price"],
+          "sortable": false,
+          "filterable": false,
+          "paginated": false
+        }
+      ],
+      "ctas": [
+        {
+          "id": "back_to_orders",
+          "label": "Back to Orders",
+          "to": "order_list",
+          "type": "link"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "create_user_flow",
+      "name": "Create User Flow",
+      "jtbd": "admin",
+      "role": "admin",
+      "entryStepId": "cu_1",
+      "steps": [
+        {
+          "id": "cu_1",
+          "screenId": "user_list",
+          "next": [
+            {
+              "targetStepId": "cu_2"
+            }
+          ],
+          "reads": ["user.id", "user.name", "user.email"]
+        },
+        {
+          "id": "cu_2",
+          "screenId": "user_create",
+          "next": [
+            {
+              "targetStepId": "cu_3"
+            }
+          ],
+          "writes": ["user.email", "user.name", "user.role"],
+          "transition": {
+            "entity": "user",
+            "from": "pending",
+            "to": "active"
+          }
+        },
+        {
+          "id": "cu_3",
+          "screenId": "user_created",
+          "next": [
+            {
+              "targetStepId": "cu_4"
+            }
+          ]
+        },
+        {
+          "id": "cu_4",
+          "screenId": "user_detail",
+          "reads": ["user.id", "user.name", "user.email", "user.role", "user.created_at"]
+        }
+      ],
+      "success": {
+        "screen": "user_detail",
+        "message": "User created successfully"
+      }
+    },
+    {
+      "id": "edit_user_flow",
+      "name": "Edit User Flow",
+      "jtbd": "admin",
+      "role": "admin",
+      "entryStepId": "eu_1",
+      "steps": [
+        {
+          "id": "eu_1",
+          "screenId": "user_detail",
+          "next": [
+            {
+              "targetStepId": "eu_2"
+            }
+          ],
+          "reads": ["user.id", "user.name", "user.email", "user.role"]
+        },
+        {
+          "id": "eu_2",
+          "screenId": "user_edit",
+          "next": [
+            {
+              "targetStepId": "eu_3"
+            }
+          ],
+          "reads": ["user.id", "user.email", "user.name", "user.role"],
+          "writes": ["user.email", "user.name", "user.role"]
+        },
+        {
+          "id": "eu_3",
+          "screenId": "user_detail",
+          "reads": ["user.id", "user.name", "user.email", "user.role", "user.created_at"]
+        }
+      ],
+      "success": {
+        "screen": "user_detail",
+        "message": "User updated successfully"
+      }
+    },
+    {
+      "id": "browse_products_flow",
+      "name": "Browse Products",
+      "jtbd": "viewer",
+      "role": "viewer",
+      "entryStepId": "bp_1",
+      "steps": [
+        {
+          "id": "bp_1",
+          "screenId": "product_list",
+          "next": [
+            {
+              "targetStepId": "bp_2"
+            }
+          ],
+          "reads": ["product.id", "product.name", "product.price", "product.stock"]
+        },
+        {
+          "id": "bp_2",
+          "screenId": "product_detail",
+          "next": [
+            {
+              "targetStepId": "bp_3"
+            }
+          ],
+          "reads": ["product.id", "product.name", "product.description", "product.price", "product.stock"]
+        },
+        {
+          "id": "bp_3",
+          "screenId": "cart",
+          "reads": ["cart.id", "cart_item.product_id", "cart_item.quantity", "cart_item.price"]
+        }
+      ]
+    },
+    {
+      "id": "purchase_flow",
+      "name": "Complete Purchase",
+      "jtbd": "viewer",
+      "role": "viewer",
+      "entryStepId": "pf_1",
+      "steps": [
+        {
+          "id": "pf_1",
+          "screenId": "cart",
+          "next": [
+            {
+              "targetStepId": "pf_2"
+            }
+          ],
+          "reads": ["cart.id", "cart_item.product_id", "cart_item.quantity", "cart_item.price"]
+        },
+        {
+          "id": "pf_2",
+          "screenId": "checkout",
+          "next": [
+            {
+              "targetStepId": "pf_3"
+            }
+          ],
+          "writes": ["order.user_id", "order.total", "order.status"],
+          "transition": {
+            "entity": "order",
+            "from": "pending",
+            "to": "confirmed"
+          }
+        },
+        {
+          "id": "pf_3",
+          "screenId": "order_confirmed",
+          "next": [
+            {
+              "targetStepId": "pf_4"
+            }
+          ]
+        },
+        {
+          "id": "pf_4",
+          "screenId": "order_detail",
+          "reads": ["order.id", "order.order_number", "order.total", "order.status", "order.created_at"]
+        }
+      ],
+      "success": {
+        "screen": "order_detail",
+        "message": "Order placed successfully"
+      }
+    }
+  ],
+  "jtbd": [
+    {
+      "role": "admin",
+      "tasks": [
+        "Create user",
+        "Edit user",
+        "Review users",
+        "Manage user permissions",
+        "Monitor system activity",
+        "View order history",
+        "Manage product catalog"
+      ],
+      "description": "Administrative oversight and user management"
+    },
+    {
+      "role": "viewer",
+      "tasks": [
+        "Browse products",
+        "See product detail",
+        "Add products to cart",
+        "Complete purchase",
+        "View order history",
+        "Compare products",
+        "Find items within budget"
+      ],
+      "description": "Browse and purchase products efficiently"
+    }
+  ],
+  "roles": [
+    {
+      "id": "admin",
+      "name": "Administrator",
+      "permissions": ["create", "read", "update", "delete"]
+    },
+    {
+      "id": "viewer",
+      "name": "Viewer",
+      "permissions": ["read", "create:order", "update:cart"]
+    }
+  ],
+  "states": [
+    {
+      "entity": "user",
+      "allowed": ["pending", "active", "suspended", "deleted"],
+      "initial": "pending",
+      "terminal": ["deleted"],
+      "transitions": [
+        { "from": "pending", "to": "active", "trigger": "verify" },
+        { "from": "active", "to": "suspended", "trigger": "suspend" },
+        { "from": "suspended", "to": "active", "trigger": "reactivate" },
+        { "from": "active", "to": "deleted", "trigger": "delete" },
+        { "from": "suspended", "to": "deleted", "trigger": "delete" }
+      ]
+    },
+    {
+      "entity": "order",
+      "allowed": ["pending", "confirmed", "shipped", "delivered", "cancelled"],
+      "initial": "pending",
+      "terminal": ["delivered", "cancelled"],
+      "transitions": [
+        { "from": "pending", "to": "confirmed", "trigger": "confirm" },
+        { "from": "confirmed", "to": "shipped", "trigger": "ship" },
+        { "from": "shipped", "to": "delivered", "trigger": "deliver" },
+        { "from": "pending", "to": "cancelled", "trigger": "cancel" },
+        { "from": "confirmed", "to": "cancelled", "trigger": "cancel" }
+      ]
+    },
+    {
+      "entity": "product",
+      "allowed": ["draft", "active", "out_of_stock", "discontinued"],
+      "initial": "draft",
+      "terminal": ["discontinued"],
+      "transitions": [
+        { "from": "draft", "to": "active", "trigger": "publish" },
+        { "from": "active", "to": "out_of_stock", "trigger": "deplete" },
+        { "from": "out_of_stock", "to": "active", "trigger": "restock" },
+        { "from": "active", "to": "discontinued", "trigger": "discontinue" },
+        { "from": "out_of_stock", "to": "discontinued", "trigger": "discontinue" }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "system.uuid",
+      "definition": "System-generated unique identifier",
+      "formula": "crypto.randomUUID()"
+    },
+    {
+      "term": "system.timestamp",
+      "definition": "Server-generated timestamp",
+      "formula": "new Date().toISOString()"
+    },
+    {
+      "term": "system.order_number",
+      "definition": "System-generated order number",
+      "formula": "ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}"
+    },
+    {
+      "term": "catalog_api",
+      "definition": "External product catalog service",
+      "source": "https://api.catalog.example/v1"
+    }
+  ]
+}

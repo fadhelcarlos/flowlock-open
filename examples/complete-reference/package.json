@@ -1,0 +1,75 @@
+{
+  "name": "@flowlock/ecommerce-reference",
+  "version": "1.0.0",
+  "description": "Complete FlowLock e-commerce reference implementation",
+  "private": true,
+  "scripts": {
+    "check": "flowlock check",
+    "check:all": "flowlock check --verbose",
+    "check:required": "flowlock check:required",
+    "check:types": "flowlock check:types",
+    "check:relationships": "flowlock check:relationships",
+    "check:flows": "flowlock check:flows",
+    "check:states": "flowlock check:states",
+    "check:roles": "flowlock check:roles",
+    "check:derived": "flowlock check:derived",
+    "check:external": "flowlock check:external",
+    "check:screens": "flowlock check:screens",
+    "check:forms": "flowlock check:forms",
+    "check:glossary": "flowlock check:glossary",
+    "generate": "flowlock generate",
+    "generate:types": "flowlock generate:types",
+    "generate:api": "flowlock generate:api",
+    "generate:ui": "flowlock generate:ui",
+    "generate:db": "flowlock generate:database",
+    "generate:docs": "flowlock generate:docs",
+    "validate": "flowlock validate",
+    "audit": "flowlock audit",
+    "clean": "rm -rf artifacts generated",
+    "test": "npm run check:all && npm run generate"
+  },
+  "keywords": [
+    "flowlock",
+    "ux-spec",
+    "e-commerce",
+    "reference",
+    "example",
+    "tutorial"
+  ],
+  "author": "FlowLock Team",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.0",
+    "redux": "^4.2.1",
+    "react-redux": "^8.1.1",
+    "@reduxjs/toolkit": "^1.9.5",
+    "axios": "^1.4.0",
+    "formik": "^2.4.2",
+    "yup": "^1.2.0",
+    "date-fns": "^2.30.0",
+    "lodash": "^4.17.21",
+    "classnames": "^2.3.2"
+  },
+  "devDependencies": {
+    "@flowlock/cli": "latest",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "typescript": "^5.0.0",
+    "vite": "^4.4.0",
+    "@vitejs/plugin-react": "^4.0.1",
+    "tailwindcss": "^3.3.2",
+    "jest": "^29.5.0",
+    "@testing-library/react": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flowlock/flowlock.git",
+    "directory": "examples/complete-reference"
+  }
+}
