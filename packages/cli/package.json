@@ -58,6 +58,5 @@
   },
   "optionalDependencies": {
     "eventsource": "^2.0.2"
-  },
-  "private": false
+  }
 }
