@@ -27,9 +27,16 @@ jobs:
       - name: Build packages in order
         run: |
           pnpm --filter flowlock-uxspec build
+          cp packages/uxspec/dist/*.d.ts node_modules/.pnpm/flowlock-uxspec@*/node_modules/flowlock-uxspec/dist/ || true
+          
           pnpm --filter flowlock-plugin-sdk build
+          cp packages/plugin-sdk/dist/*.d.ts node_modules/.pnpm/flowlock-plugin-sdk@*/node_modules/flowlock-plugin-sdk/dist/ || true
+          
           pnpm --filter flowlock-shared build
+          
           pnpm --filter flowlock-checks-core build
+          cp packages/checks-core/dist/*.d.ts node_modules/.pnpm/flowlock-checks-core@*/node_modules/flowlock-checks-core/dist/ || true
+          
           pnpm --filter flowlock-runner build
           pnpm --filter flowlock-inventory build
           pnpm --filter flowlock-uxcg build
