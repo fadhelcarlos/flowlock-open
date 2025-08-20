@@ -472,7 +472,7 @@ export async function auditCommand(opts?: AuditOptions) {
 
   process.exitCode = hasErrors(filteredResults) ? 1 : 0;
   if (!opts?.quiet && !opts?.json) {
-    const totalChecks = VALIDATION_LEVELS[level].groups.length;
+    // const totalChecks = VALIDATION_LEVELS[level].groups.length; // Reserved for future use
     const checkCounts = { basic: 7, enhanced: 12, strict: 15 };
     console.log(`\n📊 Summary: Ran ${checkCounts[level]} of 15 total checks (${level} level)`);
     console.log(process.exitCode ? "❌ Audit failed with errors" : "✅ Audit completed successfully");
