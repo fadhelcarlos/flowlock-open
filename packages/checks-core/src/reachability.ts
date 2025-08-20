@@ -19,7 +19,7 @@ export const reachabilityCheck: FlowlockCheck = {
       
       for (const step of flow.steps) {
         const screen = spec.screens.find(s => s.id === step.screenId);
-        if (screen?.type === 'success') {
+        if (screen?.type === 'success' && step.screenId) {
           successScreens.add(step.screenId);
         }
       }

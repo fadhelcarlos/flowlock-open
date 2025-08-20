@@ -58,9 +58,18 @@ async function handleCommand(base: string, token: string | undefined, cmdRow: an
   const { id, command, args } = cmdRow;
   let result = { ok: false, code: 1, out: "" };
 
-  if (command === "audit") result = await runCli("audit");
-  else if (command === "audit_fix") result = await runCli("audit", ["--fix"]);
-  else if (command === "diagrams") result = await runCli("diagrams");
+  if (command === "audit") {
+    const r = await runCli("audit");
+    result = { ok: r.code === 0, ...r };
+  }
+  else if (command === "audit_fix") {
+    const r = await runCli("audit", ["--fix"]);
+    result = { ok: r.code === 0, ...r };
+  }
+  else if (command === "diagrams") {
+    const r = await runCli("diagrams");
+    result = { ok: r.code === 0, ...r };
+  }
   else {
     result = { ok: false, code: 1, out: `Unknown command: ${command}` };
   }

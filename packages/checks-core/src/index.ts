@@ -16,6 +16,10 @@ import { checkRelations } from "./checks/relations";
 import { checkRoutes } from "./checks/routes";
 import { checkCTAs } from "./checks/ctas";
 
+// NEW: inventory/runtime compliance checks
+import { checkInventory } from "./checks/inventory";
+import { checkRuntimeDeterminism } from "./checks/runtimeDeterminism";
+
 /** Normalize unknown results to CheckResult[] with narrow level/status. Drops extra props. */
 function normalizeResults(raw: any): CheckResult[] {
   const arr = Array.isArray(raw) ? raw : [raw];
@@ -94,11 +98,27 @@ const ctas: FlowlockCheck = {
   run: (spec: UXSpec) => normalizeResults(checkCTAs(spec)),
 };
 
+// NEW: runtime inventory compliance
+const inventory: FlowlockCheck = {
+  id: "inventory",
+  name: "Inventory Completeness",
+  description: "Ensures DB/API/UI inventory was extracted and is consistent with spec.",
+  run: (spec: UXSpec) => normalizeResults(checkInventory(spec)),
+};
+
+const runtimeDeterminism: FlowlockCheck = {
+  id: "runtime_determinism",
+  name: "Runtime Determinism",
+  description: "Verifies deterministic audits: same spec+inventory always yields same results.",
+  run: (spec: UXSpec) => normalizeResults(checkRuntimeDeterminism(spec)),
+};
+
 // Optional short aliases (kept for convenience)
 export const honestReads = honestReadsCheck;
 export const creatableNeedsDetail = creatableNeedsDetailCheck;
 export const reachability = reachabilityCheck;
 export { uiStates, stateMachine, screen, coverage, jtbd, relations, routes, ctas };
+export { inventory, runtimeDeterminism };
 export const roleBoundaries = screen; // Backward compatibility alias
 
 // Bundle consumed by the runner/CLI
@@ -114,4 +134,6 @@ export const coreChecks: FlowlockCheck[] = [
   relations,
   routes,
   ctas,
+  inventory,
+  runtimeDeterminism,
 ];

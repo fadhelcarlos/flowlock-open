@@ -64,7 +64,7 @@ export function checkCTAs(spec: UXSpec): any[] {
   const navGraph = new Map<string, Set<string>>();
   for (const screen of screens) {
     const ctas = (screen as any).ctas || [];
-    const targets = new Set(ctas.map((c: any) => c.to).filter((t: string) => screenIds.has(t)));
+    const targets = new Set<string>(ctas.map((c: any) => c.to).filter((t: string) => screenIds.has(t)));
     navGraph.set(screen.id, targets);
   }
   

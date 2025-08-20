@@ -88,7 +88,6 @@ export async function watchCommand(options: WatchOptions) {
         {
           checks: result.checkResults,
           artifacts,
-          specDigest: result.specDigest ?? null,
           startedAt,
           finishedAt,
         },

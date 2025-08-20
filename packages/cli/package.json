@@ -40,6 +40,7 @@
     "chokidar": "^3.5.3",
     "commander": "^11.1.0",
     "flowlock-checks-core": "workspace:*",
+    "flowlock-inventory": "workspace:*",
     "flowlock-runner": "workspace:*",
     "flowlock-uxspec": "workspace:*",
     "node-fetch": "3",
