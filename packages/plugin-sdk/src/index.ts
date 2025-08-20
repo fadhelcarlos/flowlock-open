@@ -9,6 +9,7 @@ export interface CheckResult {
   status: CheckStatus;
   message: string;
   ref?: string;
+  details?: Record<string, any>;
 }
 
 export interface FlowlockCheck {

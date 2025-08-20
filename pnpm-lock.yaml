@@ -144,14 +144,14 @@ importers:
   packages/checks-core:
     dependencies:
       flowlock-plugin-sdk:
-        specifier: ^0.5.0
-        version: 0.5.1
+        specifier: ^0.5.2
+        version: 0.5.2
       flowlock-shared:
         specifier: ^0.2.0
         version: 0.2.0
       flowlock-uxspec:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.1
+        version: 0.5.1
     devDependencies:
       '@types/node':
         specifier: ^20.10.0
@@ -281,8 +281,8 @@ importers:
   packages/plugin-sdk:
     dependencies:
       flowlock-uxspec:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.1
+        version: 0.5.1
     devDependencies:
       '@types/node':
         specifier: ^20.10.0
@@ -299,15 +299,21 @@ importers:
 
   packages/runner:
     dependencies:
+      chalk:
+        specifier: ^4.1.2
+        version: 4.1.2
       flowlock-checks-core:
-        specifier: ^0.5.2
-        version: 0.5.2
+        specifier: workspace:*
+        version: link:../checks-core
       flowlock-plugin-sdk:
-        specifier: ^0.5.1
-        version: 0.5.1
+        specifier: workspace:*
+        version: link:../plugin-sdk
+      flowlock-shared:
+        specifier: workspace:*
+        version: link:../shared
       flowlock-uxspec:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: workspace:*
+        version: link:../uxspec
       mermaid:
         specifier: ^10.6.1
         version: 10.9.3
@@ -772,6 +778,7 @@ packages:
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
     engines: {node: '>=10.10.0'}
+    deprecated: Use @eslint/config-array instead
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -779,6 +786,7 @@ packages:
 
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
+    deprecated: Use @eslint/object-schema instead
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -2180,6 +2188,7 @@ packages:
   eslint@8.57.1:
     resolution: {integrity: sha512-ypowyDxpVSYpkXr9WPv2PAZCtNip1Mv5KTW0SCurXv/9iOpcrH9PaqUElksqEB6pChqHGDRCFTyrZlGhnLNGiA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   espree@9.6.1:
@@ -2307,6 +2316,9 @@ packages:
   flowlock-plugin-sdk@0.5.1:
     resolution: {integrity: sha512-xN0kortm6IzORya7+CKy1p55UpuIfROvHUtupg5icNuNj1Ez+E2QaMEeqkpARpY4q15EICoxdW7RtWNJSR4BdQ==}
 
+  flowlock-plugin-sdk@0.5.2:
+    resolution: {integrity: sha512-dYCG7D0U5Ean28abufnOKvS6jAz6zvTty3tlymykRMMx0mMqkm557yrVjdOAHoxRTrHCMTlVzh3oMTFnFAOJpA==}
+
   flowlock-runner@0.5.2:
     resolution: {integrity: sha512-UmyLbfEVNVv0KadNOX9UURHyTKF3tL5gUfTU/VqI1eJ/WeHum0OYvKZxtomVoehUvQN+mtpwqcgVwEkosPs5tQ==}
 
@@ -2315,6 +2327,9 @@ packages:
 
   flowlock-uxspec@0.5.0:
     resolution: {integrity: sha512-WUnmBbFLScYEmjOED4UCDfflkt8ZOXm3F8L6mOlycR/UyP5nikdQkbkOmWRKv1eU8/sMY27wpo5BrQdFSHhkkw==}
+
+  flowlock-uxspec@0.5.1:
+    resolution: {integrity: sha512-E+EmU7dytPJWj0vxmgDLf722EvnwrEFHT6GmLqcgFJNOC5IyjQQOTUep7Se5riylKQ2OrlhF5mI+wQfY2lsaSQ==}
 
   for-each@0.3.5:
     resolution: {integrity: sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==}
@@ -2427,9 +2442,11 @@ packages:
 
   glob@7.1.7:
     resolution: {integrity: sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ==}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   globals@13.24.0:
     resolution: {integrity: sha512-AhO5QUcj8llrbG09iWhPU2B204J1xnPeL8kQmVorSsy+Sjj1sk8gIyh6cUocGmH4L0UuhAJy+hJMRA4mgA4mFQ==}
@@ -2529,6 +2546,7 @@ packages:
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
+    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
@@ -3035,6 +3053,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-fetch@2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
@@ -3418,6 +3437,7 @@ packages:
 
   puppeteer@19.11.1:
     resolution: {integrity: sha512-39olGaX2djYUdhaQQHDZ0T0GwEp+5f9UB9HmEP0qHfdQHIq0xGQZuAZ5TLnJIc/88SrPLpEflPC+xUqOTv3c5g==}
+    deprecated: < 24.9.0 is no longer supported
 
   quansync@0.2.10:
     resolution: {integrity: sha512-t41VRkMYbkHyCYmOvx/6URnN80H7k4X0lLdBMGsz+maAwrJQYB1djpV6vHrQIBE0WBSGqhtEHrK9U3DWWH8v7A==}
@@ -3509,6 +3529,7 @@ packages:
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   robust-predicates@3.0.2:
@@ -3632,6 +3653,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   spawndamnit@3.0.1:
     resolution: {integrity: sha512-MmnduQUuHCoFckZoWnXsTg7JaiLBJrKFj9UI2MbRPGaJeVpsLcVBu6P/IGZovziM/YBsellCmsprgNA+w0CzVg==}
@@ -6226,7 +6248,11 @@ snapshots:
 
   flowlock-plugin-sdk@0.5.1:
     dependencies:
-      flowlock-uxspec: 0.5.0
+      flowlock-uxspec: 0.5.1
+
+  flowlock-plugin-sdk@0.5.2:
+    dependencies:
+      flowlock-uxspec: 0.5.1
 
   flowlock-runner@0.5.2:
     dependencies:
@@ -6240,6 +6266,10 @@ snapshots:
   flowlock-shared@0.2.0: {}
 
   flowlock-uxspec@0.5.0:
+    dependencies:
+      zod: 3.25.76
+
+  flowlock-uxspec@0.5.1:
     dependencies:
       zod: 3.25.76
 
