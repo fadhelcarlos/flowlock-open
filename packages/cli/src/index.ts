@@ -11,13 +11,14 @@ import { writeClaudeCommands } from "./templates/claude";
 import { initExistingCommand } from "./commands/init-existing";
 import { inventoryCommand } from "./commands/inventory";
 import { debugCommand } from "./commands/debug";
+import { VERSION } from "./version";
 
 const program = new Command();
 
 program
-  .name("uxcg")
+  .name("flowlock-uxcg")
   .description("FlowLock UX Code Generator CLI")
-  .version("0.0.0");
+  .version(VERSION);
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Project scaffolding / initialization
