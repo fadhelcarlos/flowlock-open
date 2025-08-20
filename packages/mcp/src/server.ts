@@ -78,6 +78,28 @@ const tools: Tool[] = [
         cwd: { type: "string" }
       }
     }
+  },
+  {
+    name: "init_existing",
+    description: "Initialize FlowLock in an existing project (creates config and commands)",
+    inputSchema: {
+      type: "object",
+      properties: {
+        cwd: { type: "string" }
+      }
+    }
+  },
+  {
+    name: "inventory",
+    description: "Extract runtime inventory (DB/API/UI) from existing codebase",
+    inputSchema: {
+      type: "object",
+      properties: {
+        cwd: { type: "string" },
+        config: { type: "string", description: "Path to flowlock.config.json" },
+        out: { type: "string", description: "Output file path" }
+      }
+    }
   }
 ];
 
@@ -101,8 +123,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     
     case "audit": {
       const cwd = (args?.cwd as string) || process.cwd();
-      const res = runUx("audit", args?.fix ? ["--fix"] : [], cwd);
-      const artifacts = ["er.svg","flow.svg","screens.csv","results.junit.xml","gap_report.md","acceptance_criteria.feature","er.mmd","flow.mmd"]
+      const cmdArgs = [];
+      if (args?.fix) cmdArgs.push("--fix");
+      if (args?.inventory) cmdArgs.push("--inventory");
+      const res = runUx("audit", cmdArgs, cwd);
+      const artifacts = ["er.svg","flow.svg","screens.csv","results.junit.xml","gap_report.md","acceptance_criteria.feature","er.mmd","flow.mmd","runtime_inventory.json","determinism.sha256"]
         .map((f) => path.join("artifacts", f))
         .filter((p) => fs.existsSync(path.join(cwd, p)));
       return { 
@@ -147,6 +172,46 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [{ 
           type: "text", 
           text: JSON.stringify({ ok: exists, code: res.code, output: res.out, wrote: exists }) 
+        }] 
+      };
+    }
+    
+    case "init_existing": {
+      const cwd = (args?.cwd as string) || process.cwd();
+      const res = runUx("init-existing", [], cwd);
+      const configExists = fs.existsSync(path.join(cwd, "flowlock.config.json"));
+      const commandsExist = fs.existsSync(path.join(cwd, ".claude", "commands"));
+      return { 
+        content: [{ 
+          type: "text", 
+          text: JSON.stringify({ 
+            ok: res.code === 0 && configExists && commandsExist, 
+            code: res.code, 
+            output: res.out,
+            created: { config: configExists, commands: commandsExist }
+          }) 
+        }] 
+      };
+    }
+    
+    case "inventory": {
+      const cwd = (args?.cwd as string) || process.cwd();
+      const configPath = (args?.config as string) || "flowlock.config.json";
+      const outPath = (args?.out as string) || "artifacts/runtime_inventory.json";
+      const cmdArgs = [];
+      if (args?.config) cmdArgs.push("--config", configPath);
+      if (args?.out) cmdArgs.push("--out", outPath);
+      const res = runUx("inventory", cmdArgs, cwd);
+      const inventoryExists = fs.existsSync(path.join(cwd, outPath));
+      return { 
+        content: [{ 
+          type: "text", 
+          text: JSON.stringify({ 
+            ok: res.code === 0 && inventoryExists, 
+            code: res.code, 
+            output: res.out,
+            inventoryPath: inventoryExists ? outPath : null
+          }) 
         }] 
       };
     }

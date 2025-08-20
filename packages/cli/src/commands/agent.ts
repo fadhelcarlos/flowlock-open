@@ -66,9 +66,29 @@ async function handleCommand(base: string, token: string | undefined, cmdRow: an
     const r = await runCli("audit", ["--fix"]);
     result = { ok: r.code === 0, ...r };
   }
+  else if (command === "audit_inventory") {
+    const r = await runCli("audit", ["--inventory"]);
+    result = { ok: r.code === 0, ...r };
+  }
+  else if (command === "inventory") {
+    const r = await runCli("inventory");
+    result = { ok: r.code === 0, ...r };
+  }
+  else if (command === "init_existing") {
+    const r = await runCli("init-existing");
+    result = { ok: r.code === 0, ...r };
+  }
   else if (command === "diagrams") {
     const r = await runCli("diagrams");
     result = { ok: r.code === 0, ...r };
+  }
+  else if (command === "export" && args?.format) {
+    const r = await runCli("export", [args.format]);
+    result = { ok: r.code === 0, ...r };
+  }
+  else if (command === "watch") {
+    // Watch command not supported in agent mode (requires interactive session)
+    result = { ok: false, code: 1, out: "Watch command not available in agent mode" };
   }
   else {
     result = { ok: false, code: 1, out: `Unknown command: ${command}` };

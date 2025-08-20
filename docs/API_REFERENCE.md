@@ -4,6 +4,9 @@
 - [flowlock-uxspec API](#flowlock-uxspec-api)
 - [flowlock-runner API](#flowlock-runner-api)
 - [flowlock-checks-core API](#flowlock-checks-core-api)
+- [flowlock-inventory API](#flowlock-inventory-api)
+- [flowlock-cli API](#flowlock-cli-api)
+- [flowlock-mcp API](#flowlock-mcp-api)
 - [flowlock-plugin-sdk API](#flowlock-plugin-sdk-api)
 - [Creating Custom Checks](#creating-custom-checks)
 - [Programmatic Usage Examples](#programmatic-usage-examples)
@@ -80,6 +83,138 @@ const mySpec: UXSpec = {
   screens: [],
   flows: []
 };
+```
+
+---
+
+## flowlock-inventory API
+
+### buildInventory(configPath?: string, outputPath?: string): Promise<string>
+
+Extracts runtime inventory from your codebase.
+
+```typescript
+import { buildInventory } from 'flowlock-inventory';
+
+const inventoryPath = await buildInventory(
+  'flowlock.config.json',
+  'artifacts/runtime_inventory.json'
+);
+```
+
+### Type Definitions
+
+```typescript
+export type RuntimeInventory = {
+  db: {
+    dialect?: string;
+    entities: {
+      id: string;
+      fields: { id: string; type?: string }[];
+    }[];
+  };
+  api: {
+    endpoints: ApiEndpoint[];
+  };
+  ui: {
+    reads: string[];
+    writes: string[];
+  };
+};
+
+export type ApiEndpoint = {
+  path: string;
+  methods: string[];
+  returns?: {
+    entity: string;
+    fields: string[];
+  };
+};
+```
+
+---
+
+## flowlock-cli API
+
+### Command Line Interface
+
+```bash
+# Initialize in existing project
+npx flowlock-uxcg init-existing
+# Alias: npx flowlock-uxcg wire
+
+# Extract inventory
+npx flowlock-uxcg inventory [options]
+# Options:
+#   --config <path>  Config file path (default: flowlock.config.json)
+#   --out <file>     Output path (default: artifacts/runtime_inventory.json)
+
+# Run audit
+npx flowlock-uxcg audit [options]
+# Options:
+#   --fix            Auto-fix issues
+#   --inventory      Require runtime inventory
+#   --only <checks>  Run specific checks
+#   --skip <checks>  Skip specific checks
+#   --json           Output as JSON
+#   --quiet          Suppress non-error output
+
+# Connect agent
+npx flowlock-uxcg agent --cloud <url> --project <id> [--token <token>]
+```
+
+### Programmatic Usage
+
+```typescript
+import { auditCommand } from 'flowlock-cli/commands/audit';
+import { inventoryCommand } from 'flowlock-cli/commands/inventory';
+import { initExistingCommand } from 'flowlock-cli/commands/init-existing';
+
+// Run audit programmatically
+await auditCommand({ fix: true, inventory: true });
+
+// Build inventory
+await inventoryCommand({
+  config: 'flowlock.config.json',
+  out: 'artifacts/runtime_inventory.json'
+});
+
+// Initialize existing project
+await initExistingCommand();
+```
+
+---
+
+## flowlock-mcp API
+
+### MCP Server Tools
+
+The MCP server exposes the following tools:
+
+- **ping** - Health check
+- **audit** - Run FlowLock audit
+- **diagrams** - Generate diagram artifacts
+- **init** - Initialize new project
+- **init_existing** - Wire into existing project
+- **inventory** - Extract runtime inventory
+- **write_claude_commands** - Create Claude command cards
+
+### Tool Schemas
+
+```typescript
+// Example: inventory tool
+{
+  name: "inventory",
+  description: "Extract runtime inventory from codebase",
+  inputSchema: {
+    type: "object",
+    properties: {
+      cwd: { type: "string" },
+      config: { type: "string" },
+      out: { type: "string" }
+    }
+  }
+}
 ```
 
 ---

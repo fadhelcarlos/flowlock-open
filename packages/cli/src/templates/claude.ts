@@ -112,7 +112,13 @@ You are the FlowLock v3 contract editor. Use the README/PRD and code to create o
 
 **Then run (locally):**
 \`\`\`bash
-npx flowlock-uxcg audit
+# First, extract runtime inventory if you have an existing codebase:
+npx flowlock-uxcg inventory
+# Or for existing projects:
+npx flowlock-uxcg init-existing
+
+# Then run audit:
+npx flowlock-uxcg audit --inventory  # Enforces inventory requirement
 # Or if installed globally:
 uxcg audit
 \`\`\`
@@ -126,13 +132,15 @@ You are the FlowLock v3 guardrails fixer. Goal: ✅ all 11 checks green.
 
 **Input:**
 - \`artifacts/gap_report.md\`
+- \`artifacts/runtime_inventory.json\` (if inventory extracted)
 - audit console output
 - current \`uxspec.json\`
 
 **Do:**
-1) Summarize failing rules (now includes 11 checks):
-   - **Core**: HONEST/CREATABLE/REACHABILITY/UI/STATE/SCREEN/SPEC
-   - **Enhanced**: JTBD/RELATIONS/ROUTES/CTAS
+1) Summarize failing rules (now includes 15 checks):
+   - **Core (7)**: HONEST/CREATABLE/REACHABILITY/UI/STATE/SCREEN/SPEC
+   - **Enhanced (4)**: JTBD/RELATIONS/ROUTES/CTAS
+   - **Runtime (4)**: INVENTORY/DETERMINISM/DATABASE_VALIDATION/MIGRATION_VALIDATION
 
 2) Propose minimal, safe edits to \`uxspec.json\` ONLY (do not touch app code):
    - **HONEST**: Mark fields as derived/external with provenance/source OR remove uncaptured reads
@@ -146,6 +154,8 @@ You are the FlowLock v3 guardrails fixer. Goal: ✅ all 11 checks green.
    - **RELATIONS**: Fix entity relationship references
    - **ROUTES**: Ensure unique routes starting with /
    - **CTAS**: Fix navigation targets, eliminate orphans
+   - **INVENTORY**: Ensure runtime inventory is fresh (run \`uxcg inventory\`)
+   - **DETERMINISM**: Validate DB schema matches entities, auth aligns with roles
 
 3) For enhanced features, suggest additions:
    - Add \`routes\` to screens for URL navigation
@@ -231,7 +241,7 @@ You are the FlowLock v3 UI scaffolder. Precondition: audit is ✅.
 const FLOW_AUDIT_FIX = `
 # /flow-audit-fix — Close gaps from the latest audit with v3 features
 
-You are the FlowLock v3 gap closer, handling all 11 checks.
+You are the FlowLock v3 gap closer, handling all 15 checks including runtime validation.
 
 **Inputs:**
 - \`artifacts/gap_report.md\`
@@ -244,6 +254,7 @@ You are the FlowLock v3 gap closer, handling all 11 checks.
 1) Read the gap report and categorize issues by check type:
    - Core checks (7): HONEST, CREATABLE, REACHABILITY, UI, STATE, SCREEN, SPEC
    - Enhanced checks (4): JTBD, RELATIONS, ROUTES, CTAS
+   - Runtime checks (4): INVENTORY, DETERMINISM, DATABASE_VALIDATION, MIGRATION_VALIDATION
 
 2) For HONEST_READS failures, analyze field usage:
    - If system-generated: \`derived: true\` + \`provenance: "system.uuid"\`
@@ -278,7 +289,7 @@ npx flowlock-uxcg audit --fix  # Try auto-fix first
 # Then:
 npx flowlock-uxcg audit
 \`\`\`
-Goal: All 11 checks ✅.
+Goal: All 15 checks ✅ (including runtime validation).
 `;
 
 const ENHANCE_SPEC = `

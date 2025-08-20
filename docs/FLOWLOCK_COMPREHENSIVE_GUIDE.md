@@ -229,6 +229,32 @@ Enhanced Checks (v2.0):
     - Detects orphaned screens with no incoming CTAs
     - Warns about self-referencing CTAs
 
+12. **INVENTORY** (`inventory`)
+    - Ensures runtime inventory was extracted
+    - Validates DB entities match spec entities
+    - Checks API endpoints coverage
+    - Verifies UI reads/writes alignment
+
+13. **RUNTIME_DETERMINISM** (`runtime_determinism`)
+    - Verifies deterministic audits across runs
+    - Computes SHA-256 hash of spec + inventory
+    - Ensures same inputs always yield same results
+    - Critical for CI/CD pipeline stability
+
+14. **DATABASE_VALIDATION** (`database_validation`)
+    - Validates transaction boundaries
+    - Checks for missing indexes on frequently queried fields
+    - Verifies auth table integration with roles
+    - Validates connection pooling configuration
+    - Ensures data integrity constraints
+
+15. **MIGRATION_VALIDATION** (`migration_validation`)
+    - Validates migration safety and reversibility
+    - Checks for transaction support in DDL operations
+    - Verifies rollback scripts exist
+    - Ensures data integrity in migrations
+    - Validates migration dependencies
+
 **Installation:**
 ```bash
 npm install flowlock-checks-core
@@ -296,13 +322,38 @@ Initialize a new FlowLock project with enhanced features
 - **NEW**: Creates `uxspec/glossary.yml` and `glossary.md`
 - **NEW**: Enhanced starter spec with JTBD, relations, CTAs, and more
 
-##### `uxcg audit [--fix]`
+##### `uxcg init-existing`
+Initialize FlowLock in an existing project (aliases: `wire`)
+- Creates `flowlock.config.json` with sensible defaults
+- Adds Claude/Cursor command cards
+- Updates package.json with FlowLock scripts
+- Non-destructive - won't overwrite existing files
+- Perfect for adding FlowLock to existing codebases
+
+##### `uxcg inventory [options]`
+Extract runtime inventory from your codebase (alias: `inv`)
+- `--config <path>` - Path to flowlock.config.json (default: flowlock.config.json)
+- `--out <file>` - Output file path (default: artifacts/runtime_inventory.json)
+- `--db-only` - Extract only database entities
+- `--api-only` - Extract only API endpoints
+- `--ui-only` - Extract only UI reads/writes
+- Analyzes:
+  - Database schemas (Prisma, TypeORM, Drizzle, etc.)
+  - API endpoints (OpenAPI, JSDoc, route files)
+  - UI components (React, Vue, Angular)
+
+##### `uxcg audit [options]`
 Run validation checks and generate artifacts
 - `--fix` flag enables auto-healing:
   - Adds missing roles
   - Ensures UI states (empty/loading/error)
   - Infers screen types from names
   - Fixes structural issues
+- `--inventory` - Require runtime inventory (fails if missing/stale)
+- `--only <checks>` - Run only specific checks (comma-separated)
+- `--skip <checks>` - Skip specific checks (comma-separated)
+- `--json` - Output results as JSON
+- `--quiet` - Suppress non-error output
 
 ##### `uxcg diagrams`
 Generate only diagram artifacts (ER & Flow)

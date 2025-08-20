@@ -17,6 +17,30 @@ export type ApiEndpoint = {
   returns?: { entity: string; fields: string[] };
 };
 
+export type InventoryEntity = {
+  id: string;
+  fields: { id: string; type?: string }[];
+};
+
+export type InventoryConfig = {
+  db?: {
+    mode?: "schema" | "live" | "auto";
+    dialect?: "postgres" | "mysql" | "sqlite";
+    urlEnv?: string;
+    schemaFiles?: string[];
+  };
+  api?: {
+    scan?: string[];
+    jsdoc?: boolean;
+    openapiPrefer?: boolean;
+  };
+  ui?: {
+    scan?: string[];
+    readAttribute?: string;
+    writeAttribute?: string;
+  };
+};
+
 export async function buildInventory(cfgPath = "flowlock.config.json", outFile = "artifacts/runtime_inventory.json") {
   // --- Load config (JSON or YAML) -------------------------------------------
   let raw = fs.readFileSync(cfgPath, "utf8");

@@ -19,6 +19,8 @@ import { checkCTAs } from "./checks/ctas";
 // NEW: inventory/runtime compliance checks
 import { checkInventory } from "./checks/inventory";
 import { checkRuntimeDeterminism } from "./checks/runtimeDeterminism";
+import { checkDatabaseValidation } from "./checks/databaseValidation";
+import { checkMigrationValidation } from "./checks/migrationValidation";
 
 /** Normalize unknown results to CheckResult[] with narrow level/status. Drops extra props. */
 function normalizeResults(raw: any): CheckResult[] {
@@ -113,12 +115,26 @@ const runtimeDeterminism: FlowlockCheck = {
   run: (spec: UXSpec) => normalizeResults(checkRuntimeDeterminism(spec)),
 };
 
+const databaseValidation: FlowlockCheck = {
+  id: "database_validation",
+  name: "Database Validation",
+  description: "Validates database schema, transactions, indexes, auth integration, and connection pooling.",
+  run: (spec: UXSpec) => normalizeResults(checkDatabaseValidation(spec)),
+};
+
+const migrationValidation: FlowlockCheck = {
+  id: "migration_validation",
+  name: "Migration Validation",
+  description: "Validates database migrations for safety, reversibility, and data integrity.",
+  run: () => normalizeResults(checkMigrationValidation()),
+};
+
 // Optional short aliases (kept for convenience)
 export const honestReads = honestReadsCheck;
 export const creatableNeedsDetail = creatableNeedsDetailCheck;
 export const reachability = reachabilityCheck;
 export { uiStates, stateMachine, screen, coverage, jtbd, relations, routes, ctas };
-export { inventory, runtimeDeterminism };
+export { inventory, runtimeDeterminism, databaseValidation, migrationValidation };
 export const roleBoundaries = screen; // Backward compatibility alias
 
 // Bundle consumed by the runner/CLI
@@ -136,4 +152,6 @@ export const coreChecks: FlowlockCheck[] = [
   ctas,
   inventory,
   runtimeDeterminism,
+  databaseValidation,
+  migrationValidation,
 ];

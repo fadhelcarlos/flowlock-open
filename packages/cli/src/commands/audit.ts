@@ -47,6 +47,11 @@ export interface AuditOptions {
   fix?: boolean;
   spec?: string;   // default: uxspec.json
   outDir?: string; // default: artifacts
+  inventory?: boolean; // require runtime inventory
+  only?: string;    // run only specific checks
+  skip?: string;    // skip specific checks
+  json?: boolean;   // output as JSON
+  quiet?: boolean;  // suppress non-error output
 }
 
 /* ========================= Small utils ========================== */
@@ -265,13 +270,39 @@ export async function auditCommand(opts?: AuditOptions) {
   const specPath = path.join(cwd, opts?.spec || "uxspec.json");
   const outDir = opts?.outDir || "artifacts";
 
+  // Check for runtime inventory if --inventory flag is set
+  if (opts?.inventory) {
+    const inventoryPath = path.join(outDir, "runtime_inventory.json");
+    if (!fs.existsSync(inventoryPath)) {
+      console.error("❌ Runtime inventory required but not found at:", inventoryPath);
+      console.error("   Run 'npx uxcg inventory' first to generate the inventory.");
+      process.exitCode = 1;
+      return;
+    }
+    // Check if inventory is stale (older than 24 hours)
+    const stats = fs.statSync(inventoryPath);
+    const age = Date.now() - stats.mtimeMs;
+    const dayMs = 24 * 60 * 60 * 1000;
+    if (age > dayMs) {
+      console.warn("⚠️  Runtime inventory is older than 24 hours. Consider regenerating.");
+    }
+  }
+
   // Run once; if schema fails and --fix is set, we will heal & retry inside this helper
   const res = await runRunnerWithHeal(specPath, outDir, !!opts?.fix);
 
-  console.log("🔍 Running FlowLock audit...\\n");
-  printSummary(res.checkResults as any, specPath);
-  listArtifacts(outDir);
+  if (!opts?.quiet) {
+    console.log("🔍 Running FlowLock audit...\\n");
+  }
+  if (opts?.json) {
+    console.log(JSON.stringify(res.checkResults, null, 2));
+  } else if (!opts?.quiet) {
+    printSummary(res.checkResults as any, specPath);
+    listArtifacts(outDir);
+  }
 
   process.exitCode = hasErrors(res.checkResults as any) ? 1 : 0;
-  console.log(process.exitCode ? "\n❌ Audit failed with errors" : "\n✅ Audit completed successfully");
+  if (!opts?.quiet && !opts?.json) {
+    console.log(process.exitCode ? "\n❌ Audit failed with errors" : "\n✅ Audit completed successfully");
+  }
 }

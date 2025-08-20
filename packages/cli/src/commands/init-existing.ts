@@ -6,6 +6,7 @@ const CONFIG = "flowlock.config.json";
 const CLAUDE_DIR = ".claude/commands";
 
 export const initExistingCommand = async () => {
+  try {
   if (!fs.existsSync(CONFIG)) {
     fs.writeFileSync(
       CONFIG,
@@ -43,9 +44,40 @@ export const initExistingCommand = async () => {
   console.log("✓ ensured", CLAUDE_DIR);
 
   // Add a convenience script to package.json
-  const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
-  pkg.scripts ||= {};
-  pkg.scripts["flowlock:selfcheck"] = "node tools/selfcheck.mjs";
-  fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
-  console.log("✓ package.json scripts updated");
+  const pkgPath = "package.json";
+  if (fs.existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+      pkg.scripts ||= {};
+      
+      // Add multiple useful scripts
+      pkg.scripts["flowlock:audit"] = "npx flowlock-uxcg audit";
+      pkg.scripts["flowlock:audit:fix"] = "npx flowlock-uxcg audit --fix";
+      pkg.scripts["flowlock:inventory"] = "npx flowlock-uxcg inventory";
+      pkg.scripts["flowlock:diagrams"] = "npx flowlock-uxcg diagrams";
+      
+      // Only add selfcheck if tools/selfcheck.mjs exists
+      if (fs.existsSync("tools/selfcheck.mjs")) {
+        pkg.scripts["flowlock:selfcheck"] = "node tools/selfcheck.mjs";
+      }
+      
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+      console.log("✓ package.json scripts updated");
+    } catch (e) {
+      console.log("• Could not update package.json scripts (manual update recommended)");
+    }
+  } else {
+    console.log("• No package.json found, skipping script setup");
+  }
+
+  console.log("\n✓ FlowLock initialization complete!");
+  console.log("\nNext steps:");
+  console.log("  1. Edit flowlock.config.json to match your project structure");
+  console.log("  2. Run 'npx flowlock-uxcg inventory' to extract runtime inventory");
+  console.log("  3. Create a uxspec.json with your UX specification");
+  console.log("  4. Run 'npx flowlock-uxcg audit' to validate your spec");
+  } catch (error) {
+    console.error("Error during initialization:", error instanceof Error ? error.message : error);
+    process.exit(1);
+  }
 };

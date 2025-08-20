@@ -76,6 +76,33 @@ business:
     definition: Recurring service agreement
     tags: [entity, recurring]
 
+# FlowLock Terms
+# Framework-specific terminology
+flowlock:
+  - term: inventory
+    definition: Runtime extraction of database entities, API endpoints, and UI interactions
+    tags: [framework, analysis]
+  
+  - term: runtimeDeterminism
+    definition: Validation that ensures consistent behavior across database, auth, and UI layers
+    tags: [framework, validation]
+  
+  - term: uxspec
+    definition: UX specification file that defines screens, entities, roles, and interactions
+    tags: [framework, configuration]
+  
+  - term: honest
+    definition: Screen reads are properly captured, derived, or external
+    tags: [framework, validation]
+  
+  - term: creatable
+    definition: Entity that can be created through the UI with proper validation
+    tags: [framework, validation]
+  
+  - term: reachability
+    definition: All screens can be reached within a certain number of navigation steps
+    tags: [framework, validation]
+
 # States
 # Valid states for entities
 states:

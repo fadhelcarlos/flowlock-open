@@ -29,7 +29,10 @@ program
 // NEW: wire FlowLock into an existing repository (no scaffolding)
 program
   .command("init-existing")
+  .alias("wire")
   .description("Wire FlowLock into an existing repo (creates flowlock.config.json, seeds agent commands, adds scripts)")
+  .option("--skip-scripts", "Skip adding npm scripts to package.json")
+  .option("--skip-commands", "Skip creating Claude command cards")
   .action(initExistingCommand);
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -37,9 +40,14 @@ program
 // ──────────────────────────────────────────────────────────────────────────────
 program
   .command("audit")
+  .alias("check")
   .description("Run UX specification checks and generate artifacts")
   .option("--fix", "Autofix roles/uiStates and obvious HONEST reads, then re-run")
   .option("--inventory", "Require runtime inventory (fails if missing/stale)")
+  .option("--only <checks>", "Run only specific checks (comma-separated)")
+  .option("--skip <checks>", "Skip specific checks (comma-separated)")
+  .option("--json", "Output results as JSON")
+  .option("--quiet", "Suppress non-error output")
   .action((opts) => auditCommand(opts));
 
 program
@@ -57,9 +65,13 @@ program
 // ──────────────────────────────────────────────────────────────────────────────
 program
   .command("inventory")
-  .description("Build runtime inventory (DB/API/UI) as artifacts/runtime_inventory.json")
-  .option("--config <path>", "Path to flowlock.config.json", "flowlock.config.json")
-  .option("--out <file>", "Output file path", "artifacts/runtime_inventory.json")
+  .alias("inv")
+  .description("Build runtime inventory (DB/API/UI) from your codebase")
+  .option("--config <path>", "Path to flowlock.config.json (default: flowlock.config.json)", "flowlock.config.json")
+  .option("--out <file>", "Output file path (default: artifacts/runtime_inventory.json)", "artifacts/runtime_inventory.json")
+  .option("--db-only", "Extract only database entities")
+  .option("--api-only", "Extract only API endpoints")
+  .option("--ui-only", "Extract only UI reads/writes")
   .action((opts) => inventoryCommand(opts));
 
 // ──────────────────────────────────────────────────────────────────────────────
