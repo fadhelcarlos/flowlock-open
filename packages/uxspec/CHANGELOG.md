@@ -1,5 +1,11 @@
 # flowlock-uxspec
 
+## 0.5.1
+
+### Patch Changes
+
+- Fixed TypeScript type declaration files generation and build order issues
+
 ## 0.4.1
 
 ### Patch Changes

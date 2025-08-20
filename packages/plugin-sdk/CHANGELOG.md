@@ -1,5 +1,13 @@
 # flowlock-plugin-sdk
 
+## 0.5.2
+
+### Patch Changes
+
+- Fixed TypeScript type declaration files generation and build order issues
+- Updated dependencies
+  - flowlock-uxspec@0.5.1
+
 ## 0.4.1
 
 ### Patch Changes
