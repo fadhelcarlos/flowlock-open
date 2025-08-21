@@ -1,6 +1,6 @@
 {
   "name": "@flowlock/cli-tui",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": false,
   "type": "commonjs",
   "bin": {
@@ -36,8 +36,8 @@
     "zod": "^3.23.8",
     "zustand": "^4.5.5",
     "react": "^18.3.1",
-    "flowlock-uxcg": "workspace:*",
-    "flowlock-shared": "workspace:*"
+    "flowlock-uxcg": "^0.10.0",
+    "flowlock-shared": "^0.10.0"
   },
   "devDependencies": {
     "@types/node": "^22.5.0",
