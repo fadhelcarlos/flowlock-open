@@ -1,6 +1,6 @@
 {
   "name": "flowlock-checks-core",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "Core checks library for FlowLock",
   "publishConfig": {
     "access": "public"
