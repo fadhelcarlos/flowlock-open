@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "pnpm build:deps",
     "build": "pnpm build:deps && pnpm -r build",
-    "build:deps": "pnpm -r --filter flowlock-shared --filter flowlock-uxspec --filter flowlock-plugin-sdk --filter flowlock-checks-core --filter flowlock-inventory --filter flowlock-runner build",
+    "build:deps": "pnpm -r --filter flowlock-shared --filter flowlock-uxspec --filter flowlock-plugin-sdk --filter flowlock-checks-core --filter flowlock-inventory --filter flowlock-runner --filter flowlock-uxcg build",
     "postinstall": "pnpm build:deps",
     "test": "pnpm -r test",
     "test:e2e": "cd tests && pnpm install && pnpm test",
@@ -17,7 +17,9 @@
     "uxcg": "node ./packages/cli/dist/index.js",
     "uxcg:audit": "uxcg audit",
     "uxcg:diagrams": "uxcg diagrams",
-    "uxcg:watch": "uxcg watch"
+    "uxcg:watch": "uxcg watch",
+    "flowlock": "node ./packages/cli-tui/dist/bin/flowlock.js",
+    "tui": "node ./packages/cli-tui/dist/bin/flowlock.js"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
