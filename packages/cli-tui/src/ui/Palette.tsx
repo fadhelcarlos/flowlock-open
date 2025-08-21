@@ -2,9 +2,9 @@ import React from 'react';
 import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
 import Fuse from 'fuse.js';
-import { commands } from '../commands/registry';
-import { useStore } from '../util/store';
-import { runCommandById } from '../util/runCommand';
+import { commands } from '../commands/registry.js';
+import { useStore } from '../util/store.js';
+import { runCommandById } from '../util/runCommand.js';
 
 const fuse = new Fuse(commands, { 
   keys: ['id', 'title', 'category'], 
@@ -40,8 +40,18 @@ export function Palette() {
   if (!paletteOpen) return null;
   
   return (
-    <Box flexDirection="column" borderStyle="round" padding={1}>
-      <Text>Command Palette</Text>
+    <Box 
+      position="absolute" 
+      top={2} 
+      left={2} 
+      right={2} 
+      flexDirection="column" 
+      borderStyle="round" 
+      borderColor="cyan" 
+      padding={1}
+      backgroundColor="black"
+    >
+      <Text color="cyan" bold>Command Palette</Text>
       <TextInput value={q} onChange={setQ} placeholder="Type a command…" />
       <Box flexDirection="column" marginTop={1}>
         {results.slice(0, 10).map((c, i) => (

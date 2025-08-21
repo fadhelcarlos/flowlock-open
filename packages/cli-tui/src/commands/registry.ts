@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { spawn } from 'child_process';
-import type { Command, Args, Ctx } from './types';
+import type { Command, Args, Ctx } from './types.js';
 
 // Wrapper function to call CLI commands via spawn
 const runCliCommand = (cmd: string, args: string[], ctx: Ctx): Promise<number> => {

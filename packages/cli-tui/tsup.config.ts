@@ -9,7 +9,7 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   dts: false, // Disable for now due to ink type issues
-  format: ['cjs'],
+  format: ['esm'],
   banner: { 
     js: '#!/usr/bin/env node'
   },

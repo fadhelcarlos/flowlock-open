@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Settings } from './settings';
+import type { Settings } from './settings.js';
 
 interface Job { 
   id: string; 

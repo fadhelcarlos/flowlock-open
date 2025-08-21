@@ -5,10 +5,11 @@ const isTTY = Boolean(process.stdout.isTTY && process.stdin.isTTY);
 const wantsUI = isTTY && process.env.CI !== 'true' && process.argv.length <= 2 && !process.argv.includes('--no-ui');
 
 if (wantsUI) {
-  const { startTUI } = require('../index');
-  startTUI().catch((err: any) => {
-    console.error(err);
-    process.exit(1);
+  import('../index.js').then(({ startTUI }) => {
+    startTUI().catch((err: any) => {
+      console.error(err);
+      process.exit(1);
+    });
   });
 } else {
   // Back-compat: forward args to headless CLI (uxcg)

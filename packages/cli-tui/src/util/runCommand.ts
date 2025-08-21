@@ -1,7 +1,7 @@
-import { commands } from '../commands/registry';
-import { useStore } from './store';
-import { scanArtifacts } from './scanArtifacts';
-import { timestamp } from './time';
+import { commands } from '../commands/registry.js';
+import { useStore } from './store.js';
+import { scanArtifacts } from './scanArtifacts.js';
+import { timestamp } from './time.js';
 
 export async function runCommandById(
   id: string, 

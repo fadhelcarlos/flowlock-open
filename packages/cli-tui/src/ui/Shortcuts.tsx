@@ -1,6 +1,6 @@
 import React from 'react';
 import { useInput } from 'ink';
-import { useStore } from '../util/store';
+import { useStore } from '../util/store.js';
 
 export function Shortcuts() {
   const cancel = useStore(s => s.cancelCurrent);

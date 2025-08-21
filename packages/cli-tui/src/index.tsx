@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'ink';
-import { App } from './ui/App';
+import { App } from './ui/App.js';
 
 export function startTUI() {
   const instance = render(<App />);
