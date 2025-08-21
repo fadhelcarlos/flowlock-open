@@ -1,6 +1,6 @@
 {
   "name": "flowlock-checks-core",
-  "version": "0.6.0",
+  "version": "0.6.3",
   "description": "Core checks library for FlowLock",
   "publishConfig": {
     "access": "public"
@@ -21,17 +21,17 @@
     "flowlock"
   ],
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "flowlock-shared": "workspace:*",
-    "flowlock-uxspec": "workspace:*",
-    "flowlock-plugin-sdk": "workspace:*"
+    "flowlock-shared": "^0.3.3",
+    "flowlock-uxspec": "^0.6.1",
+    "flowlock-plugin-sdk": "^0.6.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

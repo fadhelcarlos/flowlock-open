@@ -56,7 +56,7 @@ export function generateERDiagram(spec: UXSpec): string {
     }
   }
   
-  return lines.join('\\n');
+  return lines.join('\n');
 }
 
 export function generateFlowDiagram(spec: UXSpec): string {
@@ -154,5 +154,5 @@ export function generateFlowDiagram(spec: UXSpec): string {
   lines.push('    classDef error fill:#FFB6C1');
   lines.push('    classDef home fill:#87CEEB');
   
-  return lines.join('\\n');
+  return lines.join('\n');
 }

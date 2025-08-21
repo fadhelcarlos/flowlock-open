@@ -1,12 +1,35 @@
 {
   "name": "flowlock-shared",
-  "version": "0.3.1",
+  "version": "0.3.3",
   "description": "Shared utilities and types for FlowLock system",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./errors": {
+      "require": "./dist/errors.js",
+      "types": "./dist/errors.d.ts"
+    },
+    "./validation": {
+      "require": "./dist/validation.js",
+      "types": "./dist/validation.d.ts"
+    },
+    "./types": {
+      "require": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    },
+    "./config-validator": {
+      "require": "./dist/config-validator.js",
+      "types": "./dist/config-validator.d.ts"
+    }
+  },
   "files": ["dist"],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

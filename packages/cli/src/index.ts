@@ -17,8 +17,10 @@ const program = new Command();
 
 program
   .name("flowlock-uxcg")
-  .description("FlowLock UX Code Generator CLI")
-  .version(VERSION);
+  .description("FlowLock UX Code Generator CLI - Validate UX specifications and generate artifacts")
+  .version(VERSION)
+  .option("--verbose", "Enable verbose output for debugging")
+  .option("--quiet", "Suppress non-error output");
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Project scaffolding / initialization
@@ -111,4 +113,25 @@ try {
   writeClaudeCommands(process.cwd());
 } catch {}
 
+// Global error handling
+process.on('uncaughtException', (error) => {
+  console.error("💥 Unexpected error:", error.message);
+  if (process.env.FLOWLOCK_VERBOSE === "true") {
+    console.error(error.stack);
+  } else {
+    console.error("Run with --verbose for more details");
+  }
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error("💥 Unhandled promise rejection:", reason);
+  process.exit(1);
+});
+
 program.parse(process.argv);
+
+// Show help if no command is provided
+if (process.argv.length <= 2) {
+  program.help();
+}

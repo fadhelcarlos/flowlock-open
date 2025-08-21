@@ -1,6 +1,6 @@
 {
   "name": "flowlock-uxspec",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "UX specification definitions for FlowLock",
   "publishConfig": {
     "access": "public"
@@ -21,12 +21,12 @@
     "flowlock"
   ],
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

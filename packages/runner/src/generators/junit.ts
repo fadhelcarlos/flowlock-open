@@ -37,7 +37,7 @@ export function generateJUnitXML(results: CheckResult[]): string {
   lines.push('  </testsuite>');
   lines.push('</testsuites>');
   
-  return lines.join('\\n');
+  return lines.join('\n');
 }
 
 function escapeXML(str: string): string {

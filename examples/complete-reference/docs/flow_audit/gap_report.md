@@ -1,6 +1,6 @@
 # Gap Report
 
-Total issues: 51
+Total issues: 80
 
 | ID | Severity | Location | Symptom | Proposed fix |
 |---|---|---|---|---|
@@ -21,9 +21,9 @@ Total issues: 51
 | honest_reads_order_detail_order.shipped_at | error | screen:order_detail,field:order.shipped_at | Screen 'Order Detail' reads field 'order.shipped_at' which is not captured in the same flow | Align spec (roles/uiStates/state machine) and update components to match. |
 | honest_reads_order_detail_order.delivered_at | error | screen:order_detail,field:order.delivered_at | Screen 'Order Detail' reads field 'order.delivered_at' which is not captured in the same flow | Align spec (roles/uiStates/state machine) and update components to match. |
 | honest_reads_wishlist_wishlist.name | error | screen:wishlist,field:wishlist.name | Screen 'My Wishlist' reads field 'wishlist.name' which is not captured in the same flow | Align spec (roles/uiStates/state machine) and update components to match. |
-| creatable_needs_detail_user | error | entity:user | Entity 'User' has a create form but no detail screen | Align spec (roles/uiStates/state machine) and update components to match. |
-| creatable_needs_detail_profile | error | entity:profile | Entity 'Profile' has a create form but no detail screen | Align spec (roles/uiStates/state machine) and update components to match. |
-| creatable_needs_detail_review | error | entity:review | Entity 'Review' has a create form but no detail screen | Align spec (roles/uiStates/state machine) and update components to match. |
+| creatable_needs_detail_user | error | entity:user | Entity 'User' (user) has a create form but no detail screen. Expected a screen with type='detail' and entity='user' or entityId='user', or a screen with ID like 'user-detail' | Align spec (roles/uiStates/state machine) and update components to match. |
+| creatable_needs_detail_profile | error | entity:profile | Entity 'Profile' (profile) has a create form but no detail screen. Expected a screen with type='detail' and entity='profile' or entityId='profile', or a screen with ID like 'profile-detail' | Align spec (roles/uiStates/state machine) and update components to match. |
+| creatable_needs_detail_review | error | entity:review | Entity 'Review' (review) has a create form but no detail screen. Expected a screen with type='detail' and entity='review' or entityId='review', or a screen with ID like 'review-detail' | Align spec (roles/uiStates/state machine) and update components to match. |
 | reachability_browse_and_purchase_flow_order_confirmation_deep | warning | flow:browse_and_purchase_flow,screen:order_confirmation,depth:5 | Success screen 'order_confirmation' requires 5 steps (max: 3) in flow 'Browse and Purchase Flow' | Align spec (roles/uiStates/state machine) and update components to match. |
 | ui_states_present | error | - | Screen "Sign Up" missing UI states: empty. | Align spec (roles/uiStates/state machine) and update components to match. |
 | ui_states_present | error | - | Screen "Login" missing UI states: empty. | Align spec (roles/uiStates/state machine) and update components to match. |
@@ -49,7 +49,36 @@ Total issues: 51
 | cta_invalid_target_admin_dashboard_manage_products | error | screen:admin_dashboard,cta:manage_products | Screen 'Admin Dashboard' has CTA 'Manage Products' pointing to non-existent screen 'admin_products' | Align spec (roles/uiStates/state machine) and update components to match. |
 | cta_invalid_target_admin_dashboard_manage_orders | error | screen:admin_dashboard,cta:manage_orders | Screen 'Admin Dashboard' has CTA 'Manage Orders' pointing to non-existent screen 'admin_orders' | Align spec (roles/uiStates/state machine) and update components to match. |
 | cta_invalid_target_admin_dashboard_manage_users | error | screen:admin_dashboard,cta:manage_users | Screen 'Admin Dashboard' has CTA 'Manage Users' pointing to non-existent screen 'admin_users' | Align spec (roles/uiStates/state machine) and update components to match. |
-| inventory.file.missing | error | - | Missing artifacts/runtime_inventory.json. Run `uxcg inventory` before auditing. | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'user' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'profile' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'product' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'category' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'order' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'order_item' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'cart' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'cart_item' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'review' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'address' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'vendor' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'wishlist' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'tag' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'product_image' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'product_tag' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.db.entity.missing | error | - | Database entity 'wishlist_product' not found in inventory | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'product.id' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'product.rating' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'product.review_count' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'cart.id' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'cart.total' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'cart.item_count' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'order.id' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'order.order_number' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'order.total_amount' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'order.created_at' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'order.subtotal' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'order.tax_amount' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| inventory.ui.read.unproven | error | - | UI reads field 'wishlist.id' without valid provenance | Align spec (roles/uiStates/state machine) and update components to match. |
+| runtime_determinism.mismatch | error | - | Determinism mismatch. previous=691dc0996ee29b120fcccbcff078028c4660f5d76d942745821e96903b5c1fcf current=3ceb174f346aa4655af3367803fb69c96265b52a51710019da8e240022a7c3cc. Changes in spec/inventory produce different results. | Align spec (roles/uiStates/state machine) and update components to match. |
 | database_no_relationships | info | - | Multiple entities defined but no relationships detected | Align spec (roles/uiStates/state machine) and update components to match. |
 | database_no_audit_fields_tag | info | entity:tag | Entity 'Tag' missing audit fields (created_at/updated_at) | Align spec (roles/uiStates/state machine) and update components to match. |
 | database_no_audit_fields_product_image | info | entity:product_image | Entity 'Product Image' missing audit fields (created_at/updated_at) | Align spec (roles/uiStates/state machine) and update components to match. |

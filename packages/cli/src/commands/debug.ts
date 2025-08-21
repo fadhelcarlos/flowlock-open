@@ -5,6 +5,7 @@ import type { CheckResult } from "flowlock-plugin-sdk";
 import * as fs from "fs/promises";
 import * as path from "path";
 import chalk from "chalk";
+import { printArtifacts } from "../lib/printArtifacts";
 
 interface DebugOptions {
   entity?: string;
@@ -115,6 +116,13 @@ export async function debugCommand(checkName: string, options: DebugOptions) {
     // Show relations if requested
     if (options.showRelations && checkName.toLowerCase().includes('relation')) {
       showRelationsGraph(spec, options);
+    }
+
+    // Show artifacts if any were generated during debug
+    try {
+      printArtifacts('artifacts');
+    } catch {
+      // Ignore if no artifacts directory
     }
 
   } catch (error) {

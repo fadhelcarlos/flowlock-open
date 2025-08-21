@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Runner } from "flowlock-runner";
+import { printArtifacts } from "../lib/printArtifacts";
 
 /* ========================= Types (local) ========================= */
 type CheckResult = {
@@ -63,22 +64,7 @@ function loadJson<T = any>(p: string): T {
 function saveJson(p: string, obj: any) {
   fs.writeFileSync(p, JSON.stringify(obj, null, 2) + "\n", "utf8");
 }
-function listArtifacts(outDir: string) {
-  try {
-    const files = fs.readdirSync(outDir, { withFileTypes: true })
-      .filter(d => d.isFile())
-      .map(d => path.join(outDir, d.name))
-      .sort();
-    if (files.length) {
-      console.log("\n Artifacts generated:");
-      for (const f of files) console.log("  • " + f.replace(/\\/g, "/"));
-    } else {
-      console.log("\n Artifacts generated:\n  (none)");
-    }
-  } catch {
-    console.log("\n Artifacts generated:\n  (none)");
-  }
-}
+// Remove local listArtifacts function - we'll use the shared printArtifacts instead
 function ensureCoreUiStates(states?: string[]): string[] {
   const req = ["empty", "loading", "error"];
   const set = new Set([...(states || [])]);
@@ -467,7 +453,7 @@ export async function auditCommand(opts?: AuditOptions) {
     console.log(JSON.stringify(output, null, 2));
   } else if (!opts?.quiet) {
     printSummary(filteredResults, specPath, level);
-    listArtifacts(outDir);
+    printArtifacts(outDir);
   }
 
   process.exitCode = hasErrors(filteredResults) ? 1 : 0;

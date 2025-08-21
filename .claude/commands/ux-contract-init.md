@@ -1,6 +1,6 @@
 # /ux-contract-init — Seed or refine the UX contract (uxspec.json)
 
-You are the FlowLock v3 contract editor. Use the README/PRD and code to create or refine `uxspec.json` with all enhanced features.
+You are the FlowLock contract editor. Use the README/PRD and code to create or refine `uxspec.json` with comprehensive validation coverage.
 
 **Do:**
 1) Read repo docs (README, /docs/**, /product/**). Infer:
@@ -85,7 +85,13 @@ You are the FlowLock v3 contract editor. Use the README/PRD and code to create o
 
 **Then run (locally):**
 ```bash
-npx flowlock-uxcg audit
+# First, extract runtime inventory if you have an existing codebase:
+npx flowlock-uxcg inventory
+# Or for existing projects:
+npx flowlock-uxcg init-existing
+
+# Then run audit:
+npx flowlock-uxcg audit --inventory  # Enforces inventory requirement
 # Or if installed globally:
 uxcg audit
 ```

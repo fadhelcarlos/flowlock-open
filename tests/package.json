@@ -1,0 +1,19 @@
+{
+  "name": "flowlock-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for FlowLock",
+  "main": "e2e.test.js",
+  "scripts": {
+    "test": "jest e2e.test.js --verbose --detectOpenHandles",
+    "test:ci": "jest e2e.test.js --verbose --ci --detectOpenHandles --forceExit"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 300000,
+    "verbose": true,
+    "collectCoverage": false
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}

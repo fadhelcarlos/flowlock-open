@@ -1,8 +1,10 @@
 import prompts from "prompts";
 import * as path from "path";
 import * as fs from "fs";
+import chalk from "chalk";
 import { scaffoldProject, type InitChoices } from "../templates/projects";
 import { writeClaudeCommands } from "../templates/claude";
+import { printArtifacts } from "../lib/printArtifacts";
 
 type PromptAnswers = {
   mode?: "current" | "scaffold";
@@ -21,7 +23,7 @@ function repoIsProbablyEmpty(cwd: string) {
 }
 
 export const initCommand = async () => {
-  console.log("🚀 FlowLock Init");
+  console.log(chalk.cyan("🚀 FlowLock Init"));
 
   // Offer mode based on folder emptiness
   const defaultMode: "current" | "scaffold" = repoIsProbablyEmpty(process.cwd()) ? "scaffold" : "current";
@@ -112,10 +114,22 @@ export const initCommand = async () => {
     writeClaudeCommands(process.cwd());
   } catch {}
 
-  console.log("\nNext steps:");
+  console.log(chalk.green("\n✅ FlowLock initialization complete!"));
+  console.log(chalk.blue("\n🚀 Next steps:"));
   if (choices.mode === "scaffold") {
     const dir = path.join(process.cwd(), choices.appName || (choices.template === "next-tailwind" ? "flowlock-next" : "flowlock-app"));
-    console.log(`  cd ${path.relative(process.cwd(), dir)}`);
+    console.log(chalk.yellow("  1.") + ` cd ${chalk.cyan(path.relative(process.cwd(), dir))}`);
+    console.log(chalk.yellow("  2.") + ` ${chalk.cyan("npx -y flowlock-uxcg audit")}`);
+  } else {
+    console.log(chalk.yellow("  1.") + ` ${chalk.cyan("npx -y flowlock-uxcg audit")}`);
   }
-  console.log("  npx -y flowlock-uxcg audit");
+  
+  // Show any artifacts that might already exist
+  try {
+    if (fs.existsSync("artifacts")) {
+      printArtifacts("artifacts");
+    }
+  } catch {
+    // Ignore if artifacts directory doesn't exist
+  }
 };

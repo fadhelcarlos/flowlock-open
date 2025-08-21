@@ -8,5 +8,12 @@ export default defineConfig({
   sourcemap: true,
   minify: false,
   banner: { js: "#!/usr/bin/env node" },
-  external: ["../../dist/index.js"]
+  external: [
+    "flowlock-shared",
+    "flowlock-uxspec", 
+    "flowlock-plugin-sdk",
+    "flowlock-checks-core",
+    "flowlock-inventory",
+    "flowlock-runner"
+  ]
 });

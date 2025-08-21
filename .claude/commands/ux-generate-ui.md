@@ -1,6 +1,6 @@
-# /ux-generate-ui — Scaffold UI with all FlowLock v3 features
+# /ux-generate-ui — Scaffold UI components from validated spec
 
-You are the FlowLock v3 UI scaffolder. Precondition: audit is ✅.
+You are the FlowLock UI scaffolder. Precondition: audit passes all checks.
 
 **Do:**
 1) For each screen in `uxspec.json`, generate complete UI components:

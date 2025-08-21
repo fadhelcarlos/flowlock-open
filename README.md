@@ -9,6 +9,35 @@
 
 FlowLock ensures AI coding assistants follow your exact UX requirements through deterministic validation and runtime inventory extraction.
 
+## 🧠 Mental Model: The FlowLock Pipeline
+
+FlowLock follows a simple 4-stage pipeline that ensures UX contracts are honored:
+
+```
+📋 Inventory → 📝 UXSpec → ✅ Checks → 📊 Artifacts
+```
+
+### 1. 📋 **Inventory** - What you have
+- **Runtime extraction** of your actual database schema, API endpoints, and UI components
+- **Automated discovery** of existing fields, relationships, and screens
+- **Foundation truth** that prevents AI from assuming non-existent data
+
+### 2. 📝 **UXSpec** - What you want
+- **Declarative contract** defining entities, screens, flows, and user journeys
+- **Jobs-to-be-done** mapping that connects user goals to implementation
+- **State machines** for complex business logic and entity lifecycle management
+
+### 3. ✅ **Checks** - What's validated
+- **15 validation checks** that catch AI hallucinations and spec violations
+- **Deterministic auditing** with SHA-256 hashing for reproducible results
+- **Auto-healing** with `--fix` flag to resolve common issues
+
+### 4. 📊 **Artifacts** - What you get
+- **Visual diagrams** (ER diagrams, flow charts) for documentation
+- **Test scenarios** (JUnit XML, Gherkin) for CI/CD integration
+- **Gap reports** identifying missing implementations
+- **CSV exports** for data analysis and planning
+
 ## 🚀 Quick Start
 
 ```bash
@@ -29,6 +58,164 @@ npx flowlock-uxcg@latest audit --inventory
 # Debug check failures
 npx flowlock-uxcg@latest debug <check> --verbose
 ```
+
+## 🎯 Three Most Common Workflows
+
+### 1. 🏗️ **Scaffold New App** - Start from scratch
+Perfect for new projects where you want FlowLock to guide your architecture:
+
+```bash
+# Create new project directory
+mkdir my-app && cd my-app
+
+# Initialize FlowLock with starter template
+npx flowlock-uxcg@latest init
+
+# Choose template (e-commerce, SaaS, blog, etc.)
+# This creates: uxspec.json, flowlock.config.json, package.json
+
+# Generate code scaffolding
+npx flowlock-uxcg@latest generate
+
+# Validate everything looks good
+npx flowlock-uxcg@latest audit --fix
+
+# Start building with AI assistance
+npx flowlock-uxcg@latest watch
+```
+
+**What you get:**
+- Complete UXSpec with entities, screens, and flows
+- Generated TypeScript types and API routes
+- Starter UI components and forms
+- Pre-configured validation and CI/CD
+
+### 2. 🔗 **Integrate into Existing Next.js App** - Add FlowLock to your project
+For existing applications that need better UX governance:
+
+```bash
+# In your existing Next.js project
+cd my-existing-app
+
+# Initialize FlowLock for existing codebase
+npx flowlock-uxcg@latest init-existing
+
+# Extract current state from your codebase
+npx flowlock-uxcg@latest inventory
+
+# This scans and creates runtime_inventory.json with:
+# - Database schema (from Prisma, TypeORM, etc.)
+# - API routes (from pages/api/ or app/api/)
+# - React components (from components/, pages/, app/)
+
+# Validate against your runtime inventory
+npx flowlock-uxcg@latest audit --inventory
+
+# Fix any detected issues
+npx flowlock-uxcg@latest audit --fix
+
+# Export visual documentation
+npx flowlock-uxcg@latest export svg
+```
+
+**What you get:**
+- Runtime inventory of your existing codebase
+- UXSpec that matches your current implementation
+- Validation that catches drift between spec and code
+- Visual diagrams of your actual architecture
+
+### 3. 🤖 **Headless Audit on CI** - Continuous validation
+For CI/CD pipelines that need to verify UX contract compliance:
+
+```bash
+# In your CI pipeline (GitHub Actions, GitLab CI, etc.)
+
+# Install FlowLock
+npm install -g flowlock-uxcg@latest
+
+# Run full audit suite
+uxcg audit --headless --junit
+
+# Generate artifacts for review
+uxcg export svg
+uxcg export csv
+
+# Upload results for review
+# artifacts/ directory contains:
+# - results.junit.xml (for test reporting)
+# - er.svg, flow.svg (for documentation)
+# - gap_report.md (for code review)
+# - determinism.sha256 (for reproducibility)
+```
+
+**CI Integration Example:**
+```yaml
+# .github/workflows/flowlock.yml
+name: FlowLock Audit
+on: [push, pull_request]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Run FlowLock Audit
+      run: |
+        npx flowlock-uxcg@latest audit --headless --junit
+        npx flowlock-uxcg@latest export svg
+    
+    - name: Upload Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: flowlock-artifacts
+        path: artifacts/
+    
+    - name: Publish Test Results
+      uses: dorny/test-reporter@v1
+      with:
+        name: FlowLock Tests
+        path: artifacts/results.junit.xml
+        reporter: java-junit
+```
+
+## 🐛 Debug Flow
+
+When validation fails, follow this systematic debugging approach:
+
+```bash
+# 1. Run specific failing check with verbose output
+npx flowlock-uxcg@latest debug <check-name> --verbose
+
+# 2. Common checks to debug:
+npx flowlock-uxcg@latest debug HONEST --verbose     # Field existence issues
+npx flowlock-uxcg@latest debug CREATABLE --verbose  # Create form problems
+npx flowlock-uxcg@latest debug JTBD --verbose       # Missing user journeys
+npx flowlock-uxcg@latest debug RELATIONS --verbose  # Entity relationship errors
+
+# 3. View full audit report
+npx flowlock-uxcg@latest audit --verbose
+
+# 4. Check runtime inventory vs spec
+npx flowlock-uxcg@latest inventory --validate
+
+# 5. Auto-fix common issues
+npx flowlock-uxcg@latest audit --fix
+
+# 6. Generate gap report for missing implementations
+npx flowlock-uxcg@latest export gap-report
+```
+
+**Debug Tips:**
+- Always start with `--verbose` to see detailed error messages
+- Check `runtime_inventory.json` to verify what FlowLock detected
+- Review `artifacts/gap_report.md` for actionable next steps
+- Use `uxcg export svg` to visualize entity relationships
+- Run `uxcg audit --fix` before manual debugging
 
 ## 🔒 Security & Trust
 

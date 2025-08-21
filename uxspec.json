@@ -639,6 +639,7 @@
       "forms": [
         {
           "id": "create_user_form",
+          "entityId": "user",
           "entity": "user",
           "type": "create",
           "fields": [
@@ -697,6 +698,7 @@
       "forms": [
         {
           "id": "edit_user_form",
+          "entityId": "user",
           "entity": "user",
           "type": "update",
           "fields": [
@@ -901,6 +903,7 @@
       "forms": [
         {
           "id": "checkout_form",
+          "entityId": "order",
           "entity": "order",
           "type": "create",
           "fields": [],

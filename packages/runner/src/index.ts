@@ -158,3 +158,4 @@ export * from "./generators/csv";
 export * from "./utils/format";
 export * from "./generators/junit";
 export { DebugAnalyzer } from "./utils/debug";
+export { renderMermaidCLI } from "./utils/render";

@@ -1,7 +1,9 @@
 // packages/cli/src/commands/init-existing.ts
 import * as fs from "node:fs";
 import * as path from "node:path";
+import chalk from "chalk";
 import { copyFlowLockResources } from "../utils/copy-resources";
+import { printArtifacts } from "../lib/printArtifacts";
 
 const CONFIG = "flowlock.config.json";
 const CLAUDE_DIR = ".claude/commands";
@@ -75,16 +77,27 @@ export const initExistingCommand = async () => {
     console.log("• No package.json found, skipping script setup");
   }
 
-  console.log("\n✓ FlowLock initialization complete!");
-  console.log("\nResources added:");
-  console.log("  - .flowlock/examples (sample implementations)");
-  console.log("  - .flowlock/docs (documentation)");
-  console.log("  - .flowlock/README.md (getting started guide)");
-  console.log("\nNext steps:");
-  console.log("  1. Edit flowlock.config.json to match your project structure");
-  console.log("  2. Run 'npx flowlock-uxcg inventory' to extract runtime inventory");
-  console.log("  3. Create a uxspec.json with your UX specification");
-  console.log("  4. Run 'npx flowlock-uxcg audit' to validate your spec");
+  console.log(chalk.green("\n✅ FlowLock initialization complete!"));
+  console.log(chalk.blue("\n📦 Resources added:"));
+  console.log(chalk.gray("  • .flowlock/examples (sample implementations)"));
+  console.log(chalk.gray("  • .flowlock/docs (documentation)"));
+  console.log(chalk.gray("  • .flowlock/README.md (getting started guide)"));
+  console.log(chalk.gray("  • .claude/commands (helper files for Claude/Cursor)"));
+  
+  console.log(chalk.blue("\n🚀 Next steps:"));
+  console.log(chalk.yellow("  1.") + " Edit flowlock.config.json to match your project structure");
+  console.log(chalk.yellow("  2.") + " Run " + chalk.cyan("'npx flowlock-uxcg inventory'") + " to extract runtime inventory");
+  console.log(chalk.yellow("  3.") + " Create a uxspec.json with your UX specification");
+  console.log(chalk.yellow("  4.") + " Run " + chalk.cyan("'npx flowlock-uxcg audit'") + " to validate your spec");
+  
+  // Show any artifacts that might already exist
+  try {
+    if (fs.existsSync("artifacts")) {
+      printArtifacts("artifacts");
+    }
+  } catch {
+    // Ignore if artifacts directory doesn't exist
+  }
   } catch (error) {
     console.error("Error during initialization:", error instanceof Error ? error.message : error);
     process.exit(1);
