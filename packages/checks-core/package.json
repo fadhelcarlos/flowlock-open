@@ -1,6 +1,6 @@
 {
   "name": "flowlock-checks-core",
-  "version": "0.7.0",
+  "version": "0.10.0",
   "description": "Core checks library for FlowLock",
   "publishConfig": {
     "access": "public"
@@ -29,9 +29,9 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "flowlock-shared": "^0.3.3",
-    "flowlock-uxspec": "^0.6.1",
-    "flowlock-plugin-sdk": "^0.6.1"
+    "flowlock-shared": "workspace:*",
+    "flowlock-uxspec": "workspace:*",
+    "flowlock-plugin-sdk": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

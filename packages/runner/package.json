@@ -1,6 +1,6 @@
 {
   "name": "flowlock-runner",
-  "version": "0.7.0",
+  "version": "0.10.0",
   "description": "Test runner for FlowLock checks",
   "publishConfig": {
     "access": "public"
@@ -30,10 +30,10 @@
   },
   "dependencies": {
     "chalk": "^4.1.2",
-    "flowlock-checks-core": "^0.6.3",
-    "flowlock-plugin-sdk": "^0.6.1",
-    "flowlock-shared": "^0.3.3",
-    "flowlock-uxspec": "^0.6.1",
+    "flowlock-checks-core": "workspace:*",
+    "flowlock-plugin-sdk": "workspace:*",
+    "flowlock-shared": "workspace:*",
+    "flowlock-uxspec": "workspace:*",
     "mermaid": "^10.6.1",
     "@mermaid-js/mermaid-cli": "10.9.1"
   },

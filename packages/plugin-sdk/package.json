@@ -1,6 +1,6 @@
 {
   "name": "flowlock-plugin-sdk",
-  "version": "0.7.0",
+  "version": "0.10.0",
   "description": "Plugin SDK for FlowLock",
   "publishConfig": {
     "access": "public"
@@ -29,7 +29,7 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "flowlock-uxspec": "^0.6.1"
+    "flowlock-uxspec": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
