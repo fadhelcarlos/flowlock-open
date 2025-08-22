@@ -243,11 +243,11 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1
       flowlock-shared:
-        specifier: workspace:*
-        version: link:../shared
+        specifier: ^0.10.0
+        version: 0.10.0
       flowlock-uxcg:
-        specifier: workspace:*
-        version: link:../cli
+        specifier: ^0.10.0
+        version: 0.10.0
       fuse.js:
         specifier: ^7.0.0
         version: 7.1.0
@@ -264,8 +264,8 @@ importers:
         specifier: ^12.0.2
         version: 12.0.2
       marked-terminal:
-        specifier: ^6.2.0
-        version: 6.3.0(marked@12.0.2)
+        specifier: ^7.3.0
+        version: 7.3.0(marked@12.0.2)
       open:
         specifier: ^8.4.2
         version: 8.4.2
@@ -285,11 +285,17 @@ importers:
         specifier: ^4.5.5
         version: 4.5.7(@types/react@18.3.23)(react@18.3.1)
     devDependencies:
+      '@types/ink-select-input':
+        specifier: ^3.0.5
+        version: 3.0.5
+      '@types/ink-text-input':
+        specifier: ^2.0.5
+        version: 2.0.5
       '@types/node':
-        specifier: ^22.5.0
+        specifier: ^22.17.2
         version: 22.17.2
       '@types/react':
-        specifier: ^18.3.3
+        specifier: ^18.3.23
         version: 18.3.23
       eslint:
         specifier: ^9.9.0
@@ -1354,6 +1360,15 @@ packages:
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
+  '@types/ink-select-input@3.0.5':
+    resolution: {integrity: sha512-IdXW9wpgY0Dn3HLCKK5ETj7yTyZg/fDOPf9m1aGBghiRotaJbOTEAEKqLdHDqVsm8gWYDec2JiXU7g9lnu4e2w==}
+
+  '@types/ink-text-input@2.0.5':
+    resolution: {integrity: sha512-dp6qIrf/VKQyiJfLSOTk7XhbAG3SkGLMrL/5QwaOpYae20+/+VFLuEgpfjpAWOITVL7uyiE9nKdQ4pk03T2F+Q==}
+
+  '@types/ink@0.5.2':
+    resolution: {integrity: sha512-yEuhWTRMXJkIWiaM58c5kuRot5HFccv9kjjgy0fBZG0+tYb+sMBaxHNPVqyZXspGGlmwDOQ1d3BsygWpWlW17w==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -1609,10 +1624,6 @@ packages:
   ansi-colors@4.1.3:
     resolution: {integrity: sha512-/6w/C21Pm1A7aZitlI5Ni/2J6FFQN8i1Cvz3kHABAAbw93v/NlvKdVOqz7CCWz/3iv/JplRSEEZ83XION15ovw==}
     engines: {node: '>=6'}
-
-  ansi-escapes@6.2.1:
-    resolution: {integrity: sha512-4nJ3yixlEthEJ9Rk4vPcdBRkZvQZlYyu8j4/Mqz5sgIkddmEnH2Yj2ZrnP9S3tQOvSNRUIgVNF/1yPpRAGNRig==}
-    engines: {node: '>=14.16'}
 
   ansi-escapes@7.0.0:
     resolution: {integrity: sha512-GdYO7a61mR0fOlAsvC9/rIHf7L96sBc6dEWzeOu+KAea5bZyQRPIpojrVoI4AXGJS/ycu/fBTdLrUkA4ODrvjw==}
@@ -2621,17 +2632,39 @@ packages:
   flowlock-checks-core@0.5.3:
     resolution: {integrity: sha512-g3vd5qFS0KE0kC/JvlYuyo/vS3pMSxA1TnVqf66mBkZNx4ib8lnLQw1SV2FX+ZdO31sjbGeMmD1uL24W7Wq1+Q==}
 
+  flowlock-checks-core@0.6.3:
+    resolution: {integrity: sha512-VO6vPD2AYy9eXTfNcR24jOgX7/z13w5MDtjAUN5WORXe0BpTCIF1aGD0/2A2YKmuQfZWOvTM6uXULwPamm5AGA==}
+
   flowlock-inventory@0.2.1:
     resolution: {integrity: sha512-7rd0hM4nkDbUzYG7nblSDCuSJAgV0qMrnO1s5lSQTro2AwmZXW/zLnoHlh7EAWMzcbfMOSiY/A9tsUCIQsFW+A==}
+
+  flowlock-inventory@0.3.3:
+    resolution: {integrity: sha512-Pq4ZjHM166sbpit2cRiVIM/GDqkoO6+0wZ6uBBX+uBPPeMmNKofL712zjzpJVO5d10AqRL7wDSNwLdLMQraVWA==}
 
   flowlock-plugin-sdk@0.5.2:
     resolution: {integrity: sha512-dYCG7D0U5Ean28abufnOKvS6jAz6zvTty3tlymykRMMx0mMqkm557yrVjdOAHoxRTrHCMTlVzh3oMTFnFAOJpA==}
 
+  flowlock-plugin-sdk@0.6.1:
+    resolution: {integrity: sha512-zEZtQL3Xn3UX4qj/8Ud6kKSVuFZeVmyfZG5HhPjF+gtwf5GsEVePpSF10qgkRQ/PE/tX1uo/T1/cZ8+9fv3JeQ==}
+
   flowlock-runner@0.5.3:
     resolution: {integrity: sha512-Kq9avr2JaGLcCxEYc7C5FmqyG+7IEG/CaLiPuJMqk0HRVJAWSIemyojTr0UuRevuZkpJJIPUHHJyqiwbfEblqw==}
 
+  flowlock-runner@0.6.2:
+    resolution: {integrity: sha512-96h1pwOzuyYpPRmycK15oahNPHDG/udLDWHICJdhpj1dfkKliKCwN/dY3ahKgpZ/lxDdwqNUKzZ46P5GGTGfcA==}
+
+  flowlock-shared@0.10.0:
+    resolution: {integrity: sha512-SfJjQm9e8o2EYhFKbq7EbXFrLNFDyNaggYmY3Yw/ivCOu+yqDo80kBcGgKKcH0O7A9k4vQAqHpESuTyC/nwnxQ==}
+
   flowlock-shared@0.2.0:
     resolution: {integrity: sha512-4Fow/F3gVumq4I7rDn9p/D9w1xdW1n5vl9J8JzXfvMuT69gv7BDwlccjisw0GxZaABGa6RnWSsjO4fg/ewY0WQ==}
+
+  flowlock-shared@0.3.3:
+    resolution: {integrity: sha512-rAX0lRkUqO+hLAkKtXmTEW2Heg6v6M9ylK0ME9+LMYoJZDsepJALz8VR2EbWwuEb51BjZC58WC1Tm7gEHzQbjQ==}
+
+  flowlock-uxcg@0.10.0:
+    resolution: {integrity: sha512-DPRgK2E+9pYkV62cUQzLV8v450bR9NZWq3NLWx0Ob5uFxyR+wiFdBpOX7XjHM0tHB5Qy1Y/w01DP/g8jM7FSQQ==}
+    hasBin: true
 
   flowlock-uxcg@0.8.0:
     resolution: {integrity: sha512-a3j0fdoF2R08YnCCTjd0EgbDJc043DTq52ZDk9AJOuTOPup2BDKlngqG97aUKW47/yqSUI4LGWL7zP4TDVLnJg==}
@@ -2639,6 +2672,9 @@ packages:
 
   flowlock-uxspec@0.5.1:
     resolution: {integrity: sha512-E+EmU7dytPJWj0vxmgDLf722EvnwrEFHT6GmLqcgFJNOC5IyjQQOTUep7Se5riylKQ2OrlhF5mI+wQfY2lsaSQ==}
+
+  flowlock-uxspec@0.6.1:
+    resolution: {integrity: sha512-jmNuG7WCyIeZqZmbxLFNW/MIgpvc79oJ4Sw8Gkoh7Qb0CiPJn/tnm7r/mCaYbkfxJSRDEyDUhwZ44U2IDd/8pg==}
 
   for-each@0.3.5:
     resolution: {integrity: sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==}
@@ -3247,12 +3283,11 @@ packages:
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
 
-  marked-terminal@6.3.0:
-    resolution: {integrity: sha512-icQT4cpNHOC3uxYr0DjZx8yYbFVnb40dzbvbqe9G2CRpFPnCe/RjfPXzP3xKm2vrd8sw4Sqsc3O+IsoPMzE/Iw==}
+  marked-terminal@7.3.0:
+    resolution: {integrity: sha512-t4rBvPsHc57uE/2nJOLmMbZCQ4tgAccAED3ngXQqW6g+TxA488JzJ+FK3lQkzBQOI1mRV/r/Kq+1ZlJ4D0owQw==}
     engines: {node: '>=16.0.0'}
-    deprecated: should have been major release. Use 7.0.0
     peerDependencies:
-      marked: '>=1 <13'
+      marked: '>=1 <16'
 
   marked@12.0.2:
     resolution: {integrity: sha512-qXUm7e/YKFoqFPYPa3Ukg9xlI5cyAtGmyEIzMfW//m6kXwCy2Ps9DYf5ioijFKQ8qyuscrHoY04iJGctu2Kg0Q==}
@@ -5548,6 +5583,19 @@ snapshots:
 
   '@types/estree@1.0.8': {}
 
+  '@types/ink-select-input@3.0.5':
+    dependencies:
+      '@types/react': 18.3.23
+
+  '@types/ink-text-input@2.0.5':
+    dependencies:
+      '@types/ink': 0.5.2
+
+  '@types/ink@0.5.2':
+    dependencies:
+      '@types/node': 22.17.2
+      '@types/prop-types': 15.7.15
+
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
@@ -5806,8 +5854,6 @@ snapshots:
       require-from-string: 2.0.2
 
   ansi-colors@4.1.3: {}
-
-  ansi-escapes@6.2.1: {}
 
   ansi-escapes@7.0.0:
     dependencies:
@@ -6692,7 +6738,7 @@ snapshots:
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@8.57.1))(eslint@8.57.1)
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-hooks: 5.0.0-canary-7118f5dd7-20230705(eslint@8.57.1)
@@ -6722,7 +6768,7 @@ snapshots:
       tinyglobby: 0.2.14
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -6737,7 +6783,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -7069,6 +7115,12 @@ snapshots:
       flowlock-shared: 0.2.0
       flowlock-uxspec: 0.5.1
 
+  flowlock-checks-core@0.6.3:
+    dependencies:
+      flowlock-plugin-sdk: 0.6.1
+      flowlock-shared: 0.3.3
+      flowlock-uxspec: 0.6.1
+
   flowlock-inventory@0.2.1:
     dependencies:
       '@apidevtools/swagger-parser': 12.0.0(openapi-types@12.1.3)
@@ -7084,9 +7136,28 @@ snapshots:
     transitivePeerDependencies:
       - pg-native
 
+  flowlock-inventory@0.3.3:
+    dependencies:
+      '@apidevtools/swagger-parser': 12.0.0(openapi-types@12.1.3)
+      better-sqlite3: 12.2.0
+      fast-glob: 3.3.3
+      flowlock-shared: 0.3.3
+      globby: 14.1.0
+      mysql2: 3.14.3
+      openapi-types: 12.1.3
+      pg: 8.16.3
+      ts-morph: 26.0.0
+      yaml: 2.8.1
+    transitivePeerDependencies:
+      - pg-native
+
   flowlock-plugin-sdk@0.5.2:
     dependencies:
       flowlock-uxspec: 0.5.1
+
+  flowlock-plugin-sdk@0.6.1:
+    dependencies:
+      flowlock-uxspec: 0.6.1
 
   flowlock-runner@0.5.3:
     dependencies:
@@ -7097,7 +7168,43 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  flowlock-runner@0.6.2:
+    dependencies:
+      chalk: 4.1.2
+      flowlock-checks-core: 0.6.3
+      flowlock-plugin-sdk: 0.6.1
+      flowlock-shared: 0.3.3
+      flowlock-uxspec: 0.6.1
+      mermaid: 10.9.4
+    transitivePeerDependencies:
+      - supports-color
+
+  flowlock-shared@0.10.0: {}
+
   flowlock-shared@0.2.0: {}
+
+  flowlock-shared@0.3.3: {}
+
+  flowlock-uxcg@0.10.0:
+    dependencies:
+      chalk: 4.1.2
+      chokidar: 4.0.3
+      commander: 11.1.0
+      flowlock-checks-core: 0.6.3
+      flowlock-inventory: 0.3.3
+      flowlock-runner: 0.6.2
+      flowlock-shared: 0.3.3
+      flowlock-uxspec: 0.6.1
+      node-fetch: 3.3.2
+      prompts: 2.4.2
+      ws: 8.18.3
+    optionalDependencies:
+      eventsource: 2.0.2
+    transitivePeerDependencies:
+      - bufferutil
+      - pg-native
+      - supports-color
+      - utf-8-validate
 
   flowlock-uxcg@0.8.0:
     dependencies:
@@ -7121,6 +7228,10 @@ snapshots:
       - utf-8-validate
 
   flowlock-uxspec@0.5.1:
+    dependencies:
+      zod: 3.25.76
+
+  flowlock-uxspec@0.6.1:
     dependencies:
       zod: 3.25.76
 
@@ -7722,9 +7833,10 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  marked-terminal@6.3.0(marked@12.0.2):
+  marked-terminal@7.3.0(marked@12.0.2):
     dependencies:
-      ansi-escapes: 6.2.1
+      ansi-escapes: 7.0.0
+      ansi-regex: 6.2.0
       chalk: 5.6.0
       cli-highlight: 2.1.11
       cli-table3: 0.6.5
