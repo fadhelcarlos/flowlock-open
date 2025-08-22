@@ -41,15 +41,10 @@ export function Palette() {
   
   return (
     <Box 
-      position="absolute" 
-      top={2} 
-      left={2} 
-      right={2} 
       flexDirection="column" 
       borderStyle="round" 
       borderColor="cyan" 
       padding={1}
-      backgroundColor="black"
     >
       <Text color="cyan" bold>Command Palette</Text>
       <TextInput value={q} onChange={setQ} placeholder="Type a command…" />

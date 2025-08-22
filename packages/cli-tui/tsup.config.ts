@@ -1,18 +1,34 @@
 import { defineConfig } from 'tsup';
 
-export default defineConfig({
-  entry: {
-    'index': 'src/index.tsx',
-    'bin/flowlock': 'src/bin/flowlock.ts'
+export default defineConfig([
+  // Main library build without shebang
+  {
+    entry: {
+      'index': 'src/index.tsx'
+    },
+    splitting: false,
+    clean: true,
+    sourcemap: true,
+    dts: false,
+    format: ['esm'],
+    outDir: 'dist',
+    external: ['react']
   },
-  splitting: false,
-  clean: true,
-  sourcemap: true,
-  dts: false, // Disable for now due to ink type issues
-  format: ['esm'],
-  banner: { 
-    js: '#!/usr/bin/env node'
-  },
-  outDir: 'dist',
-  external: ['react']
-});
+  // Binary builds with shebang
+  {
+    entry: {
+      'bin/flowlock': 'src/bin/flowlock.ts',
+      'bin/flowlock-test': 'src/bin/flowlock-test.ts'
+    },
+    splitting: false,
+    clean: false,
+    sourcemap: true,
+    dts: false,
+    format: ['esm'],
+    banner: { 
+      js: '#!/usr/bin/env node'
+    },
+    outDir: 'dist',
+    external: ['react']
+  }
+]);

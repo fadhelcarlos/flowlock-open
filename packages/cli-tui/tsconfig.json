@@ -1,5 +1,4 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "outDir": "./dist",
@@ -7,9 +6,18 @@
     "baseUrl": "./src",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "ES2022",
     "target": "ES2022",
-    "moduleResolution": "node"
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": false,
+    "declaration": false,
+    "allowImportingTsExtensions": false,
+    "lib": ["ES2022"],
+    "types": ["node", "react"]
   },
-  "include": ["src"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

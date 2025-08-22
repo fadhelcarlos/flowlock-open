@@ -5,8 +5,8 @@ import { useStore } from '../util/store.js';
 export function Shortcuts() {
   const cancel = useStore(s => s.cancelCurrent);
   
-  useInput((_input, key) => {
-    if (key.ctrl && key.shift && key.input === 'C') {
+  useInput((input, key) => {
+    if (key.ctrl && input === 'c') {
       void cancel();
     }
   });
