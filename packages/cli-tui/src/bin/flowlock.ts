@@ -12,8 +12,8 @@ if (wantsUI) {
     });
   });
 } else {
-  // Back-compat: forward args to headless CLI (uxcg)
-  const child = spawn('uxcg', process.argv.slice(2), { 
+  // Back-compat: forward args to headless CLI (npx flowlock-uxcg)
+  const child = spawn('npx', ['flowlock-uxcg', ...process.argv.slice(2)], { 
     stdio: 'inherit', 
     shell: true 
   });

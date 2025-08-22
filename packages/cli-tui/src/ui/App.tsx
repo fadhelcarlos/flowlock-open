@@ -39,7 +39,7 @@ export function App() {
       <Shortcuts />
       <Palette />
       <Box flexGrow={1} flexDirection="row">
-        <Box width={26} flexShrink={0} borderStyle="round" borderColor="gray">
+        <Box flexBasis="25%" flexShrink={0} flexGrow={0} borderStyle="round" borderColor="gray">
           <Sidebar view={view} onChange={setView} />
         </Box>
         <Box flexGrow={1} marginLeft={1} minWidth={0}>

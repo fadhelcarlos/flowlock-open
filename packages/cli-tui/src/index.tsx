@@ -8,5 +8,5 @@ export function startTUI() {
     instance.unmount();
     process.exit(0);
   });
-  return Promise.resolve();
+  return instance.waitUntilExit();
 }

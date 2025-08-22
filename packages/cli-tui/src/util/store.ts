@@ -15,18 +15,22 @@ interface Current {
   summary?: string; 
 }
 
+export type FocusPanel = 'sidebar' | 'main' | 'input';
+
 interface StoreState {
   paletteOpen: boolean;
   current: Current;
   history: Job[];
   filter: string;
   settings?: Settings;
+  focusedPanel: FocusPanel;
   setSettings: (s: Settings) => void;
   setPaletteOpen: (v: boolean) => void;
   pushLog: (line: string) => void;
   addArtifacts: (paths: string[]) => void;
   setFilter: (q: string) => void;
   cycleFocus: () => void;
+  setFocus: (panel: FocusPanel) => void;
   cancelCurrent: () => Promise<void>;
 }
 
@@ -35,6 +39,7 @@ export const useStore = create<StoreState>((set, get) => ({
   current: { logs: [], artifacts: [] },
   history: [],
   filter: '',
+  focusedPanel: 'input',
   setSettings: (s) => set({ settings: s }),
   setPaletteOpen: (v) => set({ paletteOpen: v }),
   pushLog: (line) => set(s => ({ 
@@ -50,7 +55,13 @@ export const useStore = create<StoreState>((set, get) => ({
     }
   })),
   setFilter: (q) => set({ filter: q }),
-  cycleFocus: () => {},
+  cycleFocus: () => set(s => {
+    const panels: FocusPanel[] = ['sidebar', 'main', 'input'];
+    const currentIndex = panels.indexOf(s.focusedPanel);
+    const nextIndex = (currentIndex + 1) % panels.length;
+    return { focusedPanel: panels[nextIndex] };
+  }),
+  setFocus: (panel) => set({ focusedPanel: panel }),
   cancelCurrent: async () => { 
     /* hook up to AbortController in runCommandById if desired */ 
   }
