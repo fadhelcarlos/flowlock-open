@@ -2,6 +2,7 @@
   "name": "flowlock-shared",
   "version": "0.10.0",
   "description": "Shared utilities and types for FlowLock system",
+  "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
