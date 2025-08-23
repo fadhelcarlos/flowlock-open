@@ -555,16 +555,18 @@ flowlock-open/
 
 ## 🛠️ Development
 
+Ensure you have **Node.js >= 18** and **pnpm >= 8** installed.
+
 ```bash
 # Clone repository
 git clone https://github.com/yourusername/flowlock-open.git
 cd flowlock-open
 
 # Install dependencies
-pnpm install
+pnpm -w install
 
 # Build all packages
-pnpm build
+pnpm -w build
 
 # Run tests
 pnpm test

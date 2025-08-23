@@ -1,9 +1,12 @@
 {
   "name": "flowlock-mcp",
   "version": "0.10.0",
+  "type": "commonjs",
+  "main": "dist/server.js",
   "bin": {
     "flowlock-mcp": "dist/server.js"
   },
+  "exports": "./dist/server.js",
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/server.ts",

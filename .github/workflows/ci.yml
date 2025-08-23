@@ -15,6 +15,25 @@ env:
   PNPM_VERSION: '8'
 
 jobs:
+  workspace:
+    name: Workspace Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+      - run: pnpm -v && node -v
+      - run: pnpm -w install
+      - run: pnpm run check:engines
+      - run: pnpm -w build
   # Job 1: Build and test all packages
   test:
     name: Build and Test
