@@ -16,6 +16,7 @@ export interface FlowlockConfig {
       scan?: string[];
       jsdoc?: boolean;
       openapiPrefer?: boolean;
+      specUrl?: string;
     };
     ui?: {
       scan?: string[];

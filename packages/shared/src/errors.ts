@@ -6,6 +6,8 @@ export interface ErrorDetails {
   expected?: any;
   actual?: any;
   location?: string;
+  field?: string;
+  reason?: string;
   suggestion?: string;
   documentation?: string;
   context?: Record<string, any>;

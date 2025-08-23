@@ -4,7 +4,7 @@
 
 import { FlowlockConfig } from './types';
 import { ConfigurationError } from './errors';
-import { validateRequiredField, validateArrayField, validateEnum } from './validation';
+import { validateRequiredField, validateArrayField, validateEnum, validatePath, validateUrl } from './validation';
 
 const VALID_DB_MODES = ['auto', 'schema', 'live'] as const;
 const VALID_DB_DIALECTS = ['postgres', 'mysql', 'sqlite'] as const;
@@ -42,6 +42,9 @@ export function validateFlowlockConfig(config: any): FlowlockConfig {
       }
       if (inv.db.schemaFiles) {
         validateArrayField(inv.db.schemaFiles, 'inventory.db.schemaFiles');
+        inv.db.schemaFiles = inv.db.schemaFiles.map((p: string) =>
+          validatePath(p, 'inventory.db.schemaFiles')
+        );
       }
     }
 
@@ -49,6 +52,12 @@ export function validateFlowlockConfig(config: any): FlowlockConfig {
     if (inv.api) {
       if (inv.api.scan) {
         validateArrayField(inv.api.scan, 'inventory.api.scan');
+        inv.api.scan = inv.api.scan.map((p: string) =>
+          validatePath(p, 'inventory.api.scan')
+        );
+      }
+      if (inv.api.specUrl) {
+        inv.api.specUrl = validateUrl(inv.api.specUrl, 'inventory.api.specUrl');
       }
     }
 
@@ -56,6 +65,9 @@ export function validateFlowlockConfig(config: any): FlowlockConfig {
     if (inv.ui) {
       if (inv.ui.scan) {
         validateArrayField(inv.ui.scan, 'inventory.ui.scan');
+        inv.ui.scan = inv.ui.scan.map((p: string) =>
+          validatePath(p, 'inventory.ui.scan')
+        );
       }
     }
   }
