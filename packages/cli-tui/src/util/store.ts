@@ -34,7 +34,7 @@ interface StoreState {
   cancelCurrent: () => Promise<void>;
 }
 
-export const useStore = create<StoreState>((set, get) => ({
+export const useStore = create<StoreState>((set, _get) => ({
   paletteOpen: false,
   current: { logs: [], artifacts: [] },
   history: [],

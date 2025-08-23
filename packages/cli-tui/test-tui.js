@@ -1,3 +1,4 @@
+/* eslint-env node */
 import process from 'node:process';
 
 // Force TUI mode for testing

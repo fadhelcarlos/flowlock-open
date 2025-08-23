@@ -1,4 +1,3 @@
-import React from 'react';
 import { useInput } from 'ink';
 import { useStore } from '../util/store.js';
 
