@@ -42,7 +42,7 @@
     "strip-ansi": "^6.0.1",
     "tree-kill": "^1.2.2",
     "zod": "^3.23.8",
-    "zustand": "^4.5.5"
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@types/ink-select-input": "^3.0.5",
