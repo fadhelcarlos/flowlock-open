@@ -28,7 +28,7 @@
     "chalk": "^4.1.2",
     "chokidar": "^4.0.3",
     "enquirer": "^2.4.1",
-    "execa": "^5.1.1",
+    "execa": "^9.6.0",
     "flowlock-shared": "^0.10.0",
     "flowlock-uxcg": "^0.10.0",
     "fuse.js": "^7.0.0",
